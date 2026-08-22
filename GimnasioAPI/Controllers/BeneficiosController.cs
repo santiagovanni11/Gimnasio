@@ -1,0 +1,164 @@
+using GimnasioAPI.Data;
+using GimnasioAPI.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace GimnasioAPI.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+[Authorize]
+public class BeneficiosController : ControllerBase
+{
+    private readonly AppDbContext _context;
+
+    public BeneficiosController(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    // GET: api/Beneficios
+    // Administrador, Recepcionista y Profesor pueden consultar.
+    [HttpGet]
+    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    public async Task<ActionResult<IEnumerable<Beneficio>>> GetBeneficios()
+    {
+        return await _context.Beneficios
+            .Where(b => b.Activo)
+            .ToListAsync();
+    }
+
+    // GET: api/Beneficios/1
+    // Administrador, Recepcionista y Profesor pueden consultar.
+    [HttpGet("{id}")]
+    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    public async Task<ActionResult<Beneficio>> GetBeneficio(int id)
+    {
+        var beneficio = await _context.Beneficios
+            .FirstOrDefaultAsync(b => b.Id == id);
+
+        if (beneficio == null)
+        {
+            return NotFound();
+        }
+
+        return beneficio;
+    }
+
+    // POST: api/Beneficios
+    // Administrador y Recepcionista pueden crear.
+    [HttpPost]
+    [Authorize(Roles = "Administrador,Recepcionista")]
+    public async Task<ActionResult<Beneficio>> PostBeneficio(
+        Beneficio beneficio)
+    {
+        if (string.IsNullOrWhiteSpace(beneficio.Nombre))
+        {
+            return BadRequest(
+                "El nombre del beneficio es obligatorio.");
+        }
+
+        if (string.IsNullOrWhiteSpace(beneficio.Descripcion))
+        {
+            return BadRequest(
+                "La descripción del beneficio es obligatoria.");
+        }
+
+        var nombreExiste = await _context.Beneficios
+            .AnyAsync(b =>
+                b.Nombre.ToLower() == beneficio.Nombre.ToLower());
+
+        if (nombreExiste)
+        {
+            return BadRequest(
+                "Ya existe un beneficio con ese nombre.");
+        }
+
+        beneficio.Activo = true;
+
+        _context.Beneficios.Add(beneficio);
+
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(
+            nameof(GetBeneficio),
+            new { id = beneficio.Id },
+            beneficio);
+    }
+
+    // PUT: api/Beneficios/1
+    // Administrador y Recepcionista pueden modificar.
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Administrador,Recepcionista")]
+    public async Task<IActionResult> PutBeneficio(
+        int id,
+        Beneficio beneficio)
+    {
+        if (id != beneficio.Id)
+        {
+            return BadRequest();
+        }
+
+        if (string.IsNullOrWhiteSpace(beneficio.Nombre))
+        {
+            return BadRequest(
+                "El nombre del beneficio es obligatorio.");
+        }
+
+        if (string.IsNullOrWhiteSpace(beneficio.Descripcion))
+        {
+            return BadRequest(
+                "La descripción del beneficio es obligatoria.");
+        }
+
+        var existente = await _context.Beneficios
+            .FirstOrDefaultAsync(b => b.Id == id);
+
+        if (existente == null)
+        {
+            return NotFound();
+        }
+
+        var nombreExiste = await _context.Beneficios
+            .AnyAsync(b =>
+                b.Id != id &&
+                b.Nombre.ToLower() == beneficio.Nombre.ToLower());
+
+        if (nombreExiste)
+        {
+            return BadRequest(
+                "Ya existe otro beneficio con ese nombre.");
+        }
+
+        existente.Nombre = beneficio.Nombre;
+        existente.Descripcion = beneficio.Descripcion;
+
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    // DELETE: api/Beneficios/1
+    // Baja lógica.
+    // Solo Administrador puede eliminar.
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> DeleteBeneficio(int id)
+    {
+        var beneficio = await _context.Beneficios
+            .FirstOrDefaultAsync(b => b.Id == id);
+
+        if (beneficio == null)
+        {
+            return NotFound();
+        }
+
+        beneficio.Activo = false;
+
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+}
+

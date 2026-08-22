@@ -1,0 +1,138 @@
+﻿/* pagosDetalle.css - Ticket cuerpo, detalle de pago y responsive */
+
+.payment-ticket-body {
+  display: grid;
+  gap: 12px;
+
+  padding: 18px 22px 0;
+}
+
+.ticket-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+
+  padding-bottom: 10px;
+
+  border-bottom: 1px dashed rgba(146, 158, 173, 0.25);
+
+  color: #aeb7c2;
+  font-size: 14px;
+}
+
+.ticket-row strong {
+  color: #f4f6f8;
+
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.total-row {
+  padding-top: 8px;
+  border-bottom: none;
+
+  color: #fefefe;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.payment-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+
+  padding: 18px 22px 22px;
+}
+
+.payment-modal .secondary-button,
+.payment-modal .primary-small-button,
+.payment-modal .close-button {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.payment-modal .primary-small-button {
+  box-shadow: 0 12px 24px rgba(227, 27, 35, 0.22);
+}
+
+.payment-modal .primary-small-button:hover,
+.payment-modal .secondary-button:hover,
+.payment-modal .close-button:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+  .payment-modal-backdrop {
+    padding: 18px;
+  }
+
+  .payment-modal {
+    width: min(100%, 420px);
+    border-radius: 18px;
+  }
+
+  .payment-alert-header,
+  .payment-ticket-header,
+  .payment-modal-actions {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .payment-ticket-body,
+  .payment-alert-message {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .payment-alert-header h3,
+  .payment-ticket-header h3 {
+    font-size: 20px;
+  }
+
+  .ticket-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ticket-row strong {
+    text-align: left;
+  }
+}
+
+/* =========================
+   MODAL DETALLE PAGO
+========================= */
+
+.payment-modal-detail {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .payment-breakdown-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .filter-select,
+  .filter-date,
+  .export-button {
+    width: 100%;
+  }
+
+  .payment-chart {
+    height: 120px;
+  }
+}
+

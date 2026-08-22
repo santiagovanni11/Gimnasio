@@ -1,0 +1,135 @@
+/* pagosReportes.css - Desglose, ingresos por plan y grafico */
+
+/* =========================
+   RESUMEN CAJA EXTENDIDO
+========================= */
+
+.payment-summary-card.warning {
+  background: linear-gradient(135deg, #3d2a00, #241800);
+  border: 1px solid #6b4e00;
+}
+
+.payment-summary-card.inactive {
+  background: linear-gradient(135deg, #2a2d33, #1a1c20);
+  border: 1px solid #444a52;
+}
+
+.payment-summary-card.warning strong {
+  color: #ffb84d;
+}
+
+.payment-summary-card.inactive strong {
+  color: #9ca3af;
+}
+
+/* =========================
+   DESGLOSE POR FORMA DE PAGO
+========================= */
+
+.payment-breakdown-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.payment-breakdown-card {
+  background: #15181d;
+  border: 1px solid #2a2f37;
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.payment-breakdown-card h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f4f4f5;
+  margin-bottom: 14px;
+}
+
+.payment-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.payment-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #0d0f12;
+  border-radius: 8px;
+  border: 1px solid #23272f;
+}
+
+.payment-breakdown-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.payment-breakdown-name {
+  font-size: 14px;
+  color: #e4e4e7;
+  font-weight: 500;
+}
+
+.payment-breakdown-count {
+  font-size: 11px;
+  color: #71717a;
+}
+
+.payment-breakdown-row strong {
+  font-size: 15px;
+  color: #4ade80;
+}
+
+/* =========================
+   GRÁFICO DE INGRESOS
+========================= */
+
+.payment-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 150px;
+  padding-top: 10px;
+}
+
+.payment-chart-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  gap: 4px;
+}
+
+.payment-chart-bar-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.payment-chart-bar {
+  width: 70%;
+  background: linear-gradient(180deg, #4ade80, #22a45d);
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: height 0.3s ease;
+}
+
+.payment-chart-label {
+  font-size: 11px;
+  color: #a1a1aa;
+  text-transform: capitalize;
+}
+
+.payment-chart-value {
+  font-size: 10px;
+  color: #71717a;
+}
+

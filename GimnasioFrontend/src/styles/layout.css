@@ -1,0 +1,164 @@
+﻿/* layout.css - Sidebar y navegacion lateral */
+
+.app-layout {
+  min-height: 100vh;
+
+  display: flex;
+
+  background: #0b0d10;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+  width: 250px;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 24px 16px;
+
+  border-right: 1px solid #20252c;
+
+  background: #111419;
+}
+
+.sidebar-brand {
+  padding: 4px 8px 28px;
+}
+
+.sidebar-brand strong {
+  display: block;
+  font-size: 16px;
+}
+
+.user-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 14px;
+
+  border: 1px solid #232931;
+  border-radius: 16px;
+
+  background: #171b21;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #e31b23;
+
+  color: white;
+  font-weight: 800;
+}
+
+.user-box strong {
+  display: block;
+  font-size: 14px;
+}
+
+.user-box span {
+  color: #858c96;
+  font-size: 12px;
+}
+
+.sidebar-nav {
+  margin-top: 26px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.nav-button {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 12px 14px;
+
+  border: 1px solid transparent;
+  border-radius: 12px;
+
+  background: transparent;
+
+  color: #9ca3ad;
+
+  cursor: pointer;
+
+  text-align: left;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.nav-button span {
+  width: 20px;
+  text-align: center;
+}
+
+.nav-button:hover {
+  background: #191e24;
+  color: white;
+}
+
+.nav-button.active {
+  border-color: rgba(227, 27, 35, 0.18);
+
+  background: rgba(227, 27, 35, 0.12);
+
+  color: white;
+}
+
+.logout-button {
+  width: 100%;
+
+  margin-top: auto;
+
+  padding: 12px 14px;
+
+  border: 1px solid #292f37;
+  border-radius: 12px;
+
+  background: transparent;
+
+  color: #b0b6bf;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.logout-button:hover {
+  background: #191e24;
+
+  border-color: #383f48;
+
+  color: white;
+}
+/* =========================
+   CONTENIDO PRINCIPAL
+========================= */
+

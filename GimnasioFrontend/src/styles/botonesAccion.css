@@ -1,0 +1,154 @@
+/* botonesAccion.css - Botones de fila: editar, borrar, ver, aprobar */
+
+.edit-button {
+  height: 34px;
+
+  padding: 0 13px;
+
+  border: 1px solid #343b45;
+  border-radius: 8px;
+
+  background: #1b2027;
+
+  color: #dce1e7;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.edit-button:hover {
+  background: #252c35;
+
+  border-color: #4a535f;
+
+  color: white;
+
+  transform: translateY(-1px);
+}
+
+.edit-button:active {
+  transform: translateY(0);
+}
+
+/* =========================
+   BOT?"N BORRAR
+========================= */
+
+.delete-button {
+  height: 34px;
+
+  margin-left: 8px;
+
+  padding: 0 13px;
+
+  border: 1px solid #303740;
+  border-radius: 8px;
+
+  background: #1a1f25;
+
+  color: #b8bec7;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.delete-button:hover {
+  background: rgba(227, 27, 35, 0.12);
+
+  border-color: rgba(227, 27, 35, 0.4);
+
+  color: #ff767d;
+}
+
+.delete-button:active {
+  background: rgba(227, 27, 35, 0.18);
+}
+
+.export-button {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1px solid #2a2f37;
+  background: #1a1c20;
+  color: #f4f4f5;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.export-button:hover:not(:disabled) {
+  background: #252c35;
+}
+
+.export-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.view-button {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #2a2f37;
+  background: #1a1c20;
+  color: #f4f4f5;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.view-button:hover {
+  background: #252c35;
+}
+
+.approve-button {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.approve-button:hover {
+  background: rgba(74, 222, 128, 0.2);
+}
+
+.cancel-button {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 184, 77, 0.4);
+  background: rgba(255, 184, 77, 0.1);
+  color: #ffb84d;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cancel-button:hover {
+  background: rgba(255, 184, 77, 0.2);
+}
+

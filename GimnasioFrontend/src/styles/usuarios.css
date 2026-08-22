@@ -1,0 +1,45 @@
+﻿/* =========================================================
+   usuarios.css - Gestion de usuarios.
+========================================================= */
+
+/* =========================
+   USUARIOS - SELECT DE ROL
+========================= */
+.rol-select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #2a2f37;
+  background: #0d0f12;
+  color: #f4f4f5;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.rol-select:hover {
+  border-color: #4ade80;
+}
+.rol-select:focus {
+  outline: none;
+  border-color: #4ade80;
+}
+.rol-select option {
+  background: #15181d;
+  color: #f4f4f5;
+}
+
+/* =========================
+   USUARIOS - FILTRO POR ROL
+========================= */
+.filtro-rol-select {
+  padding: 8px 10px;
+
+  font-size: 13px;
+}
+
+/* =========================
+   USUARIOS - CELDA PRINCIPAL
+========================= */
+.usuario-celda-principal {
+  font-weight: 600;
+}

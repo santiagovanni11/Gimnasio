@@ -1,0 +1,125 @@
+﻿/* =========================================================
+   responsive.css - Media queries generales.
+   Extraido de index.css sin modificaciones.
+========================================================= */
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1100px) {
+  .search-box {
+    width: 240px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+  }
+
+  .sidebar-nav {
+    display: grid;
+
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .logout-button {
+    margin-top: 18px;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .welcome-card {
+    padding: 26px;
+  }
+
+  .welcome-card h2 {
+    font-size: 30px;
+  }
+
+  .welcome-mark {
+    display: none;
+  }
+
+  .section-header {
+    align-items: stretch;
+
+    flex-direction: column;
+  }
+
+  .section-actions {
+    width: 100%;
+
+    align-items: stretch;
+
+    flex-direction: column;
+  }
+
+  .section-actions button {
+    width: 100%;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: auto;
+  }
+
+  .form-card {
+    padding: 18px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+
+    align-items: stretch;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .register-link-container {
+    flex-wrap: wrap;
+
+    text-align: center;
+  }
+
+  .invitation-code {
+    font-size: 12px;
+  }
+
+  .delete-button {
+    margin-left: 4px;
+  }
+}
+

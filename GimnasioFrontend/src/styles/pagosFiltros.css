@@ -1,0 +1,87 @@
+﻿/* pagosFiltros.css - Filtros, estados y alerta de morosos */
+
+/* =========================
+   FILTROS DE PAGOS
+========================= */
+
+.filter-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-select,
+.filter-date {
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #2a2f37;
+  background: #0d0f12;
+  color: #f4f4f5;
+  font-size: 13px;
+}
+
+.filter-select:focus,
+.filter-date:focus {
+  outline: none;
+  border-color: #4ade80;
+}
+
+.filter-select option {
+  background: #15181d;
+  color: #f4f4f5;
+}
+
+/* =========================
+   TABLA DE PAGOS - ESTADOS Y ACCIONES
+========================= */
+
+.status-rejected {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* =========================
+   MOROSOS - ALERTA
+========================= */
+.morosos-alert {
+  border-left: 4px solid #fbbf24;
+  margin-bottom: 1rem;
+}
+.morosos-alert h3 {
+  margin: 0 0 4px;
+}
+.morosos-alert p {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.quick-range-group {
+  display: flex;
+  gap: 6px;
+}
+.quick-range-button {
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.quick-range-button:hover {
+  background: rgba(99,102,241,0.15);
+  color: #a5b4fc;
+  border-color: rgba(99,102,241,0.3);
+}
+

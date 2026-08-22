@@ -1,0 +1,33 @@
+/* =========================================================
+   HOJA DE ESTILOS PRINCIPAL
+   Punto único de entrada: importa los parciales por dominio.
+
+   El orden de importación preserva la cascada del archivo
+   monolítico original (no cambiar sin revisar conflictos):
+   - pagos* va ANTES que formularios (.form-card gana igual
+     que en el CSS histórico).
+   - pagosModales va DESPUÉS de pagosCaja (override v1 -> v2).
+   ========================================================= */
+
+@import "./base.css";
+@import "./mensajes.css";
+@import "./estados.css";
+@import "./auth.css";
+@import "./layout.css";
+@import "./principal.css";
+@import "./secciones.css";
+@import "./tablas.css";
+@import "./dashboard.css";
+@import "./pagos.css";
+@import "./pagosCaja.css";
+@import "./pagosModales.css";
+@import "./pagosDetalle.css";
+@import "./pagosReportes.css";
+@import "./pagosFiltros.css";
+@import "./precios.css";
+@import "./formularios.css";
+@import "./botones.css";
+@import "./botonesAccion.css";
+@import "./planes.css";
+@import "./usuarios.css";
+@import "./responsive.css";

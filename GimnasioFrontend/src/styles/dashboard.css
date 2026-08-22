@@ -1,0 +1,110 @@
+/* =========================================================
+   dashboard.css - Panel de inicio: bienvenida y estadisticas.
+   Extraido de index.css sin modificaciones.
+========================================================= */
+
+/* =========================
+   DASHBOARD
+========================= */
+
+.welcome-card {
+  min-height: 230px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 30px;
+
+  padding: 34px;
+
+  border: 1px solid #272d35;
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #171b21,
+      #111419
+    );
+
+  overflow: hidden;
+}
+
+.eyebrow {
+  color: #e31b23;
+
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+
+.welcome-card h2 {
+  max-width: 650px;
+
+  margin: 12px 0;
+
+  font-size: 38px;
+  line-height: 1.05;
+}
+
+.welcome-card p {
+  max-width: 600px;
+
+  color: #9199a3;
+
+  line-height: 1.6;
+}
+
+.welcome-mark {
+  color: rgba(227, 27, 35, 0.16);
+
+  font-size: 70px;
+  font-weight: 950;
+
+  letter-spacing: 4px;
+}
+
+/* =========================
+   ESTADÍSTICAS
+========================= */
+
+.stats-grid {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 16px;
+
+  margin-top: 18px;
+}
+
+.stat-card {
+  padding: 22px;
+
+  border: 1px solid #252b33;
+  border-radius: 18px;
+
+  background: #12161b;
+}
+
+.stat-card span {
+  display: block;
+
+  color: #949ba5;
+
+  font-size: 13px;
+}
+
+.stat-card strong {
+  display: block;
+
+  margin: 12px 0 4px;
+
+  font-size: 30px;
+}
+
+.stat-card small {
+  color: #707882;
+}
+

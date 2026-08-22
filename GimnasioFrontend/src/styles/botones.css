@@ -1,0 +1,100 @@
+﻿/* botones.css - Botones primarios y secundarios */
+
+.secondary-button {
+  height: 42px;
+
+  padding: 0 17px;
+
+  border: 1px solid #303740;
+  border-radius: 10px;
+
+  background: #1a1f25;
+
+  color: #d9dde3;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.secondary-button:hover {
+  background: #222830;
+
+  border-color: #3b444f;
+
+  color: white;
+
+  transform: translateY(-1px);
+}
+
+.secondary-button:active {
+  transform: translateY(0);
+}
+
+.secondary-button:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+.primary-small-button {
+  height: 42px;
+
+  padding: 0 17px;
+
+  border: 1px solid #e31b23;
+  border-radius: 10px;
+
+  background: #e31b23;
+
+  color: white;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 6px 18px rgba(227, 27, 35, 0.18);
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.primary-small-button:hover {
+  background: #f0262f;
+
+  border-color: #f0262f;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 8px 22px rgba(227, 27, 35, 0.25);
+}
+
+.primary-small-button:active {
+  transform: translateY(0);
+}
+
+.primary-small-button:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow: none;
+}
+

@@ -1,0 +1,44 @@
+﻿/* mensajes.css - Mensajes de exito, error e informacion */
+
+/* =========================
+   MENSAJES
+========================= */
+
+.login-message,
+.error-message,
+.info-message,
+.success-message {
+  margin-top: 18px;
+  padding: 13px 15px;
+
+  border-radius: 12px;
+
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.login-message,
+.error-message {
+  background: rgba(227, 27, 35, 0.1);
+
+  border: 1px solid rgba(227, 27, 35, 0.25);
+
+  color: #ff9da2;
+}
+
+.info-message {
+  background: #171c22;
+
+  border: 1px solid #282f38;
+
+  color: #d9dde3;
+}
+
+.success-message {
+  background: rgba(62, 207, 142, 0.1);
+
+  border: 1px solid rgba(62, 207, 142, 0.25);
+
+  color: #8de0b4;
+}
+
