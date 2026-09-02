@@ -37,3 +37,7 @@ Thumbs.db
 # Resultados de tests
 TestResults/
 coverage/
+
+# Configuración local de la API
+GimnasioAPI/appsettings.json
+GimnasioAPI/appsettings.Development.json
