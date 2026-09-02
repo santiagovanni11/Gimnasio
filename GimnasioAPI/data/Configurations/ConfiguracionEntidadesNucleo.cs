@@ -54,7 +54,7 @@ public class EmpleadoConfig : IEntityTypeConfiguration<Empleado>
 
         b.HasIndex(e => e.UsuarioId)
             .IsUnique()
-            .HasFilter("[UsuarioId] IS NOT NULL");
+            .HasFilter("\"UsuarioId\" IS NOT NULL");
 
         b.HasIndex(e => e.DNI).IsUnique();
     }

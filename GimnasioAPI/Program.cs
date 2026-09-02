@@ -7,6 +7,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
+// Temporal: comportamiento heredado de fechas para migrar de SQL Server a
+// PostgreSQL. Sin esto, Npgsql exige DateTime en UTC y el código usa
+// DateTime.Today/Now (Kind=Unspecified), lo que rompe consultas como las del
+// servicio de renovación automática.
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // OpenAPI
@@ -30,7 +36,7 @@ builder.Services.AgregarLimitadorAuth();
 
 // Base de datos
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
+    options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configuración JWT
