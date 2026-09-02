@@ -4,7 +4,6 @@
 // =========================================================
 
 import {
-  ESTADO_PAGO,
   FORMA_PAGO,
   formaPagoTexto,
   soloAprobados,
@@ -116,5 +115,3 @@ export const calcularComparativaMensual = (pagos, hoy) => {
 
   return { actual, previo, variacion };
 };
-
-export { ESTADO_PAGO };

@@ -2,8 +2,11 @@
 // ACCIONES DE FILA DE USUARIO
 // Sobre la propia cuenta no se ofrecen acciones destructivas
 // (clave, desactivar, eliminar): eso se gestiona desde la
-// Topbar o desde otra sesión administrativa.
+// Topbar o desde otra sesión administrativa. Los profesores
+// tienen además acceso rápido a "Asignar clase".
 // =========================================================
+
+import { ROLES } from "../../constants/roles";
 
 function AccionesUsuario({
   usuario,
@@ -14,9 +17,35 @@ function AccionesUsuario({
   desbloquear,
   eliminarUsuario,
   verAuditoria,
+  editarUsuario,
+  asignarClase,
 }) {
+  const esProfesor =
+    usuario.rolNombre === ROLES.PROFESOR;
+
   return (
     <div className="table-actions">
+      {/* Edición de datos: email, nombre, apellido y rol. */}
+      <button
+        type="button"
+        className="edit-button"
+        onClick={() => editarUsuario?.(usuario)}
+        title={`Editar datos de ${usuario.email}`}
+      >
+        Editar
+      </button>
+
+      {esProfesor && usuario.activo !== false && (
+        <button
+          type="button"
+          className="approve-button"
+          onClick={() => asignarClase?.(usuario)}
+          title="Ver sus clases y asignarle una nueva"
+        >
+          Asignar clase
+        </button>
+      )}
+
       {/* Reset de clave: solo cuentas ajenas; la propia se
           gestiona desde la Topbar. */}
       {!esMiCuenta && (

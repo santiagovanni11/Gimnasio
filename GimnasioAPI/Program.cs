@@ -18,6 +18,11 @@ builder.Services.AddScoped<AdministradorGuardService>();
 builder.Services.AddScoped<ReglasMembresia>();
 builder.Services.AddScoped<LoginGuardService>();
 builder.Services.AddScoped<AuditoriaUsuariosService>();
+builder.Services.AddScoped<AuditoriaMembresiasService>();
+builder.Services.AddScoped<AuditoriaPlanesService>();
+builder.Services.AddScoped<CreacionUsuariosService>();
+builder.Services.AddScoped<RenovacionAutomaticaService>();
+builder.Services.AddHostedService<RenovacionAutomaticaJob>();
 builder.Services.AddSingleton<TokenService>();
 
 // Limitador de tasa para Auth (fuerza bruta por IP)
@@ -95,6 +100,9 @@ if (app.Environment.IsDevelopment())
 
 // Middleware
 app.UseHttpsRedirection();
+
+// Archivos estáticos (uploads/fotos, etc.)
+app.UseStaticFiles();
 
 app.UseCors("Frontend");
 

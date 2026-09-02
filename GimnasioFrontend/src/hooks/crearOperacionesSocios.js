@@ -4,7 +4,16 @@
 // Las bajas con confirmación viven en la fachada useSocios.
 // =========================================================
 
+import { obtenerNombre, obtenerApellido } from "../services/almacenSesion";
 import { sociosService } from "../services/sociosService";
+import { registrarCambioSocio } from "../utils/sociosMetadata";
+
+const autorActual = () => {
+  const nombre = obtenerNombre();
+  const apellido = obtenerApellido();
+  const base = [nombre, apellido].filter(Boolean).join(" ");
+  return base || "Sistema";
+};
 
 export function crearOperacionesSocios({
   formulario,
@@ -38,6 +47,15 @@ export function crearOperacionesSocios({
         ? datosRespuesta
         : null;
     const socioIdCreado = creado?.id ?? datosRespuesta?.socioId ?? null;
+
+    if (socioIdCreado) {
+      registrarCambioSocio(
+        Number(socioIdCreado),
+        "Alta de socio",
+        `${formulario.nuevoSocio.nombre} ${formulario.nuevoSocio.apellido}`,
+        autorActual()
+      );
+    }
 
     formulario.setMensajeSocio("Socio creado correctamente.");
     await datos.obtenerSocios();
@@ -77,6 +95,13 @@ export function crearOperacionesSocios({
     formulario.setGuardandoSocio(false);
 
     if (!resultado) return;
+
+    registrarCambioSocio(
+      Number(formulario.socioEditando.id),
+      "Edición de socio",
+      `${formulario.socioEditando.nombre} ${formulario.socioEditando.apellido}`,
+      autorActual()
+    );
 
     formulario.setMensajeSocio("Socio actualizado correctamente.");
     await datos.obtenerSocios();

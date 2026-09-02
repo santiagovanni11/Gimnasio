@@ -1,36 +1,46 @@
-// =========================================================
 // USUARIOS — Sección (solo Administrador)
-// El orden por rol y el filtro de inactivos viven en
-// useUsuarios; la tabla, en TablaUsuarios; el historial de
-// cambios, en AuditoriaUsuarioModal.
-// =========================================================
-
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import TablaUsuarios from "./TablaUsuarios";
 import AuditoriaUsuarioModal from "./AuditoriaUsuarioModal";
+import FormularioUsuarioModal from "./FormularioUsuarioModal";
+import AsignarClaseModal from "./AsignarClaseModal";
+import FiltrosUsuarios from "./FiltrosUsuarios";
+import TarjetasResumenUsuarios from "./TarjetasResumenUsuarios";
+import UsuariosHistorialAccesosPanel from "./UsuariosHistorialAccesosPanel";
+import UsuariosSeguridadPanel from "./UsuariosSeguridadPanel";
+import EstadoVacio from "../common/EstadoVacio";
+import { useFormularioUsuario } from "../../hooks/useFormularioUsuario";
+import { useAsignacionClasesProfesor } from "../../hooks/useAsignacionClasesProfesor";
 
 function UsuariosSection({
   usuarios,
   usuariosFiltrados,
   roles,
-  verInactivos,
-  setVerInactivos,
-  filtroRol,
-  setFiltroRol,
+  verInactivos, setVerInactivos,
+  filtroRol, setFiltroRol,
   miUsuarioId,
-  cargando,
-  error,
-  mensaje,
-  alternarEstado,
-  cambiarRol,
-  resetearPassword,
-  desbloquear,
+  cargando, error, mensaje, setMensaje,
+  obtenerUsuarios,
+  alternarEstado, cambiarRol,
+  resetearPassword, desbloquear,
   eliminarUsuario,
-  auditoria,
-  verAuditoria,
-  cerrarAuditoria,
+  auditoria, verAuditoria, cerrarAuditoria,
+  cerrarSesion,
 }) {
   const [busqueda, setBusqueda] = useState("");
+
+  const formularioUsuario = useFormularioUsuario({
+    roles,
+    obtenerUsuarios,
+    notificar: setMensaje,
+  });
+
+  const asignacion = useAsignacionClasesProfesor({
+    onSesionExpirada: cerrarSesion,
+    notificar: setMensaje,
+  });
+
+  const [ordenUsuarios, setOrdenUsuarios] = useState("nombre_asc");
 
   // Búsqueda sobre el listado ya filtrado por estado y ordenado
   const resultados = usuariosFiltrados.filter((usuario) => {
@@ -49,6 +59,20 @@ function UsuariosSection({
     );
   });
 
+  const resultadosOrdenados = useMemo(() => {
+    const copia = [...resultados];
+    switch (ordenUsuarios) {
+      case "nombre_desc":
+        return copia.sort((a, b) => `${b.nombre} ${b.apellido}`.localeCompare(`${a.nombre} ${a.apellido}`));
+      case "alta_desc":
+        return copia.sort((a, b) => (b.fechaCreacion || "").localeCompare(a.fechaCreacion || ""));
+      case "acceso_desc":
+        return copia.sort((a, b) => (b.ultimoAcceso || "").localeCompare(a.ultimoAcceso || ""));
+      default:
+        return copia.sort((a, b) => `${a.nombre} ${a.apellido}`.localeCompare(`${b.nombre} ${b.apellido}`));
+    }
+  }, [resultados, ordenUsuarios]);
+
   const hayOcultos =
     !busqueda && usuarios.length > 0 && resultados.length === 0;
 
@@ -60,47 +84,25 @@ function UsuariosSection({
           <p>Cuentas con acceso al sistema.</p>
         </div>
 
-        <div className="section-actions">
-          <div className="search-box">
-            <input
-              type="text"
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar por nombre, email o rol..."
-            />
-          </div>
-
-          <select
-            className="rol-select filtro-rol-select"
-            value={filtroRol}
-            onChange={(e) => setFiltroRol(e.target.value)}
-          >
-            <option value="">Todos los roles</option>
-            {roles.map((rol) => (
-              <option key={rol.id} value={rol.id}>
-                {rol.nombre}
-              </option>
-            ))}
-          </select>
-
-          <label
-            className="quick-range-button"
-            style={{ cursor: "pointer" }}
-          >
-            <input
-              type="checkbox"
-              checked={verInactivos}
-              onChange={(e) => setVerInactivos(e.target.checked)}
-              style={{ marginRight: "6px" }}
-            />
-            Mostrar inactivos
-          </label>
-        </div>
+        <FiltrosUsuarios
+          busqueda={busqueda} setBusqueda={setBusqueda}
+          filtroRol={filtroRol} setFiltroRol={setFiltroRol}
+          verInactivos={verInactivos} setVerInactivos={setVerInactivos}
+          usuarios={resultados}
+          roles={roles}
+          ordenUsuarios={ordenUsuarios} setOrdenUsuarios={setOrdenUsuarios}
+          abrirAltaUsuario={formularioUsuario.abrirAltaUsuario}
+        />
       </div>
 
-      {mensaje && (
-        <div className="success-message">{mensaje}</div>
-      )}
+      <TarjetasResumenUsuarios usuarios={usuarios} />
+
+      <div className="usuarios-panels-grid">
+        <UsuariosHistorialAccesosPanel usuarios={usuarios} />
+        <UsuariosSeguridadPanel usuarios={usuarios} />
+      </div>
+
+      {mensaje && <div className="success-message">{mensaje}</div>}
 
       {cargando && (
         <div className="info-message">Cargando usuarios...</div>
@@ -109,24 +111,20 @@ function UsuariosSection({
       {error && <div className="error-message">{error}</div>}
 
       {!cargando && !error && usuarios.length === 0 && (
-        <div className="empty-state">No hay usuarios registrados.</div>
+        <EstadoVacio tipo="usuarios" titulo="No hay usuarios registrados" mensaje="Dales acceso al equipo para que gestionen el gimnasio." />
       )}
 
       {!cargando && !error && hayOcultos && (
-        <div className="empty-state">
-          Solo se muestran los usuarios activos.
-        </div>
+        <EstadoVacio tipo="usuarios" titulo="Solo se muestran los usuarios activos" />
       )}
 
       {!cargando && !error && resultados.length === 0 && busqueda.length > 0 && (
-        <div className="empty-state">
-          No se encontraron usuarios con esa búsqueda.
-        </div>
+        <EstadoVacio tipo="busqueda" titulo="Sin coincidencias" mensaje="Ningún usuario coincide con tu búsqueda." />
       )}
 
       {!cargando && !error && resultados.length > 0 && (
         <TablaUsuarios
-          usuarios={resultados}
+          usuarios={resultadosOrdenados}
           roles={roles}
           miUsuarioId={miUsuarioId}
           alternarEstado={alternarEstado}
@@ -135,8 +133,17 @@ function UsuariosSection({
           desbloquear={desbloquear}
           eliminarUsuario={eliminarUsuario}
           verAuditoria={verAuditoria}
+          editarUsuario={formularioUsuario.abrirEdicionUsuario}
+          asignarClase={asignacion.abrirAsignacionClases}
         />
       )}
+
+      <FormularioUsuarioModal
+        {...formularioUsuario}
+        roles={roles}
+      />
+
+      <AsignarClaseModal {...asignacion} />
 
       <AuditoriaUsuarioModal
         auditoria={auditoria}

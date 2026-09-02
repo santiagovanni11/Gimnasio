@@ -5,13 +5,17 @@
 // =========================================================
 
 import { Fragment } from "react";
-import { CAMPOS_ESCALON } from "../../utils/preciosConfig";
+import {
+  CAMPOS_ESCALON,
+  clavesIncompletas,
+} from "../../utils/preciosConfig";
 import { PrecioInput } from "./PrecioFila";
 import AccionesPrecioFila from "./AccionesPrecioFila";
 import EditorPreciosPanel from "./EditorPreciosPanel";
 
 function TablaPrecios({
   planes,
+  membresias,
   preciosEditando,
   setPreciosEditando,
   planEditando,
@@ -25,6 +29,7 @@ function TablaPrecios({
   onDuplicar,
   onVerHistorial,
   onEliminar,
+  onEditarBeneficios,
 }) {
   return (
     <div className="table-wrapper">
@@ -37,6 +42,7 @@ function TablaPrecios({
               <th key={clave}>{titulo}</th>
             ))}
 
+            <th>Beneficios</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -61,6 +67,15 @@ function TablaPrecios({
                       >
                         {plan.activo === false ? "Pausado" : "Activo"}
                       </span>
+
+                      {clavesIncompletas(plan).length > 0 && (
+                        <span
+                          className="status-warning"
+                          title="Hay períodos sin precio definido (0 o vacío)"
+                        >
+                          Incompleto
+                        </span>
+                      )}
                     </div>
                   </td>
 
@@ -79,6 +94,16 @@ function TablaPrecios({
                   ))}
 
                   <td>
+                    {plan.clases?.length > 0 && (
+                      <span className="status-active">{plan.clases.length} clases</span>
+                    )}{" "}
+                    {plan.beneficios?.length > 0 && (
+                      <span className="status-warning">{plan.beneficios.length} benef.</span>
+                    )}
+                    {!(plan.clases?.length > 0 || plan.beneficios?.length > 0) && "—"}
+                  </td>
+
+                  <td>
                     <AccionesPrecioFila
                       plan={plan}
                       enEdicion={enEdicion}
@@ -87,6 +112,7 @@ function TablaPrecios({
                       onDuplicar={onDuplicar}
                       onVerHistorial={onVerHistorial}
                       onEliminar={onEliminar}
+                      onEditarBeneficios={onEditarBeneficios}
                     />
                   </td>
                 </tr>
@@ -94,6 +120,8 @@ function TablaPrecios({
                 {enEdicion && (
                   <EditorPreciosPanel
                     plan={plan}
+                    preciosEditando={preciosEditando}
+                    membresias={membresias}
                     fechaRige={fechaRige}
                     setFechaRige={setFechaRige}
                     guardandoPrecios={guardandoPrecios}

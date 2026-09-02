@@ -65,14 +65,17 @@ export const esAnulado = (pago) =>
   Number(pago?.estado) === ESTADO_PAGO.ANULADO;
 
 /**
- * Pagos válidos: los que se listan en ingresos (excluye
- * rechazados y cancelados). Misma regla que pagosConFiltros.
+ * Pagos listables: excluye rechazados, cancelados y anulados.
+ * Regla única compartida por filtros e ingresos.
  */
-export const soloValidos = (pagos = []) =>
-  pagos.filter(
-    (pago) =>
-      !esRechazado(pago) && !esCancelado(pago) && !esAnulado(pago)
-  );
+export const esListable = (pago) =>
+  !esRechazado(pago) && !esCancelado(pago) && !esAnulado(pago);
+
+/**
+ * Pagos válidos: los que se listan en ingresos (excluye
+ * rechazados, cancelados y anulados).
+ */
+export const soloValidos = (pagos = []) => pagos.filter(esListable);
 
 /**
  * Mapa membresiaId -> total aprobado acumulado.

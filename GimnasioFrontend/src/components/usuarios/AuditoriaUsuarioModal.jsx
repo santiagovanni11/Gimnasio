@@ -4,6 +4,8 @@
 // de rol/estado, resets y eliminaciones.
 // =========================================================
 
+import { fechaHoraTexto } from "../../utils/fechas";
+
 function AuditoriaUsuarioModal({
   auditoria,
   onClose,
@@ -79,7 +81,7 @@ function FilaAuditoria({ registro }) {
         <strong>{registro.accion}</strong>
 
         <small style={{ color: "#8b929c" }}>
-          {new Date(registro.fechaUtc).toLocaleString("es-AR")}
+          {fechaHoraTexto(registro.fechaUtc)}
         </small>
       </div>
 

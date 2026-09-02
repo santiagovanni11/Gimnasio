@@ -18,7 +18,12 @@
 }
 
 .payment-summary-card.accent {
-  background: linear-gradient(135deg, rgba(227, 27, 35, 0.22), rgba(19, 23, 30, 0.96));
+  background: linear-gradient(135deg, var(--accent-suave), rgba(19, 23, 30, 0.96));
+}
+
+.payment-summary-card.active {
+  background: linear-gradient(135deg, rgba(47, 191, 113, 0.18), rgba(19, 23, 30, 0.96));
+  border: 1px solid var(--accent-borde, rgba(47, 191, 113, 0.32));
 }
 
 .payment-summary-card span {
@@ -41,7 +46,7 @@
   position: relative;
   overflow: hidden;
   background: linear-gradient(180deg, #171b21 0%, #12161b 100%);
-  border-color: rgba(227, 27, 35, 0.2);
+  border-color: var(--accent-borde);
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
 }
 
@@ -51,7 +56,7 @@
   inset: 0 auto auto 0;
   width: 220px;
   height: 220px;
-  background: radial-gradient(circle, rgba(227, 27, 35, 0.15), transparent 70%);
+  background: radial-gradient(circle, var(--accent-suave), transparent 70%);
   pointer-events: none;
 }
 
@@ -65,39 +70,14 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  border: 1px solid rgba(227, 27, 35, 0.24);
+  border: 1px solid var(--accent-borde);
   border-radius: 999px;
-  background: rgba(227, 27, 35, 0.08);
+  background: var(--accent-suave);
   color: #ffbec3;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-}
-
-.payment-method-strip {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: -4px 0 18px;
-}
-
-.payment-method-strip span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 90px;
-  height: 32px;
-  padding: 0 12px;
-  border: 1px solid #2b323b;
-  border-radius: 999px;
-  background: rgba(17, 21, 26, 0.8);
-  color: #dfe4ea;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
 }
 
 .payment-form-grid {

@@ -2,12 +2,14 @@
 // HOOK MI CUENTA
 // Cambio de la propia contraseña desde la barra superior.
 // La validación de reglas vive acá; la llamada, en
-// authService.cambiarMiPassword.
+// authService.cambiarMiPassword. Usa el ejecutor uniforme
+// (apiEjecutor) para distinguir sesión expirada, permisos,
+// errores de la API y errores de red.
 // =========================================================
 
 import { useCallback, useState } from "react";
 import { authService } from "../services/authService";
-import { mensajeDeError } from "../services/apiClient";
+import { crearEjecutorApi } from "../services/apiEjecutor";
 
 const estadoInicialCampos = {
   passwordActual: "",
@@ -15,15 +17,20 @@ const estadoInicialCampos = {
   repetirPassword: "",
 };
 
-export function useMiCuenta({ alGuardar } = {}) {
+export function useMiCuenta({ alGuardar, onSesionExpirada } = {}) {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [campos, setCampos] = useState(estadoInicialCampos);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
+  const [exito, setExito] = useState("");
+  const [ejecutar] = useState(() =>
+    crearEjecutorApi({ onSesionExpirada })
+  );
 
   const abrirModal = useCallback(() => {
     setCampos(estadoInicialCampos);
     setError("");
+    setExito("");
     setModalAbierto(true);
   }, []);
 
@@ -67,30 +74,27 @@ export function useMiCuenta({ alGuardar } = {}) {
 
     setGuardando(true);
     setError("");
+    setExito("");
 
-    try {
-      const { respuesta, datos } =
-        await authService.cambiarMiPassword({
+    const resultado = await ejecutar({
+      peticion: () =>
+        authService.cambiarMiPassword({
           passwordActual: campos.passwordActual,
           passwordNueva: campos.passwordNueva,
-        });
+        }),
+      onError: setError,
+      mensajeError: "No se pudo cambiar la contraseña.",
+      mensajeRed: "No se pudo conectar con la API.",
+      etiquetaLog: "Error al cambiar contraseña:",
+    });
 
-      if (!respuesta.ok) {
-        setError(
-          mensajeDeError(datos, "No se pudo cambiar la contraseña.")
-        );
-        return;
-      }
+    setGuardando(false);
 
-      setModalAbierto(false);
+    if (!resultado) return;
 
-      if (alGuardar) alGuardar("Contraseña actualizada correctamente.");
-    } catch (errorPeticion) {
-      console.error("Error al cambiar contraseña:", errorPeticion);
-      setError("No se pudo conectar con la API.");
-    } finally {
-      setGuardando(false);
-    }
+    setExito("Contraseña cambiada con éxito.");
+
+    if (alGuardar) alGuardar("Contraseña cambiada con éxito.");
   };
 
   return {
@@ -98,6 +102,7 @@ export function useMiCuenta({ alGuardar } = {}) {
     camposCuenta: campos,
     cambiandoPassword: guardando,
     errorMiCuenta: error,
+    exitoMiCuenta: exito,
     abrirMiCuenta: abrirModal,
     cerrarMiCuenta: cerrarModal,
     cambiarCampoCuenta: cambiarCampo,

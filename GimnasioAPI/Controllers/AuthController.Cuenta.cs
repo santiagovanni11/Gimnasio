@@ -67,6 +67,35 @@ public partial class AuthController
         return NoContent();
     }
 
+    // =========================================================
+    // GET: api/Auth/perfil
+    //
+    // Datos propios del usuario autenticado (para el saludo del
+    // Inicio). Accesible por cualquier rol; usa el claim del token.
+    // =========================================================
+
+    [HttpGet("perfil")]
+    [Authorize]
+    public async Task<IActionResult> ObtenerMiPerfil()
+    {
+        var usuario = await ObtenerUsuarioAutenticadoAsync();
+
+        if (usuario == null)
+        {
+            return NotFound("El usuario no existe.");
+        }
+
+        return Ok(new
+        {
+            usuario.Id,
+            usuario.Email,
+            usuario.Nombre,
+            usuario.Apellido,
+            usuario.RolId,
+            RolNombre = usuario.Rol?.Nombre ?? "",
+        });
+    }
+
     /// <summary>
     /// Resuelve el Usuario de la request a partir del claim
     /// NameIdentifier del JWT; null si la sesión es inválida.

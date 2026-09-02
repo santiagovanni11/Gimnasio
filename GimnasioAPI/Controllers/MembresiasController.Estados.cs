@@ -19,7 +19,7 @@ public partial class MembresiasController
     // =========================================================
 
     [HttpPut("{id}/suspender")]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<IActionResult> SuspenderMembresia(int id)
     {
         var membresia = await _context.Membresias.FindAsync(id);
@@ -43,6 +43,11 @@ public partial class MembresiasController
         membresia.FechaSuspension = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
+        await _auditoria.RegistrarAsync(
+            _context,
+            AccionesAuditoriaMembresia.Suspencion,
+            membresia,
+            "Membresía suspendida.");
 
         return NoContent();
     }
@@ -54,7 +59,7 @@ public partial class MembresiasController
     // =========================================================
 
     [HttpPut("{id}/reactivar")]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<IActionResult> ReactivarMembresia(int id)
     {
         var membresia = await _context.Membresias.FindAsync(id);
@@ -81,6 +86,11 @@ public partial class MembresiasController
             DateTime.UtcNow);
 
         await _context.SaveChangesAsync();
+        await _auditoria.RegistrarAsync(
+            _context,
+            AccionesAuditoriaMembresia.Reactivacion,
+            membresia,
+            "Membresía reactivada; días congelados extendidos.");
 
         return NoContent();
     }

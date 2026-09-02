@@ -8,7 +8,9 @@ public class Plan
 
     public string Descripcion { get; set; } = string.Empty;
 
-    // Precio base del plan.
+    // Precio mensual base de referencia del plan. Se usa como
+    // comparación para el ahorro del escalón y como precio
+    // predeterminado (fallback) en duraciones no estándar.
     public decimal Precio { get; set; }
 
     // Precios según la duración de la membresía.

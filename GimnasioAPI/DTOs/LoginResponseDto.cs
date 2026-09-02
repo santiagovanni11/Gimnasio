@@ -12,5 +12,9 @@ public class LoginResponseDto
 
     public string RolNombre { get; set; } = string.Empty;
 
+    public string Nombre { get; set; } = string.Empty;
+
+    public string Apellido { get; set; } = string.Empty;
+
     public DateTime Expira { get; set; }
 }

@@ -1,0 +1,40 @@
+/* membresias.css - Estilos del módulo membresías. */
+
+/* Renovación automática */
+.renovacion-section {
+  padding: 16px;
+  margin: 12px 0;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid #2a3038;
+  border-radius: 10px;
+}
+.toggle-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; color: #e0e4ea; }
+.toggle-label input[type="checkbox"] { display: none; }
+.toggle-slider { position: relative; width: 40px; height: 22px; background: #2a3038; border-radius: 11px; transition: background 0.2s; }
+.toggle-slider::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: #666; border-radius: 50%; transition: transform 0.2s, background 0.2s; }
+.toggle-label input:checked + .toggle-slider { background: var(--accent); }
+.toggle-label input:checked + .toggle-slider::after { transform: translateX(18px); background: white; }
+.campo-info { color: #6b7280; font-size: 12px; margin-top: 4px; }
+.campo-info--alerta { color: #f59e0b; font-weight: 600; }
+
+/* Tarjeta de pago almacenada */
+.tarjeta-form { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; padding: 12px; background: #161b21; border: 1px solid #2a3038; border-radius: 8px; }
+.tarjeta-form input, .tarjeta-form select { padding: 8px 10px; background: #0d1117; border: 1px solid #2a3038; border-radius: 6px; color: #e0e4ea; font-size: 13px; }
+.tarjeta-vencimiento { display: flex; gap: 8px; }
+.tarjeta-vencimiento select { flex: 1; }
+.tarjeta-acciones { display: flex; gap: 8px; }
+.btn-texto { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 13px; font-weight: 600; padding: 4px 0; }
+.btn-texto-cancelar { background: none; border: none; color: #6b7280; cursor: pointer; font-size: 13px; padding: 4px 0; }
+
+/* Tarjeta resumen danger */
+.payment-summary-card.danger { border-color: var(--accent-borde); }
+.payment-summary-card.danger strong { color: #ff8a8f; }
+
+/* Modal detalle pagos */
+.modal-tabla-scroll { max-height: 220px; overflow-y: auto; border: 1px solid #262c34; border-radius: 12px; }
+.modal-tabla-scroll table { width: 100%; }
+.modal-tabla-scroll td, .modal-tabla-scroll th { padding: 8px 12px; font-size: 13px; }
+.modal-tabla-scroll tbody tr + tr { border-top: 1px solid #1d232b; }
+
+/* Chip renovación automática */
+.chip-auto { display: inline-block; margin-left: 6px; padding: 2px 6px; background: rgba(47, 191, 113, 0.15); color: #2fbf71; font-size: 10px; font-weight: 700; border-radius: 4px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.3px; }

@@ -19,13 +19,16 @@ public partial class MembresiasController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly ReglasMembresia _reglas;
+    private readonly AuditoriaMembresiasService _auditoria;
 
     public MembresiasController(
         AppDbContext context,
-        ReglasMembresia reglas)
+        ReglasMembresia reglas,
+        AuditoriaMembresiasService auditoria)
     {
         _context = context;
         _reglas = reglas;
+        _auditoria = auditoria;
     }
 
     // =========================================================
@@ -34,7 +37,7 @@ public partial class MembresiasController : ControllerBase
     // =========================================================
 
     [HttpGet]
-    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    [Authorize(Roles = RolesGimnasio.TodosLosRoles)]
     public async Task<ActionResult<IEnumerable<MembresiaDto>>> GetMembresias()
     {
         var membresias = await _context.Membresias
@@ -42,14 +45,7 @@ public partial class MembresiasController : ControllerBase
             .Include(m => m.Plan)
             .ToListAsync();
 
-        var hoy = DateTime.UtcNow.Date;
-
-        foreach (var membresia in membresias)
-        {
-            ReglasMembresia.RecalcularEstado(membresia, hoy);
-        }
-
-        await _context.SaveChangesAsync();
+        await RecalcularYGuardarAsync(membresias);
 
         return Ok(membresias.Select(MapearDto));
     }
@@ -60,7 +56,7 @@ public partial class MembresiasController : ControllerBase
     // =========================================================
 
     [HttpGet("{id}")]
-    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    [Authorize(Roles = RolesGimnasio.TodosLosRoles)]
     public async Task<ActionResult<MembresiaDto>> GetMembresia(int id)
     {
         var membresia = await _context.Membresias
@@ -73,13 +69,40 @@ public partial class MembresiasController : ControllerBase
             return NotFound();
         }
 
-        ReglasMembresia.RecalcularEstado(
-            membresia,
-            DateTime.UtcNow.Date);
-
-        await _context.SaveChangesAsync();
+        await RecalcularYGuardarAsync(new[] { membresia });
 
         return Ok(MapearDto(membresia));
+    }
+
+    /// <summary>
+    /// Aplica el recálculo automático de estado por fecha y
+    /// pago efectuado, y persiste los cambios (patrón "aplicación
+    /// perezosa").
+    /// </summary>
+    private async Task RecalcularYGuardarAsync(
+        IEnumerable<Membresia> membresias)
+    {
+        var hoy = DateTime.UtcNow.Date;
+
+        var ids = membresias.Select(m => m.Id).ToList();
+
+        var aprobadas = new HashSet<int>(
+            await _context.Pagos
+                .Where(p => ids.Contains(p.MembresiaId) &&
+                            p.Estado == EstadoPago.Aprobado)
+                .Select(p => p.MembresiaId)
+                .Distinct()
+                .ToListAsync());
+
+        foreach (var membresia in membresias)
+        {
+            ReglasMembresia.RecalcularEstado(
+                membresia,
+                hoy,
+                aprobadas.Contains(membresia.Id));
+        }
+
+        await _context.SaveChangesAsync();
     }
 
     /// <summary>Proyección estándar de una membresía a su DTO.</summary>
@@ -104,6 +127,9 @@ public partial class MembresiasController : ControllerBase
             Estado = (int)m.Estado,
 
             UltimaRenovacion = m.UltimaRenovacion,
+
+            RenovacionAutomatica = m.RenovacionAutomatica,
+            MetodoPagoAlmacenadoId = m.MetodoPagoAlmacenadoId,
 
             FechaCreacion = m.FechaCreacion
         };

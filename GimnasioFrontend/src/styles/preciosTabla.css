@@ -1,0 +1,143 @@
+/* =========================================================
+   preciosTabla.css - Grilla editable de precios por plan.
+   Medidas de celdas e inputs numéricos del escalón.
+========================================================= */
+
+/* =========================
+   MEDIDAS DE LA GRILLA
+========================= */
+
+.section-header + .table-wrapper {
+  margin-top: 6px;
+}
+
+.content-card table th {
+  height: 52px;
+}
+
+.content-card table td {
+  height: 68px;
+}
+
+.content-card table td:first-child {
+  min-width: 180px;
+}
+
+.content-card table td:first-child strong {
+  display: block;
+
+  color: #f4f4f5;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.content-card table td:has(input[type="number"]) {
+  vertical-align: middle;
+}
+
+/* =========================
+   AVISO DE CAMBIOS PROGRAMADOS
+========================= */
+
+.aviso-programados ul {
+  display: flex;
+
+  flex-direction: column;
+  gap: 8px;
+
+  margin: 10px 0 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.aviso-programados li {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.aviso-programados-anular {
+  flex-shrink: 0;
+
+  height: 30px;
+
+  padding: 0 14px;
+
+  font-size: 12px;
+}
+
+@media (max-width: 760px) {
+  .aviso-programados li {
+    flex-direction: column;
+
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
+/* =========================
+   INPUT NUMÉRICO DE PRECIO
+========================= */
+
+.content-card table input[type="number"] {
+  width: 125px;
+  height: 40px;
+
+  padding: 0 12px;
+
+  border: 1px solid #303740;
+  border-radius: 10px;
+
+  background: #0d1014;
+  color: #f4f4f5;
+
+  outline: none;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  text-align: right;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.content-card table input[type="number"]:hover,
+.content-card table tbody tr:hover input[type="number"] {
+  border-color: #3a434e;
+  background: #11161b;
+}
+
+.content-card table input[type="number"]:focus {
+  border-color: var(--accent);
+  background: #101419;
+
+  box-shadow:
+    0 0 0 3px var(--accent-suave);
+}
+
+.content-card table input[type="number"]::placeholder {
+  color: #646d78;
+}
+
+/* Flechas nativas atenuadas/ocultas según motor */
+.content-card table input[type="number"]::-webkit-inner-spin-button,
+.content-card table input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .content-card table input[type="number"] {
+    width: 110px;
+  }
+}

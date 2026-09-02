@@ -33,4 +33,8 @@ public class PagoDto
     public string? RegistradoPor { get; set; }
 
     public string? MotivoAnulacion { get; set; }
+
+    public string? AnuladoPor { get; set; }
+
+    public DateTime? FechaAnulacion { get; set; }
 }

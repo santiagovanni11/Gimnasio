@@ -1,68 +1,46 @@
 /* =========================================================
-   dashboard.css - Panel de inicio: bienvenida y estadisticas.
-   Extraido de index.css sin modificaciones.
-========================================================= */
-
-/* =========================
-   DASHBOARD
-========================= */
+   dashboard.css - Panel de inicio: bienvenida y estadísticas.
+   ========================================================= */
 
 .welcome-card {
-  min-height: 230px;
-
+  position: relative;
+  min-height: 220px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   gap: 30px;
-
   padding: 34px;
-
-  border: 1px solid #272d35;
-  border-radius: 24px;
-
+  border: 1px solid var(--line);
+  border-radius: var(--radio-xl);
   background:
-    linear-gradient(
-      135deg,
-      #171b21,
-      #111419
-    );
-
+    radial-gradient(130% 140% at 100% 0%, rgba(47, 191, 113, 0.14), transparent 55%),
+    linear-gradient(135deg, var(--surface-2), var(--surface));
   overflow: hidden;
 }
 
-.eyebrow {
-  color: #e31b23;
-
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 1.6px;
-}
-
 .welcome-card h2 {
-  max-width: 650px;
-
+  max-width: 620px;
   margin: 12px 0;
-
-  font-size: 38px;
-  line-height: 1.05;
+  font-family: var(--fuente-titulo);
+  font-size: 36px;
+  line-height: 1.08;
+  letter-spacing: -0.4px;
 }
 
 .welcome-card p {
-  max-width: 600px;
-
-  color: #9199a3;
-
+  max-width: 560px;
+  color: var(--texto-muted);
   line-height: 1.6;
 }
 
 .welcome-mark {
-  color: rgba(227, 27, 35, 0.16);
-
-  font-size: 70px;
-  font-weight: 950;
-
-  letter-spacing: 4px;
+  font-family: var(--fuente-titulo);
+  font-weight: 700;
+  font-size: 64px;
+  letter-spacing: 2px;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--line-fuerte);
+  opacity: 0.9;
 }
 
 /* =========================
@@ -71,40 +49,87 @@
 
 .stats-grid {
   display: grid;
-
   grid-template-columns: repeat(4, 1fr);
-
   gap: 16px;
-
   margin-top: 18px;
 }
 
 .stat-card {
+  position: relative;
   padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radio-lg);
+  background: var(--surface);
+  overflow: hidden;
+}
 
-  border: 1px solid #252b33;
-  border-radius: 18px;
-
-  background: #12161b;
+.stat-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  opacity: 0.7;
 }
 
 .stat-card span {
   display: block;
-
-  color: #949ba5;
-
+  color: var(--texto-muted);
   font-size: 13px;
+  font-weight: 600;
 }
 
 .stat-card strong {
   display: block;
-
   margin: 12px 0 4px;
-
-  font-size: 30px;
+  font-family: var(--fuente-titulo);
+  font-size: 32px;
+  letter-spacing: -0.5px;
 }
 
 .stat-card small {
-  color: #707882;
+  color: var(--texto-dim);
 }
 
+/* =========================
+   BARRAS (ALTAS POR MES)
+========================= */
+
+.bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 52px 1fr 36px;
+  align-items: center;
+  gap: 12px;
+}
+
+.bar-label {
+  color: var(--texto-muted);
+  font-size: 13px;
+}
+
+.bar-track {
+  height: 14px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), #1f9e5c);
+}
+
+.bar-value {
+  color: var(--texto);
+  font-size: 13px;
+  text-align: right;
+}

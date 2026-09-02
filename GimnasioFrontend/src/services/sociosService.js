@@ -1,6 +1,8 @@
 // =========================================================
 // SERVICIO DE SOCIOS
-// Operaciones CRUD contra api/Socios.
+// Operaciones contra api/Socios. La baja es siempre lógica
+// (alternarEstado con Activo=false); no existe borrado
+// físico para preservar el historial del socio.
 // =========================================================
 
 import { apiRequest } from "./apiClient";
@@ -13,7 +15,13 @@ const construirPayload = (datos, extra = {}) => ({
   telefono: datos.telefono.trim(),
   email: datos.email.trim(),
   direccion:
-    datos.direccion.trim() === "" ? null : datos.direccion.trim(),
+    datos.direccion?.trim() === "" ? null : datos.direccion?.trim() || null,
+  fotoUrl:
+    datos.fotoUrl?.trim() === "" ? null : datos.fotoUrl?.trim() || null,
+  contactoEmergencia:
+    datos.contactoEmergencia?.trim() === "" ? null : datos.contactoEmergencia?.trim() || null,
+  telefonoEmergencia:
+    datos.telefonoEmergencia?.trim() === "" ? null : datos.telefonoEmergencia?.trim() || null,
   ...extra,
 });
 
@@ -40,6 +48,19 @@ export const sociosService = {
     });
   },
 
+  /** Importación masiva: recibe un arreglo de socios ya parseados. */
+  async importarSocios(lista) {
+    return apiRequest("Socios/importar", {
+      method: "POST",
+      body: lista,
+    });
+  },
+
+  /** Métricas agregadas para el panel de resumen. */
+  async obtenerEstadisticas() {
+    return apiRequest("Socios/estadisticas");
+  },
+
   /** Baja/alta lógica: reenvía el socio completo con el nuevo estado. */
   async alternarEstado(socio, activo) {
     return apiRequest(`Socios/${socio.id}`, {
@@ -53,13 +74,17 @@ export const sociosService = {
         telefono: socio.telefono,
         email: socio.email,
         direccion: socio.direccion,
+        fotoUrl: socio.fotoUrl,
+        contactoEmergencia: socio.contactoEmergencia,
+        telefonoEmergencia: socio.telefonoEmergencia,
         fechaAlta: socio.fechaAlta,
         activo,
       },
     });
   },
 
-  async eliminarSocio(id) {
-    return apiRequest(`Socios/${id}`, { method: "DELETE" });
+  /** Últimas asistencias de un socio para la ficha. */
+  async obtenerAsistenciasSocio(socioId, limite = 10) {
+    return apiRequest(`Socios/${socioId}/asistencias?limite=${limite}`);
   },
 };

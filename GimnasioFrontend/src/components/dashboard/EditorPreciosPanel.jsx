@@ -1,8 +1,10 @@
 // =========================================================
 // PANEL DE EDICIÓN DE PRECIOS
 // Fila expandible bajo el plan en edición: vigencia con
-// ayuda contextual y acciones principales.
+// ayuda contextual, simulador de impacto y acciones.
 // =========================================================
+
+import ImpactoPreciosAviso from "./ImpactoPreciosAviso";
 
 function EditorPreciosPanel({
   plan,
@@ -11,10 +13,12 @@ function EditorPreciosPanel({
   guardandoPrecios,
   guardarPreciosPlan,
   cancelarEdicionPrecios,
+  preciosEditando,
+  membresias,
 }) {
   return (
     <tr className="fila-editor-precios">
-      <td colSpan={6}>
+      <td colSpan={7}>
         <div className="editor-precios-panel">
           <div className="editor-precios-info">
             <strong>Editando precios · {plan.nombre}</strong>
@@ -23,6 +27,12 @@ function EditorPreciosPanel({
               Dejá la fecha vacía para que rija hoy; si elegís una
               futura, queda programado y visible en el historial.
             </small>
+
+            <ImpactoPreciosAviso
+              plan={plan}
+              valoresNuevos={preciosEditando[plan.id] ?? {}}
+              membresias={membresias ?? []}
+            />
           </div>
 
           <div className="campo-vigencia">
@@ -30,6 +40,7 @@ function EditorPreciosPanel({
 
             <input
               type="date"
+              className="input-fecha"
               value={fechaRige}
               onChange={(e) => setFechaRige?.(e.target.value)}
             />

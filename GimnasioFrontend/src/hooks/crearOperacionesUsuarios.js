@@ -7,7 +7,9 @@
 // =========================================================
 
 import { usuariosService } from "../services/usuariosService";
+import { clasesService } from "../services/clasesService";
 import { dialogoSistema } from "../services/servicioDialogos";
+import { diaSemanaTexto, franjaTexto } from "../utils/clases";
 
 export function crearOperacionesUsuarios({
   ejecutar,
@@ -73,6 +75,82 @@ export function crearOperacionesUsuarios({
       return;
     }
 
+    const rolActual = roles.find(
+      (rol) => Number(rol.id) === Number(usuario.rolId)
+    );
+    const esProfesorActual =
+      String(rolActual?.nombre ?? usuario.rolNombre ?? "")
+        .toLowerCase()
+        .includes("profesor");
+    const esProfesorNuevo =
+      String(rolNuevo.nombre ?? "")
+        .toLowerCase()
+        .includes("profesor");
+
+    if (esProfesorActual && !esProfesorNuevo) {
+      const resultadoHorarios = await ejecutar({
+        peticion: clasesService.obtenerHorarios,
+        onError: setError,
+        mensajePermiso: "No tenés permisos para ver los usuarios.",
+        mensajeError: "No se pudieron verificar los horarios del profesor.",
+        mensajeRed: "No se pudo conectar con la API.",
+        etiquetaLog: "Error al verificar horarios del profesor:",
+      });
+
+      const horariosLista = resultadoHorarios
+        ? [
+            ...(Array.isArray(resultadoHorarios.datos)
+              ? resultadoHorarios.datos
+              : []),
+            ...(Array.isArray(resultadoHorarios?.datos?.datos)
+              ? resultadoHorarios.datos.datos
+              : []),
+            ...(Array.isArray(resultadoHorarios?.datos?.value)
+              ? resultadoHorarios.datos.value
+              : []),
+            ...(Array.isArray(resultadoHorarios)
+              ? resultadoHorarios
+              : []),
+          ]
+        : [];
+
+      const horariosAsignados = horariosLista.filter((horario) => {
+        const empleadoId = horario?.empleadoId ?? horario?.profesorId ?? horario?.usuarioId;
+        const activo = horario?.activo ?? horario?.estado ?? true;
+        return Number(empleadoId) === Number(usuario.id) && activo !== false;
+      });
+
+      const detalleClase = horariosAsignados[0]
+        ? (() => {
+            const nombreClase =
+              horariosAsignados[0].claseNombre ??
+              horariosAsignados[0].nombreClase ??
+              horariosAsignados[0].clase?.nombre ??
+              "clase";
+
+            const dia = diaSemanaTexto(horariosAsignados[0].diaSemana);
+            const franja = franjaTexto(
+              horariosAsignados[0].horaInicio,
+              horariosAsignados[0].horaFin
+            );
+
+            return `${nombreClase} (${dia} ${franja})`;
+          })()
+        : "";
+
+      if (horariosAsignados.length > 0) {
+        setError("");
+        setMensaje("");
+        await dialogoSistema.bloqueo({
+          titulo: "No se puede cambiar el rol",
+          mensaje:
+            `Clase asignada: ${detalleClase || "sin detalle"}. Cancelá o reasigná la clase antes de cambiar el rol de ${usuario.email}.`,
+          textoAceptar: "No se puede cambiar el rol",
+        });
+        return;
+      }
+    }
+
     const aceptado = await dialogoSistema.confirmar({
       titulo: "Cambiar rol",
       mensaje: `¿Cambiar el rol de ${usuario.email} a ${rolNuevo.nombre}?`,
@@ -81,7 +159,7 @@ export function crearOperacionesUsuarios({
     });
 
     if (!aceptado) {
-      await obtenerUsuarios(); // revierte el select visualmente
+      await obtenerUsuarios();
       return;
     }
 

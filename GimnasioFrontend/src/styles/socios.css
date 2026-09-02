@@ -1,0 +1,137 @@
+/* socios.css - Estilos del módulo Socios. */
+
+/* =========================
+   CARGA DE FOTO DE PERFIL
+========================= */
+
+.campo-foto {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-cargar-foto {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 20px;
+  border: 1px dashed #3a444f;
+  border-radius: var(--radio-sm);
+  background: #161b21;
+  color: #d9dde3;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.btn-cargar-foto:hover {
+  border-color: var(--accent);
+  background: #1b2128;
+  color: white;
+}
+
+.btn-cargar-foto:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.foto-preview {
+  position: relative;
+  display: inline-flex;
+}
+
+.foto-preview img {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radio-sm);
+  object-fit: cover;
+  border: 2px solid #2a3038;
+}
+
+.btn-quitar-foto {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: #dc3545;
+  color: white;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-quitar-foto:hover {
+  background: #c82333;
+}
+
+.campo-foto-error {
+  color: #dc3545;
+  font-size: 12px;
+}
+
+/* =========================
+   INPUT DE ARCHIVO (IMPORTAR)
+========================= */
+
+.file-input-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  margin-top: 6px;
+}
+
+.file-input-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  height: 40px;
+  padding: 0 16px;
+
+  border: 1px dashed #3a444f;
+  border-radius: var(--radio-sm);
+
+  background: #161b21;
+
+  color: #d9dde3;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.file-input-button:hover {
+  border-color: var(--accent);
+
+  background: #1b2128;
+
+  color: white;
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+.file-input-name {
+  color: #8b929c;
+
+  font-size: 13px;
+}

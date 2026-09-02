@@ -27,17 +27,20 @@ public partial class AuthController : ControllerBase
     private readonly TokenService _tokenService;
     private readonly LoginGuardService _guardLogin;
     private readonly AuditoriaUsuariosService _auditoria;
+    private readonly CreacionUsuariosService _altas;
 
     public AuthController(
         AppDbContext context,
         TokenService tokenService,
         LoginGuardService guardLogin,
-        AuditoriaUsuariosService auditoria)
+        AuditoriaUsuariosService auditoria,
+        CreacionUsuariosService altas)
     {
         _context = context;
         _tokenService = tokenService;
         _guardLogin = guardLogin;
         _auditoria = auditoria;
+        _altas = altas;
     }
 
     // =========================================================
@@ -119,6 +122,8 @@ public partial class AuthController : ControllerBase
             Email = usuario.Email,
             RolId = usuario.RolId,
             RolNombre = usuario.Rol.Nombre,
+            Nombre = usuario.Nombre,
+            Apellido = usuario.Apellido,
             Expira = _tokenService.CalcularExpiracion()
         });
     }

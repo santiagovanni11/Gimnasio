@@ -16,7 +16,13 @@ public class Socio
 
     public string Email { get; set; } = string.Empty;
 
-    public string? Direccion { get; set; } 
+    public string? Direccion { get; set; }
+
+    public string? FotoUrl { get; set; }
+
+    public string? ContactoEmergencia { get; set; }
+
+    public string? TelefonoEmergencia { get; set; }
 
     public DateTime FechaAlta { get; set; } = DateTime.UtcNow;
 

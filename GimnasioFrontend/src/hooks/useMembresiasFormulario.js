@@ -5,6 +5,8 @@
 // =========================================================
 
 import { useState } from "react";
+import { aISO, fechaDesdeValor } from "../utils/fechas";
+import { mesesEscalonEntre } from "../utils/membresias";
 
 export function useMembresiasFormulario() {
   const [mostrarFormularioMembresia, setMostrarFormularioMembresia] =
@@ -19,6 +21,8 @@ export function useMembresiasFormulario() {
   const [membresiaExistente, setMembresiaExistente] = useState(null);
   const [mostrarAvisoMembresiaExistente, setMostrarAvisoMembresiaExistente] =
     useState(false);
+  const [renovacionAutomatica, setRenovacionAutomatica] = useState(false);
+  const [metodoPagoAlmacenadoId, setMetodoPagoAlmacenadoId] = useState(null);
 
   const limpiarCampos = () => {
     setPlanSeleccionado("");
@@ -28,6 +32,8 @@ export function useMembresiasFormulario() {
     setMembresiaExistente(null);
     setMostrarAvisoMembresiaExistente(false);
     setSocioSeleccionado("");
+    setRenovacionAutomatica(false);
+    setMetodoPagoAlmacenadoId(null);
   };
 
   const cerrarFormularioMembresia = () => {
@@ -58,35 +64,17 @@ export function useMembresiasFormulario() {
 
     const inicio =
       modoRenovacion && fechaInicioMembresia
-        ? new Date(fechaInicioMembresia)
+        ? fechaDesdeValor(fechaInicioMembresia)
         : new Date();
 
     const fin = new Date(inicio);
     fin.setMonth(fin.getMonth() + Number(meses));
-
-    setFechaInicioMembresia(formatear(inicio));
-    setFechaFinMembresia(formatear(fin));
-  };
-
-  const calcularMesesDesdeFechas = (fechaInicio, fechaFin) => {
-    if (!fechaInicio || !fechaFin) return "";
-
-    const inicio = new Date(fechaInicio);
-    const fin = new Date(fechaFin);
-
-    if ([inicio, fin].some((f) => Number.isNaN(f.getTime()))) {
-      return "";
+    if (fin.getDate() < inicio.getDate()) {
+      fin.setDate(0);
     }
 
-    const diferenciaMeses =
-      (fin.getFullYear() - inicio.getFullYear()) * 12 +
-      (fin.getMonth() - inicio.getMonth());
-
-    if (diferenciaMeses <= 0) return "";
-
-    return [1, 3, 6, 12].includes(diferenciaMeses)
-      ? String(diferenciaMeses)
-      : "";
+    setFechaInicioMembresia(aISO(inicio));
+    setFechaFinMembresia(aISO(fin));
   };
 
   const abrirEdicionMembresia = (membresia) => {
@@ -96,12 +84,13 @@ export function useMembresiasFormulario() {
     setMembresiaEditando(membresia);
     setSocioSeleccionado(String(membresia.socioId ?? ""));
     setPlanSeleccionado(String(membresia.planId ?? ""));
-    setFechaInicioMembresia(membresia.fechaInicio || "");
-    setFechaFinMembresia(membresia.fechaFin || "");
+    setFechaInicioMembresia(membresia.fechaInicio ? aISO(fechaDesdeValor(membresia.fechaInicio)) : "");
+    setFechaFinMembresia(membresia.fechaFin ? aISO(fechaDesdeValor(membresia.fechaFin)) : "");
     setDuracionMembresia(
-      calcularMesesDesdeFechas(membresia.fechaInicio, membresia.fechaFin) ||
-        ""
+      mesesEscalonEntre(membresia.fechaInicio, membresia.fechaFin) || ""
     );
+    setRenovacionAutomatica(membresia.renovacionAutomatica || false);
+    setMetodoPagoAlmacenadoId(membresia.metodoPagoAlmacenadoId || null);
     setMembresiaExistente(null);
     setMostrarAvisoMembresiaExistente(false);
     setMostrarFormularioMembresia(true);
@@ -111,11 +100,12 @@ export function useMembresiasFormulario() {
   const prepararRenovacionMembresia = (membresia) => {
     limpiarCampos();
     setModoRenovacion(true);
+    setRenovacionAutomatica(true);
     setMembresiaEditando(membresia);
     setSocioSeleccionado(String(membresia.socioId ?? ""));
     setPlanSeleccionado(String(membresia.planId ?? ""));
     setFechaInicioMembresia(
-      formatear(new Date(membresia.fechaFin))
+      aISO(fechaDesdeValor(membresia.fechaFin))
     );
     setMostrarFormularioMembresia(true);
   };
@@ -134,6 +124,8 @@ export function useMembresiasFormulario() {
     fechaFinMembresia, setFechaFinMembresia,
     membresiaExistente, setMembresiaExistente,
     mostrarAvisoMembresiaExistente, setMostrarAvisoMembresiaExistente,
+    renovacionAutomatica, setRenovacionAutomatica,
+    metodoPagoAlmacenadoId, setMetodoPagoAlmacenadoId,
     limpiarCampos,
     cerrarFormularioMembresia,
     abrirFormularioDesdeSocio: abrirParaSocio,
@@ -142,8 +134,4 @@ export function useMembresiasFormulario() {
     calcularFechasMembresia,
     reiniciarFormularioMembresia
   };
-}
-
-function formatear(fecha) {
-  return `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}-${String(fecha.getDate()).padStart(2, "0")}`;
 }

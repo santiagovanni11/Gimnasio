@@ -1,5 +1,6 @@
 using GimnasioAPI.Data;
 using GimnasioAPI.Models;
+using GimnasioAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,7 @@ public class BeneficiosController : ControllerBase
     // GET: api/Beneficios
     // Administrador, Recepcionista y Profesor pueden consultar.
     [HttpGet]
-    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    [Authorize(Roles = RolesGimnasio.TodosLosRoles)]
     public async Task<ActionResult<IEnumerable<Beneficio>>> GetBeneficios()
     {
         return await _context.Beneficios
@@ -32,7 +33,7 @@ public class BeneficiosController : ControllerBase
     // GET: api/Beneficios/1
     // Administrador, Recepcionista y Profesor pueden consultar.
     [HttpGet("{id}")]
-    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    [Authorize(Roles = RolesGimnasio.TodosLosRoles)]
     public async Task<ActionResult<Beneficio>> GetBeneficio(int id)
     {
         var beneficio = await _context.Beneficios
@@ -49,27 +50,19 @@ public class BeneficiosController : ControllerBase
     // POST: api/Beneficios
     // Administrador y Recepcionista pueden crear.
     [HttpPost]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<ActionResult<Beneficio>> PostBeneficio(
         Beneficio beneficio)
     {
-        if (string.IsNullOrWhiteSpace(beneficio.Nombre))
+        var error = BeneficioValidaciones.ValidarCampos(
+            beneficio.Nombre, beneficio.Descripcion);
+
+        if (error != null)
         {
-            return BadRequest(
-                "El nombre del beneficio es obligatorio.");
+            return BadRequest(error);
         }
 
-        if (string.IsNullOrWhiteSpace(beneficio.Descripcion))
-        {
-            return BadRequest(
-                "La descripción del beneficio es obligatoria.");
-        }
-
-        var nombreExiste = await _context.Beneficios
-            .AnyAsync(b =>
-                b.Nombre.ToLower() == beneficio.Nombre.ToLower());
-
-        if (nombreExiste)
+        if (await NombreEnUsoAsync(beneficio.Nombre))
         {
             return BadRequest(
                 "Ya existe un beneficio con ese nombre.");
@@ -90,7 +83,7 @@ public class BeneficiosController : ControllerBase
     // PUT: api/Beneficios/1
     // Administrador y Recepcionista pueden modificar.
     [HttpPut("{id}")]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<IActionResult> PutBeneficio(
         int id,
         Beneficio beneficio)
@@ -100,16 +93,12 @@ public class BeneficiosController : ControllerBase
             return BadRequest();
         }
 
-        if (string.IsNullOrWhiteSpace(beneficio.Nombre))
-        {
-            return BadRequest(
-                "El nombre del beneficio es obligatorio.");
-        }
+        var error = BeneficioValidaciones.ValidarCampos(
+            beneficio.Nombre, beneficio.Descripcion);
 
-        if (string.IsNullOrWhiteSpace(beneficio.Descripcion))
+        if (error != null)
         {
-            return BadRequest(
-                "La descripción del beneficio es obligatoria.");
+            return BadRequest(error);
         }
 
         var existente = await _context.Beneficios
@@ -120,12 +109,7 @@ public class BeneficiosController : ControllerBase
             return NotFound();
         }
 
-        var nombreExiste = await _context.Beneficios
-            .AnyAsync(b =>
-                b.Id != id &&
-                b.Nombre.ToLower() == beneficio.Nombre.ToLower());
-
-        if (nombreExiste)
+        if (await NombreEnUsoAsync(beneficio.Nombre, excluirId: id))
         {
             return BadRequest(
                 "Ya existe otro beneficio con ese nombre.");
@@ -143,7 +127,7 @@ public class BeneficiosController : ControllerBase
     // Baja lógica.
     // Solo Administrador puede eliminar.
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = RolesGimnasio.Administrador)]
     public async Task<IActionResult> DeleteBeneficio(int id)
     {
         var beneficio = await _context.Beneficios
@@ -159,6 +143,14 @@ public class BeneficiosController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
+    }
+
+    /// <summary>Unicidad de nombre, opcionalmente excluyendo un Id.</summary>
+    private Task<bool> NombreEnUsoAsync(string nombre, int? excluirId = null)
+    {
+        return _context.Beneficios.AnyAsync(b =>
+            b.Nombre.ToLower() == nombre.ToLower() &&
+            (excluirId == null || b.Id != excluirId));
     }
 }
 

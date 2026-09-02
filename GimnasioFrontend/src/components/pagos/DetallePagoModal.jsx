@@ -4,11 +4,14 @@ import {
   estadoPagoTexto,
 } from "../../utils/pagos";
 import { getPlanNombre } from "../../utils/planes";
+import { exportarComprobantePagoPdf } from "../../utils/exportar/comprobantePagoPdf";
 
 export default function DetallePagoModal({ pago, membresias = [], saldoInfo, onClose }) {
   if (!pago) {
     return null;
   }
+
+  const planNombre = getPlanNombre(pago, membresias);
 
   return (
     <div className="payment-modal-backdrop" onClick={onClose}>
@@ -122,6 +125,9 @@ export default function DetallePagoModal({ pago, membresias = [], saldoInfo, onC
         </div>
 
         <div className="payment-modal-actions">
+          <button type="button" className="secondary-button" onClick={() => exportarComprobantePagoPdf(pago, planNombre)}>
+            Descargar PDF
+          </button>
           <button type="button" className="primary-small-button" onClick={onClose}>
             Cerrar
           </button>

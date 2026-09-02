@@ -1,18 +1,19 @@
 // =========================================================
 // TABLA DE SOCIOS — Listado con ordenamiento y acciones
+// Las acciones de fila viven en AccionesSocio; el indicador
+// de datos incompletos usa camposFaltantesDe.
 // =========================================================
 
 import ThOrdenable from "../common/ThOrdenable";
-import { getMembresiaVisual } from "../../utils/socios";
+import Avatar from "../common/Avatar";
+import AccionesSocio from "./AccionesSocio";
+import {
+  camposFaltantesDe,
+  getMembresiaVisual,
+} from "../../utils/socios";
 
 const fecha = (valor) =>
   valor ? new Date(valor).toLocaleDateString("es-AR") : "-";
-
-/** Merece renovación: sin membresía, vencida o rechazada. */
-const necesitaRenovacion = (socio, rechazadasIds) =>
-  !socio.membresia ||
-  socio.membresia.estado !== "Vigente" ||
-  rechazadasIds?.has(Number(socio.membresia.id));
 
 function TablaSocios({
   socios,
@@ -20,16 +21,16 @@ function TablaSocios({
   toggleOrden,
   puedeEditarSocios,
   puedeCrearSocios,
-  puedeEliminarSocios,
   editarSocio,
   alternarEstadoSocio,
   abrirFormularioMembresiaDesdeSocio,
   verFicha,
+  inscribirEnClases,
   membresias,
   membresiasRechazadasIds,
+  selectedIds = [],
+  onToggleSeleccion,
 }) {
-  const conAcciones = puedeEditarSocios || puedeEliminarSocios;
-
   const th = (campo, texto) => (
     <ThOrdenable
       campo={campo}
@@ -45,6 +46,21 @@ function TablaSocios({
       <table>
         <thead>
           <tr>
+            <th style={{ width: "32px" }}>
+              <input
+                type="checkbox"
+                checked={socios.length > 0 && socios.every((socio) => selectedIds.includes(Number(socio.id)))}
+                onChange={() => {
+                  if (socios.every((socio) => selectedIds.includes(Number(socio.id)))) {
+                    socios.forEach((socio) => onToggleSeleccion?.(socio.id));
+                    return;
+                  }
+                  socios.forEach((socio) => {
+                    if (!selectedIds.includes(Number(socio.id))) onToggleSeleccion?.(socio.id);
+                  });
+                }}
+              />
+            </th>
             {th("nombre", "Nombre")}
             {th("apellido", "Apellido")}
             {th("dni", "DNI")}
@@ -58,7 +74,7 @@ function TablaSocios({
 
             {th("vencimiento", "Vencimiento")}
 
-            {conAcciones && <th>Acciones</th>}
+            <th>Acciones</th>
           </tr>
         </thead>
 
@@ -70,9 +86,41 @@ function TablaSocios({
               membresiasRechazadasIds
             );
 
+            const faltantes = camposFaltantesDe(socio);
+
             return (
               <tr key={socio.id}>
-                <td>{socio.nombre}</td>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(Number(socio.id))}
+                    onChange={() => onToggleSeleccion?.(socio.id)}
+                  />
+                </td>
+                <td>
+                  <div className="celda-con-avatar">
+                    <Avatar
+                      nombre={socio.nombre}
+                      apellido={socio.apellido}
+                      email={socio.email}
+                      fotoUrl={socio.fotoUrl}
+                    />
+
+                    <span>
+                      {socio.nombre}
+
+                      {faltantes.length > 0 && (
+                        <span
+                          className="status-warning"
+                          style={{ marginLeft: "6px", fontSize: "10px" }}
+                          title={`Falta: ${faltantes.join(", ")}`}
+                        >
+                          datos incompletos
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                </td>
                 <td>{socio.apellido}</td>
                 <td>{socio.dni}</td>
 
@@ -89,58 +137,28 @@ function TablaSocios({
 
                 <td>
                   <span className={visual.clase}>{visual.texto}</span>
+                  {visual.membresia?.renovacionAutomatica && (
+                    <span className="chip-auto">Renov. auto</span>
+                  )}
                 </td>
 
                 <td>{fecha(visual.fechaFin)}</td>
 
-                {conAcciones && (
-                  <td>
-                    {puedeEditarSocios && (
-                      <button
-                        type="button"
-                        className="edit-button"
-                        onClick={() => editarSocio(socio)}
-                      >
-                        Editar
-                      </button>
-                    )}
-
-                    {puedeCrearSocios && necesitaRenovacion(socio, membresiasRechazadasIds) && (
-                      <button
-                        type="button"
-                        className="approve-button"
-                        onClick={() => abrirFormularioMembresiaDesdeSocio(socio.id)}
-                        title="Asignar nueva membresía"
-                      >
-                        Renovar
-                      </button>
-                    )}
-
-                    <button
-                      type="button"
-                      className="view-button"
-                      onClick={() => verFicha(socio)}
-                      title="Ver ficha completa"
-                    >
-                      Ficha
-                    </button>
-
-                    {puedeEditarSocios && (
-                      <button
-                        type="button"
-                        className={socio.activo === false ? "approve-button" : "cancel-button"}
-                        onClick={() => alternarEstadoSocio(socio)}
-                        title={
-                          socio.activo === false
-                            ? "Reactivar socio"
-                            : "Desactivar socio"
-                        }
-                      >
-                        {socio.activo === false ? "Activar" : "Desactivar"}
-                      </button>
-                    )}
-                  </td>
-                )}
+                <td>
+                  <AccionesSocio
+                    socio={socio}
+                    puedeEditarSocios={puedeEditarSocios}
+                    puedeCrearSocios={puedeCrearSocios}
+                    editarSocio={editarSocio}
+                    alternarEstadoSocio={alternarEstadoSocio}
+                    abrirFormularioMembresiaDesdeSocio={
+                      abrirFormularioMembresiaDesdeSocio
+                    }
+                    verFicha={verFicha}
+                    inscribirEnClases={inscribirEnClases}
+                    membresiasRechazadasIds={membresiasRechazadasIds}
+                  />
+                </td>
               </tr>
             );
           })}

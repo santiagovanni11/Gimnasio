@@ -21,7 +21,6 @@ public static class AccionesAuditoriaUsuario
     // Accesos
     public const string AccesoExitoso = "Acceso exitoso";
     public const string AccesoFallido = "Intento fallido";
-    public const string CuentaBloqueada = "Cuenta bloqueada";
     public const string Desbloqueo = "Desbloqueo";
 }
 
@@ -39,7 +38,7 @@ public class AuditoriaUsuariosService
     }
 
     /// <summary>Actor autenticado de la request actual.</summary>
-    public (int? Id, string? Email) ObtenerActor()
+    private (int? Id, string? Email) ObtenerActor()
     {
         var user = _http.HttpContext?.User;
 
@@ -55,6 +54,20 @@ public class AuditoriaUsuariosService
 
         return (int.TryParse(idTexto, out var id) ? id : null,
                 email);
+    }
+
+    /// <summary>
+    /// Email del actor autenticado, para firmar registros
+    /// (historial de precios, pagos). Con fallback al nombre
+    /// de la identidad y, por último, "desconocido".
+    /// </summary>
+    public string ObtenerEmailActor()
+    {
+        var user = _http.HttpContext?.User;
+
+        return user?.FindFirst(ClaimTypes.Email)?.Value
+               ?? user?.Identity?.Name
+               ?? "desconocido";
     }
 
     /// <summary>Agrega un registro y persiste los cambios.</summary>

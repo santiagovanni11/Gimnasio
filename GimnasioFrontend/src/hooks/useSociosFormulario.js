@@ -13,6 +13,9 @@ export const SOCIO_VACIO = {
   telefono: "",
   email: "",
   direccion: "",
+  fotoUrl: "",
+  contactoEmergencia: "",
+  telefonoEmergencia: "",
 };
 
 export function useSociosFormulario() {
@@ -46,6 +49,9 @@ export function useSociosFormulario() {
       telefono: socio.telefono || "",
       email: socio.email || "",
       direccion: socio.direccion || "",
+      fotoUrl: socio.fotoUrl || "",
+      contactoEmergencia: socio.contactoEmergencia || "",
+      telefonoEmergencia: socio.telefonoEmergencia || "",
     });
     setMensajeSocio("");
     setErrorSocio("");

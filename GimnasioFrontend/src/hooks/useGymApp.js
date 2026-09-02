@@ -117,19 +117,6 @@ export function useGymApp() {
     pagos.prefillPago(membresiaId, precioAplicado);
   }
 
-  /** Socio eliminado -> sincroniza membresías y refresca. */
-  async function eliminarSocio(socio) {
-    const idEliminado = await socios.eliminarSocio(socio);
-    if (idEliminado == null) return;
-
-    const restantes = socios.socios.filter(
-      (item) => Number(item.id) !== Number(socio.id)
-    );
-
-    await membresias.sincronizarSocioEliminado(socio.id, restantes);
-    await socios.obtenerSocios();
-  }
-
   return {
     ...sesion,
     cerrarSesion,
@@ -144,7 +131,6 @@ export function useGymApp() {
     seccion,
     setSeccion,
     cambiarSeccion,
-    eliminarSocio,
     ...calcularPermisos(sesion.rol),
   };
 }

@@ -1,36 +1,26 @@
-﻿/* botones.css - Botones primarios y secundarios */
+﻿/* botones.css - Botones primarios y secundarios (tokens FORZA) */
 
 .secondary-button {
-  height: 42px;
-
-  padding: 0 17px;
-
-  border: 1px solid #303740;
-  border-radius: 10px;
-
-  background: #1a1f25;
-
-  color: #d9dde3;
-
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--line-fuerte);
+  border-radius: var(--radio-sm);
+  background: var(--surface-2);
+  color: var(--texto);
   font-size: 14px;
-  font-weight: 700;
-
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .secondary-button:hover {
-  background: #222830;
-
-  border-color: #3b444f;
-
-  color: white;
-
+  background: var(--surface-3);
+  border-color: rgba(255, 255, 255, 0.22);
   transform: translateY(-1px);
 }
 
@@ -40,48 +30,33 @@
 
 .secondary-button:disabled {
   opacity: 0.55;
-
   cursor: not-allowed;
-
   transform: none;
 }
 
 .primary-small-button {
-  height: 42px;
-
-  padding: 0 17px;
-
-  border: 1px solid #e31b23;
-  border-radius: 10px;
-
-  background: #e31b23;
-
-  color: white;
-
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radio-sm);
+  background: var(--accent);
+  color: var(--accent-tinta);
   font-size: 14px;
   font-weight: 700;
-
+  line-height: 1;
   cursor: pointer;
-
-  box-shadow:
-    0 6px 18px rgba(227, 27, 35, 0.18);
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  box-shadow: var(--sombra-sm);
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .primary-small-button:hover {
-  background: #f0262f;
-
-  border-color: #f0262f;
-
+  background: var(--accent-hover);
   transform: translateY(-1px);
-
-  box-shadow:
-    0 8px 22px rgba(227, 27, 35, 0.25);
+  box-shadow: 0 10px 26px rgba(47, 191, 113, 0.22);
 }
 
 .primary-small-button:active {
@@ -90,11 +65,37 @@
 
 .primary-small-button:disabled {
   opacity: 0.55;
-
   cursor: not-allowed;
-
   transform: none;
-
   box-shadow: none;
 }
 
+/* Botón de envío ancho (login y formularios principales) */
+.primary-button {
+  width: 100%;
+  height: 40px;
+  margin-top: 8px;
+  border: none;
+  border-radius: var(--radio);
+  background: var(--accent);
+  color: var(--accent-tinta);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--sombra-sm);
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primary-button:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(47, 191, 113, 0.24);
+}
+
+.primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

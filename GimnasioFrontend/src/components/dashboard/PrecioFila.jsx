@@ -23,7 +23,7 @@ function PrecioInput({
     : equivalenciaMensual(
         valores[campo],
         meses,
-        plan.precio1Mes
+        plan.precio
       );
 
   return (

@@ -6,8 +6,10 @@
 // recálculo por fechas.
 // =========================================================
 
+import { obtenerNombre, obtenerApellido } from "../services/almacenSesion";
 import { membresiasService } from "../services/membresiasService";
 import { dialogoSistema } from "../services/servicioDialogos";
+import { registrarEventoMembresia } from "../utils/membresiasMetadata";
 
 const ESTADO_SUSPENDIDA = 4;
 
@@ -17,6 +19,7 @@ export function crearEstadosMembresias({
   notificar,
 }) {
   const suspenderMembresia = async (membresia) => {
+    const usuario = [obtenerNombre(), obtenerApellido()].filter(Boolean).join(" ") || "Sistema";
     const aceptado = await dialogoSistema.confirmar({
       titulo: "Suspender membresía",
       mensaje: `¿Suspender la membresía de ${membresia.socioNombre} ${membresia.socioApellido}?`,
@@ -37,6 +40,13 @@ export function crearEstadosMembresias({
 
     if (!resultado) return;
 
+    registrarEventoMembresia(
+      Number(membresia.id),
+      "Suspensión de membresía",
+      `Estado actualizado a suspendida · ${membresia.fechaFin || "-"}`,
+      usuario
+    );
+
     datos.setMembresias((previo) =>
       previo.map((item) =>
         Number(item.id) === Number(membresia.id)
@@ -49,6 +59,7 @@ export function crearEstadosMembresias({
   };
 
   const reactivarMembresia = async (membresia) => {
+    const usuario = [obtenerNombre(), obtenerApellido()].filter(Boolean).join(" ") || "Sistema";
     const resultado = await ejecutar({
       peticion: () =>
         membresiasService.reactivarMembresia(membresia.id),
@@ -60,6 +71,13 @@ export function crearEstadosMembresias({
     });
 
     if (!resultado) return;
+
+    registrarEventoMembresia(
+      Number(membresia.id),
+      "Reactivación de membresía",
+      `Se reactivó la membresía del socio ${membresia.socioNombre} ${membresia.socioApellido}`,
+      usuario
+    );
 
     // El estado final lo define el backend según fechas.
     await datos.obtenerMembresias();

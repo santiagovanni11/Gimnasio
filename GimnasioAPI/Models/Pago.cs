@@ -23,6 +23,10 @@ public class Pago
 
     public string? MotivoAnulacion { get; set; }
 
+    public string? AnuladoPor { get; set; }
+
+    public DateTime? FechaAnulacion { get; set; }
+
     public Membresia? Membresia { get; set; }
 
 }

@@ -13,7 +13,7 @@ public partial class AsistenciasController
 {
     // PUT: api/Asistencias/5 — Administrador y Recepcionista.
     [HttpPut("{id}")]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<IActionResult> PutAsistencia(
         int id,
         Asistencia asistencia)
@@ -38,7 +38,7 @@ public partial class AsistenciasController
         if (!socioExiste)
         {
             return BadRequest(
-                "El socio indicado no existe o está inactivo.");
+                "El socio no existe o está inactivo.");
         }
 
         if (asistencia.InscripcionClaseId.HasValue)
@@ -47,22 +47,13 @@ public partial class AsistenciasController
                 .FirstOrDefaultAsync(i =>
                     i.Id == asistencia.InscripcionClaseId.Value);
 
-            if (inscripcion == null)
-            {
-                return BadRequest(
-                    "La inscripción indicada no existe.");
-            }
+            var error = ValidarInscripcionDeAsistencia(
+                inscripcion,
+                asistencia.SocioId);
 
-            if (inscripcion.SocioId != asistencia.SocioId)
+            if (error != null)
             {
-                return BadRequest(
-                    "La inscripción no pertenece al socio indicado.");
-            }
-
-            if (inscripcion.Estado == EstadoInscripcion.Cancelada)
-            {
-                return BadRequest(
-                    "No se puede asociar una asistencia a una inscripción cancelada.");
+                return BadRequest(error);
             }
         }
 
@@ -78,11 +69,29 @@ public partial class AsistenciasController
                 "Ya existe otra asistencia para esta inscripción en esa fecha.");
         }
 
-        existente.SocioId = asistencia.SocioId;
+existente.SocioId = asistencia.SocioId;
         existente.InscripcionClaseId =
             asistencia.InscripcionClaseId;
         existente.Fecha = asistencia.Fecha;
         existente.Presente = asistencia.Presente;
+        existente.Motivo = string.IsNullOrWhiteSpace(
+            asistencia.Motivo) ? "normal" : asistencia.Motivo;
+        existente.DetalleMotivo = asistencia.DetalleMotivo;
+
+        AplicarAuditoria(existente);
+
+        var inscripcionActual = existente.InscripcionClaseId.HasValue
+            ? await _context.InscripcionesClases
+                .FirstOrDefaultAsync(i =>
+                    i.Id == existente.InscripcionClaseId.Value)
+            : null;
+
+        if (inscripcionActual != null)
+        {
+            inscripcionActual.Estado = existente.Presente
+                ? EstadoInscripcion.Asistio
+                : EstadoInscripcion.NoAsistio;
+        }
 
         await _context.SaveChangesAsync();
 
@@ -91,7 +100,7 @@ public partial class AsistenciasController
 
     // DELETE: api/Asistencias/5 — Solo Administrador.
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = RolesGimnasio.Administrador)]
     public async Task<IActionResult> DeleteAsistencia(int id)
     {
         var asistencia = await _context.Asistencias.FindAsync(id);
@@ -105,6 +114,33 @@ public partial class AsistenciasController
         await _context.SaveChangesAsync();
 
         return NoContent();
+    }
+
+    /// <summary>
+    /// Reglas comunes de una inscripción asociada a una
+    /// asistencia: debe existir, pertenecer al socio y no estar
+    /// cancelada. Devuelve el mensaje de error o null.
+    /// </summary>
+    private static string? ValidarInscripcionDeAsistencia(
+        InscripcionClase? inscripcion,
+        int socioId)
+    {
+        if (inscripcion == null)
+        {
+            return "La inscripción indicada no existe.";
+        }
+
+        if (inscripcion.SocioId != socioId)
+        {
+            return "La inscripción no pertenece al socio indicado.";
+        }
+
+        if (inscripcion.Estado == EstadoInscripcion.Cancelada)
+        {
+            return "No se puede registrar asistencia para una inscripción cancelada.";
+        }
+
+        return null;
     }
 
     private Task<InscripcionClase?> CargarInscripcionCompleta(int id)

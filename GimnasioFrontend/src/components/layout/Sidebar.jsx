@@ -1,99 +1,102 @@
 // =========================================================
-// SIDEBAR — Navegación lateral del panel
+// SIDEBAR — Navegación lateral agrupada y profesional.
+// Mantiene la misma interfaz (rol, seccion, cambiarSeccion,
+// permisos, cerrarSesion) para no romper DashboardPage.
 // =========================================================
 
-function Sidebar({
-  rol,
-  seccion,
-  cambiarSeccion,
-  permisos,
-  setMensaje,
-  cerrarSesion,
-}) {
-  const boton = (id, icono, texto, visible = true) =>
-    !visible ? null : (
-      <button
-        type="button"
-        className={seccion === id ? "nav-button active" : "nav-button"}
-        onClick={() => cambiarSeccion(id)}
-      >
-        <span>{icono}</span>
-        {texto}
-      </button>
-    );
+import { Logo, Logotipo } from "../../assets/Marca";
+import {
+  IconoInicio,
+  IconoSocios,
+  IconoMembresias,
+  IconoPrecios,
+  IconoUsuarios,
+  IconoPagos,
+  IconoClases,
+  IconoAsistencias,
+  IconoCerrarSesion,
+} from "../../assets/Iconos";
 
-  const botonPendiente = (icono, texto, mensaje) => (
-    <button
-      type="button"
-      className="nav-button"
-      onClick={() => setMensaje(mensaje)}
-    >
-      <span>{icono}</span>
-      {texto}
-    </button>
-  );
+const GRUPOS = [
+  {
+    titulo: "Panel",
+    items: [{ id: "inicio", texto: "Inicio", icono: <IconoInicio /> }],
+  },
+  {
+    titulo: "Operaciones",
+    items: [
+      { id: "socios", texto: "Socios", icono: <IconoSocios />, permiso: "puedeVerSocios" },
+      { id: "membresias", texto: "Membresías", icono: <IconoMembresias />, permiso: "puedeVerMembresias" },
+      { id: "clases", texto: "Clases", icono: <IconoClases />, permiso: "puedeVerClases" },
+      { id: "asistencias", texto: "Asistencias", icono: <IconoAsistencias />, permiso: "puedeVerAsistencias" },
+    ],
+  },
+  {
+    titulo: "Finanzas",
+    items: [
+      { id: "pagos", texto: "Pagos", icono: <IconoPagos />, permiso: "puedeVerPagos" },
+      { id: "precios", texto: "Precios", icono: <IconoPrecios />, admin: true },
+    ],
+  },
+  {
+    titulo: "Sistema",
+    items: [{ id: "usuarios", texto: "Usuarios", icono: <IconoUsuarios />, admin: true }],
+  },
+];
+
+function Sidebar({ rol, seccion, cambiarSeccion, permisos, cerrarSesion }) {
+  const esAdmin = rol === "Administrador";
+  const visible = (item) =>
+    item.admin ? esAdmin : item.permiso ? permisos[item.permiso] : true;
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-brand">
-        <div className="brand-icon">GYM</div>
-
-        <div>
-          <strong>Gimnasio</strong>
-          <span>Administración</span>
-        </div>
-      </div>
-
-      <div className="user-box">
-        <div className="avatar">{rol.charAt(0).toUpperCase()}</div>
-
-        <div>
-          <strong>{rol}</strong>
-          <span>Usuario activo</span>
+      <div className="sidebar-cabecera">
+        <Logo size={42} />
+        <div className="marca">
+          <Logotipo size={19} />
+          <span className="marca-sub">Centro de gestión</span>
         </div>
       </div>
 
       <nav className="sidebar-nav">
-        {boton("inicio", "⌂", "Inicio")}
+        {GRUPOS.map((grupo) => {
+          const items = grupo.items.filter(visible);
+          if (!items.length) return null;
 
-        {boton("socios", "◉", "Socios", permisos.puedeVerSocios)}
-
-        {boton(
-          "membresias",
-          "▣",
-          "Membresías",
-          permisos.puedeVerMembresias
-        )}
-
-        {boton(
-          "precios",
-          "⚙",
-          "Configuración de precios",
-          rol === "Administrador"
-        )}
-
-        {boton("usuarios", "☰", "Usuarios", rol === "Administrador")}
-
-        {boton("pagos", "◫", "Pagos", permisos.puedeVerPagos)}
-
-        {permisos.puedeVerClases &&
-          botonPendiente(
-            "◌",
-            "Clases",
-            "Este módulo lo construiremos a continuación."
-          )}
-
-        {permisos.puedeVerAsistencias &&
-          botonPendiente(
-            "◈",
-            "Asistencias",
-            "Este módulo lo construiremos a continuación."
-          )}
+          return (
+            <div className="nav-grupo" key={grupo.titulo}>
+              <span className="nav-grupo-titulo">{grupo.titulo}</span>
+              {items.map((i) => (
+                <button
+                  key={i.id}
+                  type="button"
+                  className={`nav-item ${seccion === i.id ? "is-active" : ""}`}
+                  onClick={() => cambiarSeccion(i.id)}
+                >
+                  <span className="nav-item-icon">{i.icono}</span>
+                  <span className="nav-item-texto">{i.texto}</span>
+                </button>
+              ))}
+            </div>
+          );
+        })}
       </nav>
 
-      <button type="button" className="logout-button" onClick={cerrarSesion}>
-        Cerrar sesión
-      </button>
+      <div className="sidebar-pie">
+        <div className="user-card">
+          <div className="user-avatar">{rol.charAt(0).toUpperCase()}</div>
+          <div className="user-meta">
+            <span className="user-nombre">{rol}</span>
+            <span className="user-sub">Sesión activa</span>
+          </div>
+        </div>
+
+        <button type="button" className="nav-logout" onClick={cerrarSesion}>
+          <IconoCerrarSesion width={18} height={18} />
+          <span>Cerrar sesión</span>
+        </button>
+      </div>
     </aside>
   );
 }

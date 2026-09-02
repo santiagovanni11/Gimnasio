@@ -25,7 +25,7 @@ public partial class InscripcionesClasesController : ControllerBase
 
     // GET: api/InscripcionesClases
     [HttpGet]
-    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    [Authorize(Roles = RolesGimnasio.TodosLosRoles)]
     public async Task<ActionResult<IEnumerable<InscripcionClaseDto>>> GetInscripciones()
     {
         var inscripciones = await CargarConRelaciones().ToListAsync();
@@ -34,7 +34,7 @@ public partial class InscripcionesClasesController : ControllerBase
 
     // GET: api/InscripcionesClases/5
     [HttpGet("{id}")]
-    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    [Authorize(Roles = RolesGimnasio.TodosLosRoles)]
     public async Task<ActionResult<InscripcionClaseDto>> GetInscripcion(int id)
     {
         var inscripcion = await CargarConRelaciones()
@@ -61,6 +61,8 @@ public partial class InscripcionesClasesController : ControllerBase
     /// <summary>Proyección estándar de una inscripción a su DTO.</summary>
     internal static InscripcionClaseDto MapearDto(InscripcionClase i)
     {
+        var hoy = DateTime.UtcNow.Date;
+
         return new InscripcionClaseDto
         {
             Id = i.Id,
@@ -83,6 +85,13 @@ public partial class InscripcionesClasesController : ControllerBase
             HoraFin = i.HorarioClase?.HoraFin ?? TimeSpan.Zero,
 
             FechaInscripcion = i.FechaInscripcion,
+            FechaHasta = i.FechaHasta,
+
+            // Recálculo perezoso: la vigencia definida ya pasó.
+            Vencida = i.FechaHasta.HasValue &&
+                i.FechaHasta.Value.Date < hoy &&
+                i.Estado != EstadoInscripcion.Cancelada,
+
             Estado = i.Estado
         };
     }

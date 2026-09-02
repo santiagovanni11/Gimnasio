@@ -5,6 +5,7 @@ import {
   esAnulado,
 } from "../../utils/pagos";
 import { getPlanNombre, getPlanBadgeClase } from "../../utils/planes";
+import EstadoVacio from "../common/EstadoVacio";
 
 export default function TablaPagos({
   pagos,
@@ -13,9 +14,16 @@ export default function TablaPagos({
   onDelete,
   onViewDetail,
   onCambiarEstado,
+  onEditar,
 }) {
   if (!pagos.length) {
-    return <div className="empty-state">No hay pagos registrados.</div>;
+    return (
+      <EstadoVacio
+        tipo="pagos"
+        titulo="Sin pagos todavía"
+        mensaje="Cuando registres un cobro aparecerá aquí, con su comprobante."
+      />
+    );
   }
 
   return (
@@ -44,9 +52,8 @@ export default function TablaPagos({
                 {pago.socioNombre} {pago.socioApellido}
               </td>
               <td>
-                <span className={getPlanBadgeClase(planNombre)}>
-                  {planNombre}
-                </span>
+                <span className={getPlanBadgeClase(planNombre)}>{planNombre}</span>
+                {pago.referencia?.startsWith("AUTO-") && <span className="chip-auto">Renov. auto</span>}
               </td>
               <td>{formatoMoneda(pago.monto)}</td>
               <td>
@@ -98,6 +105,16 @@ export default function TablaPagos({
                   >
                     Ver
                   </button>
+                  {!esAnulado(pago) && (
+                    <button
+                      type="button"
+                      className="edit-button"
+                      onClick={() => onEditar?.(pago)}
+                      title="Editar monto, forma o estado del pago"
+                    >
+                      Editar
+                    </button>
+                  )}
                   {Number(pago.estado) === 1 && (
                     <button
                       type="button"

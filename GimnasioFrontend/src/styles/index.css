@@ -9,25 +9,35 @@
    - pagosModales va DESPUÉS de pagosCaja (override v1 -> v2).
    ========================================================= */
 
+@import "./tokens.css";
 @import "./base.css";
 @import "./mensajes.css";
 @import "./estados.css";
+@import "./authHero.css";
 @import "./auth.css";
+@import "./registro.css";
 @import "./layout.css";
 @import "./principal.css";
 @import "./secciones.css";
 @import "./tablas.css";
 @import "./dashboard.css";
+@import "./inicio.css";
+@import "./inicioWidgets.css";
 @import "./pagos.css";
 @import "./pagosCaja.css";
 @import "./pagosModales.css";
 @import "./pagosDetalle.css";
 @import "./pagosReportes.css";
 @import "./pagosFiltros.css";
-@import "./precios.css";
+@import "./preciosTabla.css";
+@import "./preciosEditor.css";
+@import "./camposFecha.css";
 @import "./formularios.css";
 @import "./botones.css";
 @import "./botonesAccion.css";
+@import "./socios.css";
 @import "./planes.css";
+@import "./membresias.css";
 @import "./usuarios.css";
+@import "./clases.css";
 @import "./responsive.css";

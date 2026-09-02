@@ -1,11 +1,14 @@
 // =========================================================
 // BAJAS DE MEMBRESÍAS
-// Eliminación física, cancelación lógica (con historial) y
-// sincronización cuando se elimina un socio.
+// Eliminación física y cancelación lógica (con historial).
+// La baja de socios es lógica, así que no hay membresías
+// huérfanas que sincronizar.
 // =========================================================
 
+import { obtenerNombre, obtenerApellido } from "../services/almacenSesion";
 import { membresiasService } from "../services/membresiasService";
 import { dialogoSistema } from "../services/servicioDialogos";
+import { registrarEventoMembresia } from "../utils/membresiasMetadata";
 
 const ESTADO_CANCELADA = 5;
 
@@ -16,6 +19,7 @@ export function crearBajasMembresias({
   notificar,
 }) {
   const eliminarMembresia = async (membresia) => {
+    const usuario = [obtenerNombre(), obtenerApellido()].filter(Boolean).join(" ") || "Sistema";
     const aceptado = await dialogoSistema.confirmar({
       titulo: "Eliminar membresía",
       mensaje: `¿ELIMINAR definitivamente la membresía de ${membresia.socioNombre} ${membresia.socioApellido}?`,
@@ -37,6 +41,13 @@ export function crearBajasMembresias({
 
     if (!resultado) return;
 
+    registrarEventoMembresia(
+      Number(membresia.id),
+      "Eliminación de membresía",
+      `Se eliminó la membresía de ${membresia.socioNombre} ${membresia.socioApellido}`,
+      usuario
+    );
+
     datos.setMembresias((prev) =>
       prev.filter((item) => Number(item.id) !== Number(membresia.id))
     );
@@ -45,32 +56,24 @@ export function crearBajasMembresias({
   };
 
   /** Cancelación lógica: conserva historial (estado Cancelada). */
-  const cancelarMembresia = async (membresia) => {
-    const aceptado = await dialogoSistema.confirmar({
-      titulo: "Cancelar membresía",
-      mensaje: `¿Cancelar la membresía de ${membresia.socioNombre} ${membresia.socioApellido}? Conserva el historial.`,
-      textoAceptar: "Cancelar membresía",
-      tono: "peligro",
-    });
+  const cancelarMembresia = async (membresia, opciones = {}) => {
+    const usuario = [obtenerNombre(), obtenerApellido()].filter(Boolean).join(" ") || "Sistema";
+    const confirmar = opciones.confirmar ?? true;
 
-    if (!aceptado) return;
+    if (confirmar) {
+      const aceptado = await dialogoSistema.confirmar({
+        titulo: "Cancelar membresía",
+        mensaje: `¿Cancelar la membresía de ${membresia.socioNombre} ${membresia.socioApellido}? Conserva el historial.`,
+        textoAceptar: "Cancelar membresía",
+        tono: "peligro",
+      });
 
-    const payload = {
-      id: membresia.id,
-      socioId: Number(membresia.socioId),
-      planId: Number(membresia.planId),
-      fechaInicio: membresia.fechaInicio,
-      fechaFin: membresia.fechaFin,
-      precioAplicado: Number(membresia.precioAplicado || 0),
-      estado: ESTADO_CANCELADA,
-    };
+      if (!aceptado) return;
+    }
 
     const resultado = await ejecutar({
       peticion: () =>
-        membresiasService.actualizarMembresia(
-          membresia.id,
-          payload
-        ),
+        membresiasService.cancelarMembresia(membresia.id),
       onError: datos.setErrorMembresias,
       mensajePermiso: "No tenés permisos para modificar membresías.",
       mensajeError: "No se pudo cancelar la membresía.",
@@ -79,6 +82,13 @@ export function crearBajasMembresias({
     });
 
     if (!resultado) return;
+
+    registrarEventoMembresia(
+      Number(membresia.id),
+      "Cancelación de membresía",
+      `Se canceló la membresía · ${membresia.planNombre || "plan"}`,
+      usuario
+    );
 
     datos.setMembresias((prev) =>
       prev.map((item) =>
@@ -89,27 +99,6 @@ export function crearBajasMembresias({
     );
     notificar("Membresía cancelada correctamente.");
     cerrarSiEsLaEditada(membresia);
-  };
-
-  /** Tras borrar un socio: limpia formularios y refresca. */
-  const sincronizarSocioEliminado = async (
-    socioId,
-    sociosRestantes
-  ) => {
-    datos.quitarMembresiasDeSocio(socioId);
-    await datos.obtenerMembresias(sociosRestantes);
-
-    if (Number(formulario.socioSeleccionado) === Number(socioId)) {
-      formulario.limpiarCampos();
-    }
-
-    if (
-      formulario.membresiaEditando &&
-      Number(formulario.membresiaEditando.socioId) ===
-        Number(socioId)
-    ) {
-      formulario.cerrarFormularioMembresia();
-    }
   };
 
   function cerrarSiEsLaEditada(membresia) {
@@ -125,6 +114,5 @@ export function crearBajasMembresias({
   return {
     eliminarMembresia,
     cancelarMembresia,
-    sincronizarSocioEliminado,
   };
 }

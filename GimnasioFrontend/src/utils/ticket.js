@@ -4,6 +4,7 @@
 // =========================================================
 
 import jsPDF from "jspdf";
+import { formatoMoneda } from "./pagos";
 
 const ANCHO = 80;
 const MARGEN = 8;
@@ -127,10 +128,6 @@ export const construirTicketPago = (
     fecha: pagoPersistido?.fechaPago
       ? new Date(pagoPersistido.fechaPago).toLocaleDateString("es-AR")
       : new Date().toLocaleDateString("es-AR"),
-    monto: new Intl.NumberFormat("es-AR", {
-      style: "currency",
-      currency: "ARS",
-      minimumFractionDigits: 2,
-    }).format(Number(pagoPersistido?.monto || 0)),
+    monto: formatoMoneda(pagoPersistido?.monto || 0),
   };
 };

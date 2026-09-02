@@ -11,6 +11,7 @@ import { enVentanaDeVencimiento } from "../utils/vencimientosMembresia";
 export function useVisibilidadMembresias(membresiasFiltradas) {
   const [filtroEstado, setFiltroEstado] = useState("");
   const [filtroVencimiento, setFiltroVencimiento] = useState("");
+  const [filtroPlan, setFiltroPlan] = useState("");
   const { orden, toggleOrden, ordenar } = useOrdenTabla("fechaFin");
 
   // Filtro por estado manual del listado
@@ -38,9 +39,18 @@ export function useVisibilidadMembresias(membresiasFiltradas) {
     [porEstado, filtroVencimiento]
   );
 
+  // Filtro por plan (nombre del plan de la membresía)
+  const porPlan = useMemo(
+    () =>
+      filtroPlan
+        ? porVencimiento.filter((m) => m.planNombre === filtroPlan)
+        : porVencimiento,
+    [porVencimiento, filtroPlan]
+  );
+
   const membresiasVisibles = useMemo(
-    () => ordenar(porVencimiento),
-    [porVencimiento, ordenar]
+    () => ordenar(porPlan),
+    [porPlan, ordenar]
   );
 
   return {
@@ -48,6 +58,8 @@ export function useVisibilidadMembresias(membresiasFiltradas) {
     setFiltroEstado,
     filtroVencimiento,
     setFiltroVencimiento,
+    filtroPlan,
+    setFiltroPlan,
     orden,
     toggleOrden,
     membresiasVisibles,

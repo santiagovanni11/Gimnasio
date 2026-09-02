@@ -49,6 +49,17 @@ export const dialogoSistema = {
     });
   },
 
+  /** Bloqueo operativo: no deja continuar y usa un patrón visual fijo. */
+  bloqueo(opciones = {}) {
+    return this.confirmar({
+      titulo: "No se puede continuar",
+      textoAceptar: "Entendido",
+      textoCancelar: "Cerrar",
+      tono: "info",
+      ...opciones,
+    });
+  },
+
   /**
    * Texto libre (reemplaza prompt): resuelve string o null si
    * se canceló. Con minimoCaracteres, el host valida antes de
@@ -58,6 +69,7 @@ export const dialogoSistema = {
     return solicitar({
       tipo: "texto",
       textoAceptar: "Guardar",
+      textoCancelar: "Cancelar",
       ...opciones,
     });
   },

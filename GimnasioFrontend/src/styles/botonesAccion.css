@@ -1,36 +1,26 @@
 /* botonesAccion.css - Botones de fila: editar, borrar, ver, aprobar */
 
 .edit-button {
-  height: 34px;
-
-  padding: 0 13px;
-
-  border: 1px solid #343b45;
-  border-radius: 8px;
-
-  background: #1b2027;
-
-  color: #dce1e7;
-
-  font-size: 13px;
-  font-weight: 700;
-
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--line-fuerte);
+  border-radius: var(--radio-sm);
+  background: var(--surface-2);
+  color: var(--texto);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .edit-button:hover {
-  background: #252c35;
-
-  border-color: #4a535f;
-
-  color: white;
-
+  background: var(--surface-3);
+  border-color: rgba(255, 255, 255, 0.24);
   transform: translateY(-1px);
 }
 
@@ -38,62 +28,56 @@
   transform: translateY(0);
 }
 
-/* =========================
-   BOT?"N BORRAR
-========================= */
-
 .delete-button {
-  height: 34px;
-
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
   margin-left: 8px;
-
-  padding: 0 13px;
-
-  border: 1px solid #303740;
-  border-radius: 8px;
-
-  background: #1a1f25;
-
-  color: #b8bec7;
-
-  font-size: 13px;
-  font-weight: 700;
-
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radio-sm);
+  background: transparent;
+  color: var(--texto-muted);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .delete-button:hover {
-  background: rgba(227, 27, 35, 0.12);
-
-  border-color: rgba(227, 27, 35, 0.4);
-
-  color: #ff767d;
+  background: rgba(251, 113, 133, 0.12);
+  border-color: rgba(251, 113, 133, 0.4);
+  color: var(--peligro);
 }
 
 .delete-button:active {
-  background: rgba(227, 27, 35, 0.18);
+  background: rgba(251, 113, 133, 0.18);
 }
 
 .export-button {
-  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
   padding: 0 16px;
-  border-radius: 8px;
-  border: 1px solid #2a2f37;
-  background: #1a1c20;
-  color: #f4f4f5;
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: var(--radio-sm);
+  border: 1px solid var(--line-fuerte);
+  background: var(--surface-2);
+  color: var(--texto);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .export-button:hover:not(:disabled) {
-  background: #252c35;
+  background: var(--surface-3);
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 .export-button:disabled {
@@ -102,53 +86,68 @@
 }
 
 .view-button {
-  height: 34px;
-  padding: 0 12px;
-  border-radius: 8px;
-  border: 1px solid #2a2f37;
-  background: #1a1c20;
-  color: #f4f4f5;
-  font-size: 13px;
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radio-sm);
+  border: 1px solid var(--line-fuerte);
+  background: var(--surface-2);
+  color: var(--texto);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .view-button:hover {
-  background: #252c35;
+  background: var(--surface-3);
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 .approve-button {
-  height: 34px;
-  padding: 0 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(74, 222, 128, 0.4);
-  background: rgba(74, 222, 128, 0.1);
-  color: #4ade80;
-  font-size: 13px;
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radio-sm);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  background: rgba(52, 211, 153, 0.12);
+  color: var(--exito);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .approve-button:hover {
-  background: rgba(74, 222, 128, 0.2);
+  background: rgba(52, 211, 153, 0.2);
 }
 
 .cancel-button {
-  height: 34px;
-  padding: 0 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 184, 77, 0.4);
-  background: rgba(255, 184, 77, 0.1);
-  color: #ffb84d;
-  font-size: 13px;
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radio-sm);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  background: rgba(251, 191, 36, 0.12);
+  color: var(--aviso);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .cancel-button:hover {
-  background: rgba(255, 184, 77, 0.2);
+  background: rgba(251, 191, 36, 0.2);
 }
-

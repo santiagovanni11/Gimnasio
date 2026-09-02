@@ -1,0 +1,76 @@
+/* =========================================================
+   registro.css - Registro de cuenta y controles de
+   contraseña (recordarme, ver/ocultar clave). Tokens FORZA.
+   ========================================================= */
+
+.register-link-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 22px;
+  color: var(--texto-muted);
+  font-size: 14px;
+}
+
+.register-link {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.register-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.login-back-button {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.login-recordarme {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 4px;
+  color: var(--texto-muted);
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.login-recordarme input {
+  width: auto;
+  accent-color: var(--accent);
+}
+
+.campo-password-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.campo-password-control input {
+  padding-right: 72px;
+}
+
+.campo-password-toggle {
+  position: absolute;
+  right: 10px;
+  padding: 4px 6px;
+  border: none;
+  background: transparent;
+  color: var(--texto-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.campo-password-toggle:hover {
+  color: var(--texto);
+}

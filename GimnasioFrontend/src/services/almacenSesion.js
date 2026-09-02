@@ -5,7 +5,7 @@
 // pestaña actual). El resto de la app consume estos helpers.
 // =========================================================
 
-const CLAVES = ["token", "rol", "usuarioId", "expira"];
+const CLAVES = ["token", "rol", "usuarioId", "expira", "nombre", "apellido"];
 
 const leer = (clave) =>
   localStorage.getItem(clave) || sessionStorage.getItem(clave);
@@ -15,7 +15,7 @@ const leer = (clave) =>
  * para evitar restos de una sesión anterior con otro modo.
  */
 export const guardarSesion = (
-  { token, rol, usuarioId, expira },
+  { token, rol, usuarioId, expira, nombre, apellido },
   recordar = true
 ) => {
   limpiarSesion();
@@ -25,6 +25,8 @@ export const guardarSesion = (
   destino.setItem("token", token);
   destino.setItem("rol", rol ?? "");
   destino.setItem("usuarioId", String(usuarioId ?? ""));
+  destino.setItem("nombre", nombre ?? "");
+  destino.setItem("apellido", apellido ?? "");
 
   if (expira) {
     destino.setItem("expira", String(expira));
@@ -36,6 +38,10 @@ export const obtenerToken = () => leer("token");
 export const obtenerRol = () => leer("rol") || "";
 
 export const obtenerUsuarioId = () => leer("usuarioId") || "";
+
+export const obtenerNombre = () => leer("nombre") || "";
+
+export const obtenerApellido = () => leer("apellido") || "";
 
 export const obtenerExpira = () => leer("expira");
 

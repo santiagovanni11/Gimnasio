@@ -1,6 +1,13 @@
 // =========================================================
 // UTILIDADES DE SOCIOS
+// Cumpleaños, vencimientos próximos y contacto faltante.
+// La visualización de membresía vive en utils/membresiaVisual.
+// La exportación a CSV está en utils/exportar/sociosExportarCsv.
 // =========================================================
+
+import { aISO } from "./fechas";
+
+export { getMembresiaVisual } from "./membresiaVisual";
 
 /**
  * Socios activos que cumplen años en el mes actual,
@@ -35,7 +42,8 @@ export const getVencimientosProximos = (
 ) => {
   const limite = new Date(hoy);
   limite.setDate(limite.getDate() + dias);
-  const limiteISO = limite.toISOString().slice(0, 10);
+
+  const limiteISO = aISO(limite);
 
   return membresias.filter(
     (m) =>
@@ -45,125 +53,32 @@ export const getVencimientosProximos = (
 };
 
 /**
- * Visualización de la membresía de un socio.
- * Prioriza la última membresía válida (no rechazada);
- * si todas están rechazadas muestra "Rechazada".
+ * ¿El socio tiene membresía vigente? La última membresía debe
+ * estar en curso (Vigente o Por vencer) y no rechazada.
  */
-export const getMembresiaVisual = (
-  socio,
-  membresias = [],
-  membresiasRechazadasIds
-) => {
-  const delSocio = membresias.filter(
-    (m) => Number(m.socioId) === Number(socio?.id)
+export const tieneMembresiaVigente = (socio, membresiasRechazadasIds) => {
+  const membresia = socio?.membresia;
+
+  if (!membresia) return false;
+  if (membresiasRechazadasIds?.has(Number(membresia.id))) return false;
+
+  return (
+    membresia.estado === "Vigente" || membresia.estado === "Por vencer"
   );
-
-  const validas = delSocio.filter(
-    (m) => !membresiasRechazadasIds?.has(Number(m.id))
-  );
-
-  if (validas.length > 0) {
-    const ultima = [...validas].sort(
-      (a, b) =>
-        new Date(b.fechaFin) - new Date(a.fechaFin) ||
-        Number(b.id) - Number(a.id)
-    )[0];
-
-    const estados = {
-      1: "Pendiente",
-      2: "Vigente",
-      3: "Vencida",
-      4: "Suspendida",
-      5: "Cancelada",
-    };
-
-    const texto =
-      estados[ultima.estado] ||
-      (typeof ultima.estado === "string" ? ultima.estado : "Desconocida");
-
-    const clases = {
-      Vigente: "status-active",
-      "Por vencer": "status-warning",
-      Vencida: "status-expired",
-      Pendiente: "status-warning",
-    };
-
-    return {
-      texto,
-      clase: clases[texto] || "status-inactive",
-      fechaFin: ultima.fechaFin,
-      membresia: ultima,
-    };
-  }
-
-  if (membresiasRechazadasIds?.has(Number(socio?.membresia?.id))) {
-    return { texto: "Rechazada", clase: "status-rejected", fechaFin: null };
-  }
-
-  const estado = socio?.membresia?.estado;
-  const clases = {
-    Vigente: "status-active",
-    "Por vencer": "status-warning",
-    Vencida: "status-expired",
-  };
-
-  return {
-    texto: estado || "Sin membresía",
-    clase: clases[estado] || "status-inactive",
-    fechaFin: socio?.membresia?.fechaFin || null,
-  };
 };
+
+/** Campos de contacto opcionales que debería tener un socio. */
+const CAMPOS_CONTACTO = [
+  { clave: "telefono", titulo: "teléfono" },
+  { clave: "email", titulo: "email" },
+  { clave: "direccion", titulo: "dirección" },
+];
 
 /**
- * Descarga el listado de socios como CSV.
+ * Datos de contacto faltantes del socio, para el indicador
+ * de ficha incompleta ("teléfono", "email"…).
  */
-export const exportarSociosCsv = (socios = []) => {
-  if (!socios.length) return;
-
-  const encabezados = [
-    "Nombre",
-    "Apellido",
-    "DNI",
-    "Fecha nacimiento",
-    "Teléfono",
-    "Email",
-    "Dirección",
-    "Estado",
-    "Membresía",
-    "Vencimiento",
-  ];
-
-  const filas = socios.map((s) => [
-    s.nombre,
-    s.apellido,
-    s.dni,
-    s.fechaNacimiento
-      ? new Date(s.fechaNacimiento).toLocaleDateString("es-AR")
-      : "",
-    s.telefono,
-    s.email,
-    s.direccion || "",
-    s.activo === false ? "Inactivo" : "Activo",
-    s.membresia?.estado || "Sin membresía",
-    s.membresia?.fechaFin
-      ? new Date(s.membresia.fechaFin).toLocaleDateString("es-AR")
-      : "",
-  ]);
-
-  const csv = [encabezados, ...filas]
-    .map((fila) =>
-      fila.map((celda) => `"${String(celda ?? "").replace(/"/g, '""')}"`).join(",")
-    )
-    .join("\n");
-
-  const blob = new Blob(["\uFEFF" + csv], {
-    type: "text/csv;charset=utf-8;",
-  });
-
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `socios_${new Date().toISOString().slice(0, 10)}.csv`;
-  link.click();
-  URL.revokeObjectURL(url);
-};
+export const camposFaltantesDe = (socio) =>
+  CAMPOS_CONTACTO.filter(
+    ({ clave }) => !String(socio?.[clave] ?? "").trim()
+  ).map(({ titulo }) => titulo);

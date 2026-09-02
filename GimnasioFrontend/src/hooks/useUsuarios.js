@@ -119,6 +119,7 @@ export function useUsuarios(activo = true) {
     cargando,
     error,
     mensaje,
+    setMensaje,
     verInactivos,
     setVerInactivos,
     filtroRol,

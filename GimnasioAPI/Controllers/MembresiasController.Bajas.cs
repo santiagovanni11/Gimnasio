@@ -1,4 +1,5 @@
 using GimnasioAPI.Models;
+using GimnasioAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +17,7 @@ public partial class MembresiasController
     // =========================================================
 
     [HttpPut("{id}/cancelar")]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<IActionResult> CancelarMembresia(int id)
     {
         var membresia = await _context.Membresias.FindAsync(id);
@@ -34,6 +35,11 @@ public partial class MembresiasController
         membresia.Estado = EstadoMembresia.Cancelada;
 
         await _context.SaveChangesAsync();
+        await _auditoria.RegistrarAsync(
+            _context,
+            AccionesAuditoriaMembresia.Cancelacion,
+            membresia,
+            "Membresía cancelada.");
 
         return NoContent();
     }
@@ -43,7 +49,7 @@ public partial class MembresiasController
     // =========================================================
 
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = RolesGimnasio.Administrador)]
     public async Task<IActionResult> DeleteMembresia(int id)
     {
         var membresia = await _context.Membresias.FindAsync(id);

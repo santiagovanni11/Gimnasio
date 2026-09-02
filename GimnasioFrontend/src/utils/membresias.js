@@ -4,12 +4,56 @@
 // rechazo por período vive en utils/pagosPeriodo.
 // =========================================================
 
+import { descargarCsv } from "./exportar/csvComun";
+import { aISO, fechaDesdeValor, fechaTexto } from "./fechas";
+
 export const ESTADO_MEMBRESIA = {
   PENDIENTE: 1,
   ACTIVA: 2,
   VENCIDA: 3,
   SUSPENDIDA: 4,
   CANCELADA: 5,
+};
+
+/**
+ * Escalón de duración (1/3/6/12) entre dos fechas ISO,
+ * como string; "" si las fechas son inválidas o no
+ * corresponden a un escalón estándar.
+ */
+export const mesesEscalonEntre = (fechaInicio, fechaFin) => {
+  if (!fechaInicio || !fechaFin) return "";
+
+  const inicio = fechaDesdeValor(fechaInicio);
+  const fin = fechaDesdeValor(fechaFin);
+
+  if ([inicio, fin].some((f) => Number.isNaN(f.getTime()))) {
+    return "";
+  }
+
+  var diferenciaMeses =
+    (fin.getFullYear() - inicio.getFullYear()) * 12 +
+    (fin.getMonth() - inicio.getMonth());
+
+  if (fin.getDate() < inicio.getDate()) diferenciaMeses--;
+
+  if (![1, 3, 6, 12].includes(diferenciaMeses)) return "";
+
+  return String(diferenciaMeses);
+};
+
+/** Fecha ISO local (yyyy-mm-dd) resultante de sumar meses. */
+export const sumarMesesIso = (fechaIso, meses) => {
+  const fecha = fechaDesdeValor(fechaIso);
+  const diaInicio = fecha.getDate();
+
+  if (Number.isNaN(fecha.getTime()) || !meses) return "";
+
+  fecha.setMonth(fecha.getMonth() + Number(meses));
+  if (fecha.getDate() < diaInicio) {
+    fecha.setDate(0);
+  }
+
+  return aISO(fecha);
 };
 
 export const estadoMembresiaTexto = (valor) => {
@@ -35,6 +79,7 @@ export const getMembresiasConSaldoPendiente = (
   rechazadasIds
 ) => {
   return membresias
+    .filter((m) => Number(m.estado) !== ESTADO_MEMBRESIA.CANCELADA)
     .filter((m) => !rechazadasIds?.has(Number(m.id)))
     .map((m) => {
       const pagado =
@@ -84,29 +129,10 @@ export const exportarMembresiasCsv = (membresias = []) => {
     `${m.socioNombre || ""} ${m.socioApellido || ""}`.trim(),
     m.planNombre,
     m.precioAplicado,
-    m.fechaInicio
-      ? new Date(m.fechaInicio).toLocaleDateString("es-AR")
-      : "",
-    m.fechaFin
-      ? new Date(m.fechaFin).toLocaleDateString("es-AR")
-      : "",
+    m.fechaInicio ? fechaTexto(m.fechaInicio) : "",
+    m.fechaFin ? fechaTexto(m.fechaFin) : "",
     estadoMembresiaTexto(m.estado),
   ]);
 
-  const csv = [encabezados, ...filas]
-    .map((fila) =>
-      fila.map((celda) => `"${String(celda ?? "").replace(/"/g, '""')}"`).join(",")
-    )
-    .join("\n");
-
-  const blob = new Blob(["\uFEFF" + csv], {
-    type: "text/csv;charset=utf-8;",
-  });
-
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `membresias_${new Date().toISOString().slice(0, 10)}.csv`;
-  link.click();
-  URL.revokeObjectURL(url);
+  descargarCsv("membresias", encabezados, filas);
 };

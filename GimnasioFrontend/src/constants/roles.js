@@ -60,9 +60,24 @@ export const calcularPermisos = (rol) => ({
     ROLES.RECEPCIONISTA,
     ROLES.PROFESOR,
   ]),
+  // Espejo exacto de la autorización del backend:
+  // clases escribe Admin+Recepcionista (borra solo Admin);
+  // horarios, solo Administrador.
+  puedeGestionarClases: esAlguno(rol, [
+    ROLES.ADMINISTRADOR,
+    ROLES.RECEPCIONISTA,
+  ]),
+  puedeEliminarClases: rol === ROLES.ADMINISTRADOR,
+  puedeGestionarHorarios: rol === ROLES.ADMINISTRADOR,
   puedeVerAsistencias: esAlguno(rol, [
     ROLES.ADMINISTRADOR,
     ROLES.RECEPCIONISTA,
     ROLES.PROFESOR,
+  ]),
+  // Espejo del backend: tomar lista lo hace cualquier rol
+  // (POST); corregir marcas cargadas, Admin + Recepcionista.
+  puedeEditarAsistencias: esAlguno(rol, [
+    ROLES.ADMINISTRADOR,
+    ROLES.RECEPCIONISTA,
   ]),
 });

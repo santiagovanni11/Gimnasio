@@ -1,19 +1,11 @@
 // =========================================================
 // UTILIDADES DE PLANES
-// Single Responsibility: toda la lógica de presentación
-// de planes centralizada aquí. Escalable si se agregan
-// nuevos tipos (Premium, Básico, VIP, etc.).
+// Presentación de planes: nombre, precios por duración,
+// filtro y badge visual.
 // =========================================================
 
-export const PLAN_TIPO = {
-  BASICO: "Basico",
-  PREMIUM: "Premium",
-};
+import { quitarAcentos } from "./texto";
 
-/**
- * Normaliza y retorna el nombre del plan para mostrar.
- * Prioriza planNombre del DTO; fallback a planId o genérico.
- */
 /**
  * Retorna el nombre del plan para un pago.
  * @param {object} pago - Objeto pago del API
@@ -77,8 +69,11 @@ export const precioSegunDuracion = (plan, duracion) => {
     12: plan.precio12Meses,
   };
 
-  const precio = precios[Number(duracion)];
-  return precio !== undefined ? Number(precio) : Number(plan.precio ?? 0);
+  const meses = Number(duracion);
+  const precio = precios[meses];
+  return precio !== undefined
+    ? Number(precio)
+    : Number(plan.precio ?? 0) * Math.max(meses, 1);
 };
 
 /**
@@ -92,18 +87,18 @@ export const coincideFiltroPlan = (
 ) => {
   if (!filtroPlan) return true;
 
-  const nombre = getPlanNombre(pago, membresias)
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+  const nombre = quitarAcentos(
+    getPlanNombre(pago, membresias).toLowerCase()
+  );
+  const buscado = quitarAcentos(String(filtroPlan).toLowerCase());
 
-  return nombre.includes(filtroPlan);
+  return nombre.includes(buscado);
 };
 
 /**
  * Retorna true si el plan es Premium (case-insensitive).
  */
-export const esPlanPremium = (nombrePlan) =>
+const esPlanPremium = (nombrePlan) =>
   String(nombrePlan).toLowerCase().includes("premium");
 
 /**

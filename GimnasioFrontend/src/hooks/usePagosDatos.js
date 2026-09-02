@@ -10,6 +10,7 @@ import { ESTADO_PAGO } from "../utils/pagos";
 import { normalizarTextoBusqueda } from "../utils/texto";
 import { hoyISO } from "../utils/fechas";
 import { dialogoSistema } from "../services/servicioDialogos";
+import { registrarEventoPago } from "../utils/pagosMetadata";
 
 export function usePagosDatos({ onSesionExpirada, notificar }) {
   const [pagos, setPagos] = useState([]);
@@ -86,6 +87,7 @@ export function usePagosDatos({ onSesionExpirada, notificar }) {
 
     if (!resultado) return;
 
+    registrarEventoPago(pago, "Anulación", `Pago anulado por ${motivo}.`, "Operador");
     notificar?.("Pago anulado correctamente.");
     await obtenerPagos();
   };
@@ -115,6 +117,12 @@ export function usePagosDatos({ onSesionExpirada, notificar }) {
 
     if (!resultado) return;
 
+    registrarEventoPago(
+      pago,
+      nuevoEstado === ESTADO_PAGO.APROBADO ? "Aprobación" : "Cambio de estado",
+      `Estado actualizado a ${textoEstado(nuevoEstado)}.`,
+      "Operador"
+    );
     notificar?.(`Pago ${textoEstado(nuevoEstado)} correctamente.`);
     await obtenerPagos();
   };

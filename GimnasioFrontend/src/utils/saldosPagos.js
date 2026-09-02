@@ -8,7 +8,6 @@
 import {
   totalAprobadoDelPeriodoPorMembresia,
 } from "./pagosPeriodo";
-import { getMembresiasConSaldoPendiente } from "./membresias";
 
 /** Mapa membresiaId -> precio aplicado. */
 export const calcularPrecioPorMembresia = (membresias = []) =>
@@ -38,15 +37,3 @@ export const calcularSaldoPorPago = (pagos = [], membresias = []) => {
 
   return mapa;
 };
-
-/** Membresías con saldo pendiente (para MorososAlert). */
-export const calcularMorosos = (
-  membresias = [],
-  pagadoPorMembresia,
-  rechazadasIds
-) =>
-  getMembresiasConSaldoPendiente(
-    membresias,
-    pagadoPorMembresia,
-    rechazadasIds
-  );

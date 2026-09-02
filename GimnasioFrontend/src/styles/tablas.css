@@ -1,45 +1,39 @@
-﻿/* tablas.css - Estilos base de tablas */
+﻿/* tablas.css - Estilos base de tablas (tokens FORZA) */
 
 .table-wrapper {
   overflow-x: auto;
-
-  border: 1px solid #252b33;
-  border-radius: 14px;
-
+  border: 1px solid var(--line);
+  border-radius: var(--radio-lg);
+  background: var(--surface);
   scrollbar-width: thin;
 }
 
 table {
   width: 100%;
   min-width: 1000px;
-
   border-collapse: collapse;
 }
 
 th,
 td {
-  padding: 14px 16px;
-
-  border-bottom: 1px solid #232932;
-
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--line);
   text-align: left;
-
   font-size: 14px;
 }
 
 th {
-  background: #171b20;
-
-  color: #aab1bb;
-
+  background: var(--surface-2);
+  color: var(--texto-muted);
   font-weight: 700;
-
+  font-size: 12px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
 td {
-  color: #e3e6ea;
-
+  color: var(--texto);
   white-space: nowrap;
 }
 
@@ -47,7 +41,23 @@ tbody tr:last-child td {
   border-bottom: none;
 }
 
-tbody tr:hover {
-  background: #171b20;
+tbody tr {
+  transition: background 0.15s ease;
 }
 
+tbody tr:hover {
+  background: var(--surface-2);
+}
+
+.celda-con-avatar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}

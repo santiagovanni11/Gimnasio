@@ -1,14 +1,15 @@
 using GimnasioAPI.DTOs;
 using GimnasioAPI.Models;
-using GimnasioAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace GimnasioAPI.Controllers;
 
 /// <summary>
-/// Alta pública de cuentas con nombre, apellido y rol.
+/// Alta pública de cuentas con nombre, apellido y rol. La
+/// creación (validaciones, hash y auditoría) vive en
+/// CreacionUsuariosService; aquí solo aplica la política de
+/// roles admitidos y da forma a la respuesta.
 /// </summary>
 public partial class AuthController
 {
@@ -21,61 +22,17 @@ public partial class AuthController
     public async Task<IActionResult> RegistrarUsuario(
         CrearUsuarioDto dto)
     {
-        var error =
-            CredencialesValidator.ValidarEmail(dto.Email);
+        var resultado = await _altas.CrearAsync(
+            dto,
+            politicaRol: ValidarPoliticaRegistro);
 
-        if (!string.IsNullOrEmpty(error)) return BadRequest(error);
-
-        error = CredencialesValidator.ValidarPassword(
-            dto.Password);
-
-        if (!string.IsNullOrEmpty(error)) return BadRequest(error);
-
-        var emailNormalizado = dto.Email.Trim();
-
-        if (await _context.Usuarios.AnyAsync(u =>
-                u.Email.ToLower() ==
-                emailNormalizado.ToLower()))
+        if (resultado.Error != null)
         {
-            return BadRequest(
-                "Ya existe un usuario con ese email.");
+            return BadRequest(resultado.Error);
         }
 
-        var rol = await _context.Roles.FirstOrDefaultAsync(
-            r => r.Id == dto.RolId && r.Activo);
-
-        if (rol == null)
-        {
-            return BadRequest(
-                "El rol indicado no existe o está inactivo.");
-        }
-
-        if (!EsRolDeRegistroPermitido(rol.Nombre))
-        {
-            return BadRequest(
-                "El rol seleccionado no está permitido.");
-        }
-
-        var usuario = new Usuario
-        {
-            Email = emailNormalizado,
-            PasswordHash =
-                BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Nombre = dto.Nombre?.Trim(),
-            Apellido = dto.Apellido?.Trim(),
-            RolId = rol.Id,
-            FechaCreacion = DateTime.UtcNow,
-            Activo = true
-        };
-
-        _context.Usuarios.Add(usuario);
-        await _context.SaveChangesAsync();
-
-        await _auditoria.RegistrarAsync(
-            _context,
-            AccionesAuditoriaUsuario.Creacion,
-            usuario,
-            detalle: $"Rol {rol.Nombre}.");
+        var usuario = resultado.Usuario!;
+        var rol = resultado.Rol!;
 
         return Created(
             $"api/Usuarios/{usuario.Id}",
@@ -92,8 +49,17 @@ public partial class AuthController
             });
     }
 
-    private static bool EsRolDeRegistroPermitido(string nombreRol) =>
-        nombreRol == "Administrador" ||
-        nombreRol == "Recepcionista" ||
-        nombreRol == "Profesor";
+    private static bool EsRolDeRegistroPermitido(
+        string nombreRol) =>
+        RolesGimnasio.RegistroPermitido.Contains(nombreRol);
+
+    /// <summary>
+    /// Política del registro público: solo roles operativos.
+    /// </summary>
+    private static string? ValidarPoliticaRegistro(Rol rol)
+    {
+        return EsRolDeRegistroPermitido(rol.Nombre)
+            ? null
+            : "El rol seleccionado no está permitido.";
+    }
 }

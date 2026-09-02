@@ -18,7 +18,7 @@ public partial class SociosController
     // =========================================================
 
     [HttpPost]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<ActionResult<Socio>> CrearSocio(Socio socio)
     {
         var errorValidacion = SocioValidaciones.ValidarDatos(socio);
@@ -30,10 +30,7 @@ public partial class SociosController
 
         var dniNormalizado = socio.DNI.Trim();
 
-        var dniExiste = await _context.Socios
-            .AnyAsync(s => s.DNI == dniNormalizado);
-
-        if (dniExiste)
+        if (await DniEnUsoAsync(dniNormalizado))
         {
             return BadRequest("Ya existe un socio con ese DNI.");
         }
@@ -58,7 +55,7 @@ public partial class SociosController
     // =========================================================
 
     [HttpPut("{id}")]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<IActionResult> ActualizarSocio(
         int id,
         Socio socio)
@@ -86,11 +83,7 @@ public partial class SociosController
 
         var dniNormalizado = socio.DNI.Trim();
 
-        var dniExiste = await _context.Socios
-            .AnyAsync(s =>
-                s.DNI == dniNormalizado && s.Id != id);
-
-        if (dniExiste)
+        if (await DniEnUsoAsync(dniNormalizado, excluirId: id))
         {
             return BadRequest("Ya existe otro socio con ese DNI.");
         }
@@ -105,6 +98,18 @@ public partial class SociosController
             string.IsNullOrWhiteSpace(socio.Direccion)
                 ? null
                 : socio.Direccion.Trim();
+        existente.FotoUrl =
+            string.IsNullOrWhiteSpace(socio.FotoUrl)
+                ? null
+                : socio.FotoUrl.Trim();
+        existente.ContactoEmergencia =
+            string.IsNullOrWhiteSpace(socio.ContactoEmergencia)
+                ? null
+                : socio.ContactoEmergencia.Trim();
+        existente.TelefonoEmergencia =
+            string.IsNullOrWhiteSpace(socio.TelefonoEmergencia)
+                ? null
+                : socio.TelefonoEmergencia.Trim();
         existente.Activo = socio.Activo;
 
         await _context.SaveChangesAsync();
@@ -113,27 +118,12 @@ public partial class SociosController
     }
 
     // =========================================================
-    // DELETE: api/Socios/5 — Solo Administrador.
-    // Borrado físico del socio y sus datos dependientes.
+    // BAJA DE SOCIOS
+    // La baja es SIEMPRE lógica (PUT con Activo=false): el socio
+    // conserva su historial de membresías, pagos y asistencias.
+    // No existe borrado físico justamente para no perder ese
+    // historial contable.
     // =========================================================
-
-    [HttpDelete("{id}")]
-    [Authorize(Roles = "Administrador")]
-    public async Task<IActionResult> EliminarSocio(int id)
-    {
-        var socio = await _context.Socios
-            .FirstOrDefaultAsync(s => s.Id == id);
-
-        if (socio == null)
-        {
-            return NotFound();
-        }
-
-        _context.Socios.Remove(socio);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
-    }
 
     private static void NormalizarDatos(Socio socio)
     {
@@ -146,5 +136,13 @@ public partial class SociosController
             string.IsNullOrWhiteSpace(socio.Direccion)
                 ? null
                 : socio.Direccion.Trim();
+    }
+
+    /// <summary>Unicidad de DNI, opcionalmente excluyendo un Id.</summary>
+    private Task<bool> DniEnUsoAsync(string dni, int? excluirId = null)
+    {
+        return _context.Socios.AnyAsync(s =>
+            s.DNI == dni &&
+            (excluirId == null || s.Id != excluirId));
     }
 }

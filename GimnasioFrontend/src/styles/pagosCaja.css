@@ -8,8 +8,8 @@
   margin: 0 0 1rem;
   padding: 14px 18px;
   border-radius: 12px;
-  background: rgba(227, 27, 35, 0.1);
-  border: 1px solid rgba(227, 27, 35, 0.24);
+  background: var(--accent-suave);
+  border: 1px solid var(--accent-borde);
   color: #f8d4d6;
 }
 
@@ -39,7 +39,7 @@
 }
 
 .payment-modal-alert {
-  border-color: rgba(227, 27, 35, 0.32);
+  border-color: var(--accent-borde);
 }
 
 .payment-alert-header,
@@ -57,7 +57,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(227, 27, 35, 0.12);
+  background: var(--accent-suave);
   color: #ff9da2;
   font-size: 24px;
   font-weight: 800;

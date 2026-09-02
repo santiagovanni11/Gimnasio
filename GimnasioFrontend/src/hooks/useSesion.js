@@ -5,7 +5,7 @@
 // La persistencia (recordarme) vive en almacenSesion.
 // =========================================================
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { authService } from "../services/authService";
 import { mensajeDeError } from "../services/apiClient";
 import {
@@ -13,6 +13,11 @@ import {
   haySesion,
   limpiarSesion,
   obtenerRol,
+  obtenerNombre,
+  obtenerApellido,
+  obtenerToken,
+  obtenerUsuarioId,
+  obtenerExpira,
 } from "../services/almacenSesion";
 import { useRegistroCuenta } from "./useRegistroCuenta";
 
@@ -23,6 +28,8 @@ export function useSesion() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const [nombre, setNombre] = useState(obtenerNombre());
+  const [apellido, setApellido] = useState(obtenerApellido());
 
   // UX del formulario
   const [ingresando, setIngresando] = useState(false);
@@ -30,11 +37,31 @@ export function useSesion() {
 
   const registro = useRegistroCuenta();
 
+  // Perfil propio para el saludo: se consulta al cargar la
+  // sesión (refresco) sin exigir re-login.
+  useEffect(() => {
+    if (!logueado || (nombre && apellido)) return;
+    let activo = true;
+    authService.obtenerPerfil().then(({ respuesta, datos }) => {
+      if (!activo || !respuesta.ok) return;
+      const n = datos?.nombre ?? datos?.Nombre ?? "";
+      const a = datos?.apellido ?? datos?.Apellido ?? "";
+      if (!n && !a) return;
+      setNombre(n);
+      setApellido(a);
+      guardarSesion({ token: obtenerToken(), rol, usuarioId: obtenerUsuarioId(), expira: obtenerExpira(), nombre: n, apellido: a }, recordar);
+    }).catch(() => {});
+    return () => { activo = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logueado, nombre, apellido]);
+
   const cerrarSesion = useCallback(() => {
     limpiarSesion();
 
     setLogueado(false);
     setRol("");
+    setNombre("");
+    setApellido("");
     setMensaje("");
     setEmail("");
     setPassword("");
@@ -80,6 +107,8 @@ export function useSesion() {
       const token = datos?.token;
       const rolNombre = datos?.rolNombre ?? datos?.rol ?? "";
       const usuarioId = datos?.usuarioId ?? "";
+      const nombreUsuario = datos?.nombre ?? datos?.Nombre ?? "";
+      const apellidoUsuario = datos?.apellido ?? datos?.Apellido ?? "";
 
       if (!token) {
         setMensaje(
@@ -94,11 +123,15 @@ export function useSesion() {
           rol: rolNombre,
           usuarioId,
           expira: datos.expira,
+          nombre: nombreUsuario,
+          apellido: apellidoUsuario,
         },
         recordar
       );
 
       setRol(rolNombre);
+      setNombre(nombreUsuario);
+      setApellido(apellidoUsuario);
       setLogueado(true);
       setEmail("");
       setPassword("");
@@ -113,6 +146,8 @@ export function useSesion() {
   return {
     logueado,
     rol,
+    nombre,
+    apellido,
     email,
     setEmail,
     password,

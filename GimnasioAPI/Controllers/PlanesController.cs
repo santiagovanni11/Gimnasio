@@ -1,6 +1,7 @@
 using GimnasioAPI.Data;
 using GimnasioAPI.DTOs;
 using GimnasioAPI.Models;
+using GimnasioAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,8 @@ namespace GimnasioAPI.Controllers;
 
 /// <summary>
 /// Consulta de planes (GET). Las mutaciones viven en la parte
-/// Comandos; las validaciones, en PlanesValidaciones.
+/// Comandos; las validaciones, en PlanesValidaciones; el
+/// historial de precios, en la parte Historial.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
@@ -17,15 +19,22 @@ namespace GimnasioAPI.Controllers;
 public partial class PlanesController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly AuditoriaUsuariosService _auditoria;
+    private readonly AuditoriaPlanesService _auditoriaPlanes;
 
-    public PlanesController(AppDbContext context)
+    public PlanesController(
+        AppDbContext context,
+        AuditoriaUsuariosService auditoria,
+        AuditoriaPlanesService auditoriaPlanes)
     {
         _context = context;
+        _auditoria = auditoria;
+        _auditoriaPlanes = auditoriaPlanes;
     }
 
     // GET: api/Planes
     [HttpGet]
-    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    [Authorize(Roles = RolesGimnasio.TodosLosRoles)]
     public async Task<ActionResult<IEnumerable<PlanDto>>> GetPlanes()
     {
         // Aplica cambios de precio programados cuya fecha llegó.
@@ -46,7 +55,7 @@ public partial class PlanesController : ControllerBase
 
     // GET: api/Planes/5
     [HttpGet("{id}")]
-    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    [Authorize(Roles = RolesGimnasio.TodosLosRoles)]
     public async Task<ActionResult<PlanDto>> GetPlan(int id)
     {
         var plan = await CargarConRelaciones()

@@ -15,21 +15,24 @@ namespace GimnasioAPI.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Administrador")]
+[Authorize(Roles = RolesGimnasio.Administrador)]
 public partial class UsuariosController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly AdministradorGuardService _guard;
     private readonly AuditoriaUsuariosService _auditoria;
+    private readonly CreacionUsuariosService _altas;
 
     public UsuariosController(
         AppDbContext context,
         AdministradorGuardService guard,
-        AuditoriaUsuariosService auditoria)
+        AuditoriaUsuariosService auditoria,
+        CreacionUsuariosService altas)
     {
         _context = context;
         _guard = guard;
         _auditoria = auditoria;
+        _altas = altas;
     }
 
     // =========================================================
@@ -45,13 +48,13 @@ public partial class UsuariosController : ControllerBase
             .Include(u => u.Rol)
             .OrderBy(u =>
                 u.Rol != null &&
-                u.Rol.Nombre == "Administrador"
+                u.Rol.Nombre == RolesGimnasio.Administrador
                     ? 1
                     : u.Rol != null &&
-                      u.Rol.Nombre == "Recepcionista"
+                      u.Rol.Nombre == RolesGimnasio.Recepcionista
                           ? 2
                           : u.Rol != null &&
-                            u.Rol.Nombre == "Profesor"
+                            u.Rol.Nombre == RolesGimnasio.Profesor
                                 ? 3
                                 : 4)
             .ThenBy(u => u.Email)
@@ -109,21 +112,6 @@ public partial class UsuariosController : ControllerBase
     // =========================================================
     // VALIDACIONES COMPARTIDAS
     // =========================================================
-
-    private static string ValidarCredenciales(
-        string? email,
-        string? password)
-    {
-        var errorEmail =
-            CredencialesValidator.ValidarEmail(email);
-
-        if (!string.IsNullOrEmpty(errorEmail))
-        {
-            return errorEmail;
-        }
-
-        return CredencialesValidator.ValidarPassword(password);
-    }
 
     private Task<bool> EmailEnUsoAsync(
         string email,

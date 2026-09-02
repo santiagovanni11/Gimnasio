@@ -15,7 +15,7 @@ public partial class PlanesController
 {
     // POST: api/Planes — Solo Administrador.
     [HttpPost]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = RolesGimnasio.Administrador)]
     public async Task<ActionResult<Plan>> PostPlan(Plan plan)
     {
         var error = PlanesValidaciones.ValidarPlan(plan);
@@ -30,6 +30,9 @@ public partial class PlanesController
         _context.Planes.Add(plan);
         await _context.SaveChangesAsync();
 
+        await _auditoriaPlanes.RegistrarAsync(
+            _context, AccionesAuditoriaPlan.Alta, plan);
+
         return CreatedAtAction(
             nameof(GetPlan),
             new { id = plan.Id },
@@ -38,7 +41,7 @@ public partial class PlanesController
 
     // PUT: api/Planes/5 — Solo Administrador.
     [HttpPut("{id}")]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = RolesGimnasio.Administrador)]
     public async Task<IActionResult> PutPlan(int id, Plan plan)
     {
         if (id != plan.Id)
@@ -77,12 +80,15 @@ public partial class PlanesController
 
         await _context.SaveChangesAsync();
 
+        await _auditoriaPlanes.RegistrarAsync(
+            _context, AccionesAuditoriaPlan.Edicion, existente);
+
         return NoContent();
     }
 
     // PUT: api/Planes/5/precios — Solo Administrador.
     [HttpPut("{id}/precios")]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = RolesGimnasio.Administrador)]
     public async Task<IActionResult> ActualizarPrecios(
         int id,
         ActualizarPreciosPlanDto precios)

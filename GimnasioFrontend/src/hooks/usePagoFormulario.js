@@ -5,6 +5,8 @@
 
 import { useState } from "react";
 import { hoyISO } from "../utils/fechas";
+import { FORMA_PAGO } from "../utils/pagos";
+import { datosTarjetaDesdePago } from "../utils/pagosCheckout/datosTarjetaDesdePago";
 
 const FECHA_HOY = () => hoyISO();
 
@@ -27,6 +29,9 @@ const FORM_INICIAL = () => ({
   ...TARJETA_VACIA,
 });
 
+const esPagoTarjeta = (pago) =>
+  [FORMA_PAGO.DEBITO, FORMA_PAGO.CREDITO].includes(Number(pago?.formaPago));
+
 export function usePagoFormulario() {
   const [formPago, setFormPago] = useState(FORM_INICIAL);
   const [pagoEditando, setPagoEditando] = useState(null);
@@ -47,6 +52,7 @@ export function usePagoFormulario() {
       referencia: pago.referencia || "",
       observaciones: pago.observaciones || "",
       ...TARJETA_VACIA,
+      ...(esPagoTarjeta(pago) ? datosTarjetaDesdePago(pago) : {}),
     });
   };
 

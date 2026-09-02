@@ -1,144 +1,120 @@
-﻿/* estados.css - Badges de estado y estado vacio */
+﻿/* estados.css - Badges de estado y estado vacio (tokens FORZA) */
 
-/* =========================
-   ESTADOS
-========================= */
-
-.status-active {
-  display: inline-flex;
-  align-items: center;
-
-  padding: 5px 9px;
-
-  border-radius: 999px;
-
-  background: rgba(62, 207, 142, 0.12);
-
-  color: #8de0b4;
-
-  font-size: 12px;
-  font-weight: 700;
-
-  white-space: nowrap;
-}
-
-.status-invitation {
-  display: inline-flex;
-  align-items: center;
-
-  padding: 5px 9px;
-
-  border-radius: 999px;
-
-  background: rgba(255, 193, 7, 0.12);
-
-  color: #ffd76a;
-
-  font-size: 12px;
-  font-weight: 700;
-
-  white-space: nowrap;
-}
-
-.status-used {
-  display: inline-flex;
-  align-items: center;
-
-  padding: 5px 9px;
-
-  border-radius: 999px;
-
-  background: rgba(130, 138, 150, 0.12);
-
-  color: #aeb5bf;
-
-  font-size: 12px;
-  font-weight: 700;
-
-  white-space: nowrap;
-}
-
-.status-expired {
-  display: inline-flex;
-  align-items: center;
-
-  padding: 5px 9px;
-
-  border-radius: 999px;
-
-  background: rgba(227, 27, 35, 0.12);
-
-  color: #ff9da2;
-
-  font-size: 12px;
-  font-weight: 700;
-
-  white-space: nowrap;
-}
-
-.status-warning {
-  display: inline-flex;
-  align-items: center;
-
-  padding: 5px 9px;
-
-  border-radius: 999px;
-
-  background: rgba(255, 193, 7, 0.12);
-
-  color: #ffd76a;
-
-  font-size: 12px;
-  font-weight: 700;
-
-  white-space: nowrap;
-}
-
-.status-inactive {
-  display: inline-flex;
-  align-items: center;
-
-  padding: 5px 9px;
-
-  border-radius: 999px;
-
-  background: rgba(130, 138, 150, 0.12);
-
-  color: #aeb5bf;
-
-  font-size: 12px;
-  font-weight: 700;
-
-  white-space: nowrap;
-}
-
-.empty-state {
-  padding: 40px;
-
-  border: 1px dashed #2a3038;
-  border-radius: 14px;
-
-  text-align: center;
-
-  color: #7f8791;
-}
-
-
+.status-active,
+.status-expired,
+.status-warning,
+.status-inactive,
 .status-blocked {
   display: inline-flex;
   align-items: center;
-
-  padding: 5px 9px;
-  margin-left: 6px;
-
+  padding: 5px 11px;
   border-radius: 999px;
-
-  background: rgba(227, 27, 35, 0.14);
-
-  color: #ff8a8f;
-
   font-size: 12px;
   font-weight: 700;
-
   white-space: nowrap;
+}
+
+.status-active {
+  background: rgba(52, 211, 153, 0.12);
+  color: var(--exito);
+}
+
+.status-expired {
+  background: rgba(251, 113, 133, 0.12);
+  color: var(--peligro);
+}
+
+.status-warning {
+  background: rgba(251, 191, 36, 0.12);
+  color: var(--aviso);
+}
+
+.status-inactive {
+  background: rgba(154, 162, 179, 0.12);
+  color: var(--texto-muted);
+}
+
+.status-blocked {
+  margin-left: 6px;
+  background: rgba(251, 113, 133, 0.14);
+  color: var(--peligro);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 44px 24px;
+  border: 1px dashed var(--line-fuerte);
+  border-radius: var(--radio-lg);
+  text-align: center;
+  color: var(--texto-dim);
+}
+
+.empty-state::before {
+  content: "";
+  width: 56px;
+  height: 56px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none' stroke='%2398a2b3' stroke-width='3' stroke-linecap='round'%3E%3Crect x='12' y='26' width='8' height='12' rx='3'/%3E%3Crect x='44' y='26' width='8' height='12' rx='3'/%3E%3Cpath d='M22 32h20'/%3E%3C/svg%3E") center / contain no-repeat;
+  opacity: 0.5;
+}
+
+/* =========================
+   ESTADO VACÍO (ilustrado)
+========================= */
+
+.estado-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 44px 24px;
+  border: 1px dashed var(--line-fuerte);
+  border-radius: var(--radio-lg);
+  text-align: center;
+}
+
+.estado-vacio-ilustracion {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+.estado-vacio-ilustracion svg {
+  width: 100%;
+  height: 100%;
+}
+
+.estado-vacio h3 {
+  color: var(--texto);
+  font-family: var(--fuente-titulo);
+  font-size: 17px;
+}
+
+.estado-vacio p {
+  max-width: 420px;
+  color: var(--texto-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* =========================
+   AVATAR (iniciales con gradiente)
+========================= */
+
+.avatar-dm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
 }

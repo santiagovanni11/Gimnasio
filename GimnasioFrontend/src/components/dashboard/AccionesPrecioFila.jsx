@@ -10,6 +10,7 @@ function AccionesPrecio({
   onDuplicar,
   onVerHistorial,
   onEliminar,
+  onEditarBeneficios,
 }) {
   if (enEdicion) {
     return (
@@ -64,6 +65,17 @@ function AccionesPrecio({
           title="Ver cambios de precio"
         >
           Historial
+        </button>
+      )}
+
+      {onEditarBeneficios && (
+        <button
+          type="button"
+          className="view-button"
+          onClick={() => onEditarBeneficios(plan)}
+          title="Beneficios y clases incluidos"
+        >
+          Benef/Clases
         </button>
       )}
 

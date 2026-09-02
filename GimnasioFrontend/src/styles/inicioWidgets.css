@@ -1,0 +1,56 @@
+/* inicioWidgets.css - Saludo, subtítulo, skeletons y socios por plan */
+
+.inicio-titulo {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.inicio-titulo h2 {
+  font-family: var(--fuente-titulo);
+  font-size: 18px;
+}
+.inicio-titulo span { color: var(--texto-dim); font-size: 13px; }
+
+.panel-skeleton { gap: 12px; }
+.skeleton-linea {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--surface-2), var(--surface-3), var(--surface-2));
+  background-size: 200% 100%;
+  animation: skeleton 1.2s infinite;
+}
+.skeleton-titulo {
+  height: 18px;
+  width: 55%;
+  margin-bottom: 4px;
+}
+@keyframes skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.plan-barras {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.plan-barra-cabecera {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.plan-barra-cabecera span:first-child { font-weight: 600; }
+.plan-barra-pista {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.plan-barra-relleno {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), #1f9e5c);
+}

@@ -1,68 +1,54 @@
 // =========================================================
 // DASHBOARD — Página principal autenticada
-// Compone layout y secciones; delega en useGymApp (app).
+// Arma el shell (Sidebar + Topbar) y deja la conmutación de
+// secciones en ContenidoDashboard. Los proveedores por
+// dominio se inicializan acá y se pasan ya resueltos.
 // =========================================================
 
 import Sidebar from "../components/layout/Sidebar";
-import Topbar from "../components/layout/Topbar";
-import AvisoSesion from "../components/layout/AvisoSesion";
-import InicioSeccion from "../components/dashboard/InicioSeccion";
-import PreciosSeccion from "../components/dashboard/PreciosSeccion";
-import SociosSection from "../components/socios/SociosSection";
-import MembresiasSection from "../components/membresias/MembresiasSection";
-import PagosSection from "../components/pagos/PagosSection";
-import UsuariosSection from "../components/usuarios/UsuariosSection";
-import CambiarMiPasswordModal from "../components/usuarios/CambiarMiPasswordModal";
+import ContenidoDashboard from "../components/dashboard/ContenidoDashboard";
 import { useUsuarios } from "../hooks/useUsuarios";
+import { useClases } from "../hooks/useClases";
+import { useAsistencias } from "../hooks/useAsistencias";
 import { useMiCuenta } from "../hooks/useMiCuenta";
-import { useVigenciaSesion } from "../hooks/useVigenciaSesion";
-import { soloValidos } from "../utils/pagos";
+import { useInactividadSesion } from "../hooks/useInactividadSesion";
 
 export default function DashboardPage({ app }) {
-  const {
-    rol,
-    mensaje,
-    seccion,
-    socios,
-    membresias,
-    membresiasRechazadasIds,
-    pagos,
-    cambiarSeccion,
-    setMensaje,
-    cerrarSesion,
-    puedeVerSocios,
-    puedeVerMembresias,
-    puedeVerPagos,
-    puedeVerClases,
-    puedeVerAsistencias,
-  } = app;
+  const { rol, seccion, membresias, membresiasRechazadasIds } = app;
 
-  // Gestión de usuarios: solo Administrador
   const gestionUsuarios = useUsuarios(
     rol === "Administrador" && seccion === "usuarios"
   );
 
-  // Cambio de la propia contraseña (todos los roles)
-  const miCuenta = useMiCuenta({ alGuardar: setMensaje });
+  const gestionClases = useClases({
+    activo: seccion === "clases",
+    onSesionExpirada: app.cerrarSesion,
+  });
 
-  // Aviso de sesión por vencer + cierre automático al expirar
-  const vigencia = useVigenciaSesion({
+  const gestionAsistencias = useAsistencias({
     activo: true,
-    onExpirada: cerrarSesion,
+    onSesionExpirada: app.cerrarSesion,
+  });
+
+  const miCuenta = useMiCuenta({
+    alGuardar: app.setMensaje,
+    onSesionExpirada: app.cerrarSesion,
+  });
+
+  const vigencia = useInactividadSesion({
+    onInactividad: app.cerrarSesion,
   });
 
   const permisos = {
-    puedeVerSocios,
-    puedeVerMembresias,
-    puedeVerPagos,
-    puedeVerClases,
-    puedeVerAsistencias,
+    puedeVerSocios: app.puedeVerSocios,
+    puedeVerMembresias: app.puedeVerMembresias,
+    puedeVerPagos: app.puedeVerPagos,
+    puedeVerClases: app.puedeVerClases,
+    puedeVerAsistencias: app.puedeVerAsistencias,
   };
 
   const membresiasActivasCount = membresiasRechazadasIds
-    ? membresias.filter(
-        (m) => !membresiasRechazadasIds.has(Number(m.id))
-      ).length
+    ? membresias.filter((m) => !membresiasRechazadasIds.has(Number(m.id))).length
     : membresias.length;
 
   return (
@@ -70,50 +56,24 @@ export default function DashboardPage({ app }) {
       <Sidebar
         rol={rol}
         seccion={seccion}
-        cambiarSeccion={cambiarSeccion}
+        cambiarSeccion={app.cambiarSeccion}
         permisos={permisos}
-        setMensaje={setMensaje}
-        cerrarSesion={cerrarSesion}
+        cerrarSesion={app.cerrarSesion}
       />
 
       <main className="main-content">
-        <AvisoSesion
-          debeAvisar={vigencia.debeAvisar}
-          segundosRestantes={vigencia.segundosRestantes}
+        <ContenidoDashboard
+          app={app}
+          dash={{
+            gestionUsuarios,
+            gestionClases,
+            gestionAsistencias,
+            miCuenta,
+            vigencia,
+            permisos,
+            membresiasActivasCount,
+          }}
         />
-
-        <Topbar
-          seccion={seccion}
-          rol={rol}
-          onAbrirMiCuenta={miCuenta.abrirMiCuenta}
-        />
-
-        {seccion === "inicio" && (
-          <InicioSeccion
-            mensaje={mensaje}
-            sociosActivosCount={
-              socios.filter((s) => s.activo !== false).length
-            }
-            membresiasActivasCount={membresiasActivasCount}
-            pagosRegistradosCount={soloValidos(pagos).length}
-          />
-        )}
-
-        {seccion === "socios" && <SociosSection {...app} />}
-
-        {seccion === "membresias" && <MembresiasSection {...app} />}
-
-        {seccion === "pagos" && <PagosSection {...app} />}
-
-        {seccion === "usuarios" && (
-          <UsuariosSection {...gestionUsuarios} />
-        )}
-
-        {seccion === "precios" && (
-          <PreciosSeccion {...app} />
-        )}
-
-        <CambiarMiPasswordModal {...miCuenta} />
       </main>
     </div>
   );

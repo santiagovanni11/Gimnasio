@@ -73,11 +73,12 @@ function DialogoSistema() {
 
   return (
     <div
-      className="payment-modal-backdrop"
+      className="modal-sistema-velo dialogo-host"
+      style={{ zIndex: 10000 }}
       onClick={() => responder(esTexto ? null : false)}
     >
       <div
-        className="payment-modal dialogo-sistema"
+        className="modal-sistema dialogo-sistema"
         onClick={(event) => event.stopPropagation()}
         role="alertdialog"
         aria-modal="true"

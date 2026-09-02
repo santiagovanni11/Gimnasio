@@ -39,6 +39,40 @@ export const errorEscalonCelda = (valores = {}, campo) => {
 export { CAMPOS_ESCALON };
 
 /**
+ * Escalones del plan sin precio definido (0, vacío o no
+ * numérico). Base del chip de advertencia "Incompleto".
+ */
+export const clavesIncompletas = (plan = {}) =>
+  CAMPOS_ESCALON.filter(
+    ({ clave }) => !(Number(plan[clave]) > 0)
+  ).map(({ clave }) => clave);
+
+/**
+ * Saltos de precio >20% respecto del valor vigente, como
+ * líneas legibles para la confirmación anti-salto grosero.
+ */
+export const calcularSaltosPrecio = (previos = {}, nuevos = {}) =>
+  CAMPOS_ESCALON.filter(({ clave }) => {
+    const viejo = Number(previos[clave]);
+    const nuevo = Number(nuevos[clave]);
+
+    return (
+      viejo > 0 &&
+      Math.abs((nuevo - viejo) / viejo) * 100 > 20
+    );
+  }).map(({ titulo, clave }) => {
+    const viejo = Number(previos[clave]);
+    const nuevo = Number(nuevos[clave]);
+    const pct = Math.round(
+      Math.abs((nuevo - viejo) / viejo) * 100
+    );
+
+    return `${titulo}: $${viejo} → $${nuevo} (${
+      pct > 0 ? "+" : ""
+    }${pct}%)`;
+  });
+
+/**
  * Cuota mensual equivalente y % de ahorro frente al plan
  * mensual (para destacar el valor del compromiso largo).
  */

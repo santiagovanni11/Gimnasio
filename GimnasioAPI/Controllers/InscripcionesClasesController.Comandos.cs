@@ -1,6 +1,7 @@
 using GimnasioAPI.Data;
 using GimnasioAPI.DTOs;
 using GimnasioAPI.Models;
+using GimnasioAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,7 @@ public partial class InscripcionesClasesController
 {
     // POST: api/InscripcionesClases — Administrador y Recepcionista.
     [HttpPost]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<ActionResult<InscripcionClaseDto>> PostInscripcion(
         InscripcionClase inscripcion)
     {
@@ -51,12 +52,26 @@ public partial class InscripcionesClasesController
             return BadRequest("La clase seleccionada está inactiva.");
         }
 
-        // Evitar inscripción duplicada.
+        // Evitar inscripción duplicada (vigente a hoy).
+        var hoy = DateTime.UtcNow.Date;
+
+        // El socio no puede inscribirse a clases si su membresía
+        // vigente tiene un plan SIN el beneficio "Acceso a clases".
+        var sinAccesoAClases = await _context.Membresias
+            .SinAccesoAClases(hoy)
+            .AnyAsync(m => m.SocioId == inscripcion.SocioId);
+
+        if (sinAccesoAClases)
+        {
+            return BadRequest(
+                "El plan del socio no incluye acceso a clases.");
+        }
+
         var inscripcionExiste = await _context.InscripcionesClases
+            .Where(ReglasInscripcionClase.OcupaCupo(hoy))
             .AnyAsync(i =>
                 i.SocioId == inscripcion.SocioId &&
-                i.HorarioClaseId == inscripcion.HorarioClaseId &&
-                i.Estado != EstadoInscripcion.Cancelada);
+                i.HorarioClaseId == inscripcion.HorarioClaseId);
 
         if (inscripcionExiste)
         {
@@ -64,11 +79,36 @@ public partial class InscripcionesClasesController
                 "El socio ya está inscripto en este horario.");
         }
 
-        // Contar reservas activas y validar capacidad.
+        // El socio no puede estar en dos clases cuyas franjas
+        // se superpongan el mismo día (aunque sean otras clases).
+        var seSuperpone = await _context.InscripcionesClases
+            .Where(i => i.SocioId == inscripcion.SocioId)
+            .Where(ReglasInscripcionClase.SeSuperponeEn(
+                horario.DiaSemana,
+                horario.HoraInicio,
+                horario.HoraFin,
+                hoy))
+            .AnyAsync();
+
+        if (seSuperpone)
+        {
+            return BadRequest(
+                "El socio ya está inscripto a otra clase " +
+                "el mismo día a la misma hora.");
+        }
+
+        if (inscripcion.FechaHasta.HasValue &&
+            inscripcion.FechaHasta.Value.Date < hoy)
+        {
+            return BadRequest(
+                "La vigencia no puede ser una fecha pasada.");
+        }
+
+        // Contar reservas vigentes y validar capacidad.
         var cantidadInscritos = await _context.InscripcionesClases
+            .Where(ReglasInscripcionClase.OcupaCupo(hoy))
             .CountAsync(i =>
-                i.HorarioClaseId == inscripcion.HorarioClaseId &&
-                i.Estado != EstadoInscripcion.Cancelada);
+                i.HorarioClaseId == inscripcion.HorarioClaseId);
 
         if (cantidadInscritos >= horario.Clase.CapacidadMaxima)
         {
@@ -102,7 +142,7 @@ public partial class InscripcionesClasesController
 
     // PUT: api/InscripcionesClases/5 — Administrador y Recepcionista.
     [HttpPut("{id}")]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<IActionResult> PutInscripcion(
         int id,
         InscripcionClase inscripcion)
@@ -124,6 +164,9 @@ public partial class InscripcionesClasesController
         existente.HorarioClaseId = inscripcion.HorarioClaseId;
         existente.Estado = inscripcion.Estado;
 
+        // Vigencia editable; vacía = sin vencimiento.
+        existente.FechaHasta = inscripcion.FechaHasta;
+
         await _context.SaveChangesAsync();
 
         return NoContent();
@@ -133,7 +176,7 @@ public partial class InscripcionesClasesController
     // Cancelación lógica: la inscripción puede tener asistencias
     // asociadas, por lo que no se elimina físicamente.
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<IActionResult> DeleteInscripcion(int id)
     {
         var inscripcion = await _context.InscripcionesClases

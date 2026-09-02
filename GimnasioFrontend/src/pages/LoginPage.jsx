@@ -1,16 +1,12 @@
-// =========================================================
-// LOGIN — Página de acceso y registro
-// El formulario de alta (con invitación) vive en
-// FormularioRegistro; acá queda solo el inicio de sesión:
-// ver/ocultar clave, recordarme y bloqueo temporal con
-// cuenta regresiva.
-// =========================================================
+// LOGIN — Pantalla de acceso (tarjeta profesional DiseñoLogin)
 
 import { useEffect, useState } from "react";
 import AuthField from "../components/auth/AuthField";
 import AuthMessage from "../components/auth/AuthMessage";
 import CampoPassword from "../components/auth/CampoPassword";
 import FormularioRegistro from "../components/auth/FormularioRegistro";
+import LoginHero from "../components/auth/LoginHero";
+import { Logo, Logotipo } from "../assets/Marca";
 
 function LoginPage({ app }) {
   const {
@@ -27,60 +23,41 @@ function LoginPage({ app }) {
     setRecordar,
   } = app;
 
-  // Cuenta regresiva cuando la cuenta está bloqueada.
   const [bloqueadoSegundos, setBloqueadoSegundos] = useState(0);
   const estaBloqueado = bloqueadoSegundos > 0;
 
   useEffect(() => {
     if (!mensaje) return undefined;
-
-    const coincidencia = mensaje.match(/en (\d+) minuto/);
-    if (!coincidencia) return undefined;
-
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- arranca la cuenta regresiva al llegar el aviso
-    setBloqueadoSegundos(Number(coincidencia[1]) * 60);
+    const match = mensaje.match(/en (\d+) minuto/);
+    if (!match) return undefined;
+    setBloqueadoSegundos(Number(match[1]) * 60);
     return undefined;
   }, [mensaje]);
 
   useEffect(() => {
     if (!estaBloqueado) return undefined;
-
-    const intervalo = setInterval(() => {
-      setBloqueadoSegundos((segundos) =>
-        segundos > 0 ? segundos - 1 : 0
-      );
-    }, 1000);
-
-    return () => clearInterval(intervalo);
+    const id = setInterval(
+      () => setBloqueadoSegundos((s) => (s > 0 ? s - 1 : 0)),
+      1000
+    );
+    return () => clearInterval(id);
   }, [estaBloqueado]);
 
-  if (modoRegistro) {
+  // Renderiza el formulario de login o registro como rama única
+  const formRender = () => {
+    if (modoRegistro) {
+      return <FormularioRegistro app={app} />;
+    }
+
     return (
-      <div className="login-page">
-        <div className="login-card">
-          <Marca />
-          <FormularioRegistro app={app} />
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="login-page">
-      <div className="login-card">
-        <Marca />
-
-        <div className="login-title">
-          <h2>Bienvenido</h2>
-          <p>Ingresá a tu cuenta para continuar.</p>
-        </div>
+      <>
 
         <form onSubmit={iniciarSesion}>
           <AuthField
             label="Email"
             type="email"
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="tu@email.com"
             autoComplete="email"
             autoFocus
@@ -100,15 +77,13 @@ function LoginPage({ app }) {
             <input
               type="checkbox"
               checked={recordar}
-              onChange={(event) =>
-                setRecordar(event.target.checked)
-              }
+              onChange={(e) => setRecordar(e.target.checked)}
             />
             Recordarme en este equipo
           </label>
 
           <button
-            className="primary-button"
+            className="login-button"
             type="submit"
             disabled={ingresando || estaBloqueado}
           >
@@ -121,30 +96,44 @@ function LoginPage({ app }) {
         </form>
 
         <AuthMessage type="error" message={mensaje} />
+      </>
+    );
+  };
 
-        <div className="register-link-container">
-          <span>¿No tenés una cuenta?</span>
-          <button
-            type="button"
-            className="register-link"
-            onClick={abrirRegistro}
-          >
-            Crear cuenta
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Marca() {
   return (
-    <div className="brand">
-      <div className="brand-icon">GYM</div>
-      <div>
-        <h1>Gimnasio</h1>
-        <span>Panel de gestión</span>
-      </div>
+    <div className="login-page">
+      <LoginHero />
+
+      <section className="login-container">
+        <div className="login-card">
+          <header className="login-header">
+            <div className="login-brand">
+              <Logo size={36} />
+              <Logotipo size={18} />
+            </div>
+            <h1 className="login-titulo">
+              {modoRegistro ? "Creá tu cuenta" : "Bienvenido"}
+            </h1>
+            <p className="login-subtitulo">
+              {modoRegistro
+                ? "Comenzá a gestionar tu gimnasio"
+                : "Iniciá sesión para continuar"}
+            </p>
+          </header>
+
+          <div className="login-form">{formRender()}</div>
+
+          <footer className="login-footer">
+            <div className="login-links">
+              <span>¿No tenés una cuenta?</span>
+              <button type="button" className="login-registrarse" onClick={abrirRegistro}>
+                Crear cuenta
+              </button>
+            </div>
+            <p className="login-copyright">© FORZA · Software para gimnasios</p>
+          </footer>
+        </div>
+      </section>
     </div>
   );
 }

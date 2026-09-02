@@ -27,6 +27,12 @@ export const membresiasService = {
     });
   },
 
+  async cancelarMembresia(id) {
+    return apiRequest(`Membresias/${id}/cancelar`, {
+      method: "PUT",
+    });
+  },
+
   async eliminarMembresia(id) {
     return apiRequest(`Membresias/${id}`, { method: "DELETE" });
   },

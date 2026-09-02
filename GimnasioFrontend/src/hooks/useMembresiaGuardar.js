@@ -4,7 +4,9 @@
 // actualización según exista membresía en edición.
 // =========================================================
 
+import { obtenerNombre, obtenerApellido } from "../services/almacenSesion";
 import { membresiasService } from "../services/membresiasService";
+import { registrarEventoMembresia, registrarRenovacionMembresia } from "../utils/membresiasMetadata";
 import { precioSegunDuracion } from "../utils/planes";
 
 /** Validaciones previas al guardado. */
@@ -17,11 +19,14 @@ function validarSeleccion(f) {
   if (!f.fechaInicioMembresia || !f.fechaFinMembresia) {
     return "No se pudieron calcular las fechas de la membresía.";
   }
+  if (f.renovacionAutomatica && !f.metodoPagoAlmacenadoId) {
+    return "Para activar la renovación automática debés cargar un método de pago.";
+  }
   return "";
 }
 
 export function crearGuardadoMembresia({
-  formulario,
+  getFormulario,
   datos,
   ejecutar,
   notificar,
@@ -30,6 +35,8 @@ export function crearGuardadoMembresia({
   alMembresiaCreada,
 }) {
   return async function guardarMembresia() {
+    const formulario = getFormulario();
+    const usuario = [obtenerNombre(), obtenerApellido()].filter(Boolean).join(" ") || "Sistema";
     const errorValidacion = validarSeleccion(formulario);
 
     if (errorValidacion) {
@@ -84,6 +91,18 @@ export function crearGuardadoMembresia({
     if (!resultado) return;
 
     const nuevaId = resultado.datos?.id ?? null;
+    const idGuardado = Number(nuevaId ?? formulario.membresiaEditando?.id ?? 0);
+
+    if (formulario.modoRenovacion) {
+      registrarRenovacionMembresia(
+        { ...formulario.membresiaEditando, ...payload, planNombre: (getPlanes?.() ?? []).find((plan) => Number(plan.id) === Number(formulario.planSeleccionado))?.nombre || formulario.membresiaEditando?.planNombre },
+        usuario
+      );
+    } else if (editando && idGuardado) {
+      registrarEventoMembresia(idGuardado, "Cambio de plan o fecha", `Plan: ${formulario.planSeleccionado} · inicio ${formulario.fechaInicioMembresia} · fin ${formulario.fechaFinMembresia}`, usuario);
+    } else if (idGuardado) {
+      registrarEventoMembresia(idGuardado, "Alta de membresía", `Plan: ${formulario.planSeleccionado} · ${formulario.fechaInicioMembresia} → ${formulario.fechaFinMembresia}`, usuario);
+    }
 
     notificar(
       formulario.modoRenovacion
@@ -96,21 +115,26 @@ export function crearGuardadoMembresia({
     await datos.obtenerMembresias();
     formulario.cerrarFormularioMembresia();
 
+    // El precio a cobrar es siempre el que el backend realmente
+    // persistió (recalculado por fechas), evitando discrepancias
+    // entre el cálculo del frontend y el del backend.
+    const precioBackend = resultado.datos?.precioAplicado;
+    const precioCobrado =
+      precioBackend > 0 ? precioBackend : precioAplicado;
+
     if (!editando && nuevaId) {
-      // Alta nueva: salta a Pagos para el cobro inicial.
-      alMembresiaCreada?.(nuevaId, precioAplicado);
+      alMembresiaCreada?.(nuevaId, precioCobrado);
     } else if (formulario.modoRenovacion) {
-      // Renovación: mismo salto, cobrando la renovación.
       alMembresiaCreada?.(
         formulario.membresiaEditando.id,
-        precioAplicado
+        precioCobrado
       );
     }
   };
 }
 
 function construirPayload(formulario, precioAplicado, editando) {
-  return {
+  const payload = {
     ...(editando ? { id: formulario.membresiaEditando.id } : {}),
     socioId: Number(formulario.socioSeleccionado),
     planId: Number(formulario.planSeleccionado),
@@ -120,5 +144,8 @@ function construirPayload(formulario, precioAplicado, editando) {
     estado: editando
       ? Number(formulario.membresiaEditando.estado ?? 1)
       : 1,
+    renovacionAutomatica: formulario.renovacionAutomatica || false,
+    metodoPagoAlmacenadoId: formulario.metodoPagoAlmacenadoId || null,
   };
+  return payload;
 }

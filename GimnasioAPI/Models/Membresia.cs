@@ -29,11 +29,17 @@ public class Membresia
     /// </summary>
     public DateTime? UltimaRenovacion { get; set; }
 
+    public bool RenovacionAutomatica { get; set; }
+
+    public int? MetodoPagoAlmacenadoId { get; set; }
+
     public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
 
     public Socio? Socio { get; set; }
 
     public Plan? Plan { get; set; }
+
+    public MetodoPagoAlmacenado? MetodoPagoAlmacenado { get; set; }
 
     public ICollection<Pago> Pagos { get; set; } = new List<Pago>();
 }

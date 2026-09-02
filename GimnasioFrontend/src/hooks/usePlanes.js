@@ -1,7 +1,8 @@
 // =========================================================
 // HOOK DE PLANES Y PRECIOS (FACHADA)
 // Consulta de planes + wiring de la edición (que vive en
-// crearEdicionPrecios). Reglas puras: utils/preciosConfig.
+// useEdicionPrecios) y del historial (useHistorialPrecios).
+// Reglas puras: utils/preciosConfig.
 // =========================================================
 
 import { useState } from "react";
@@ -9,6 +10,7 @@ import { planesService } from "../services/planesService";
 import { crearEjecutorApi } from "../services/apiEjecutor";
 import { precioSegunDuracion } from "../utils/planes";
 import { useEdicionPrecios } from "./useEdicionPrecios";
+import { useHistorialPrecios } from "./useHistorialPrecios";
 import { crearOperacionesPlanes } from "./crearOperacionesPlanes";
 
 export function usePlanes({ onSesionExpirada }) {
@@ -23,9 +25,7 @@ export function usePlanes({ onSesionExpirada }) {
   const [errorPrecios, setErrorPrecios] = useState("");
   const [fechaRige, setFechaRige] = useState("");
 
-  const [ejecutar] = useState(() =>
-    crearEjecutorApi({ onSesionExpirada })
-  );
+  const [ejecutar] = useState(() => crearEjecutorApi({ onSesionExpirada }));
 
   const obtenerPlanes = async () => {
     setCargandoPlanes(true);
@@ -34,18 +34,13 @@ export function usePlanes({ onSesionExpirada }) {
     const resultado = await ejecutar({
       peticion: planesService.obtenerPlanes,
       onError: setErrorPlanes,
-      mensajePermiso:
-        "No tenés permisos para consultar los planes.",
-      mensajeError:
-        (status) =>
-          `Error al cargar los planes. Código HTTP: ${status}`,
-      mensajeRed:
-        "No se pudo conectar con la API para cargar los planes.",
+      mensajePermiso: "No tenés permisos para consultar los planes.",
+      mensajeError: (status) => `Error al cargar los planes. Código HTTP: ${status}`,
+      mensajeRed: "No se pudo conectar con la API para cargar los planes.",
       etiquetaLog: "Error al obtener planes:",
     });
 
     setCargandoPlanes(false);
-
     if (!resultado) return;
     setPlanes(Array.isArray(resultado.datos) ? resultado.datos : []);
   };
@@ -72,39 +67,7 @@ export function usePlanes({ onSesionExpirada }) {
     obtenerPlanes,
   });
 
-  // ---------------------------------------------------------
-  // HISTORIAL DE PRECIOS (auditoría)
-  // ---------------------------------------------------------
-
-  const [planHistorial, setPlanHistorial] = useState(null);
-  const [filasHistorial, setFilasHistorial] = useState([]);
-  const [cargandoHistorial, setCargandoHistorial] = useState(false);
-
-  const verHistorial = async (plan) => {
-    setPlanHistorial(plan);
-    setFilasHistorial([]);
-    setCargandoHistorial(true);
-
-    try {
-      const { respuesta, datos } =
-        await planesService.historialPrecios(plan.id);
-
-      if (!respuesta.ok) return;
-
-      setFilasHistorial(
-        Array.isArray(datos) ? datos : []
-      );
-    } catch (error) {
-      console.error("Error al obtener historial:", error);
-    } finally {
-      setCargandoHistorial(false);
-    }
-  };
-
-  const cerrarHistorial = () => {
-    setPlanHistorial(null);
-    setFilasHistorial([]);
-  };
+  const historial = useHistorialPrecios();
 
   /** Reset total del dominio (al cerrar sesión). */
   const reiniciar = () => {
@@ -134,19 +97,14 @@ export function usePlanes({ onSesionExpirada }) {
     setErrorPrecios,
     obtenerPlanes,
     prepararPreciosEditando: edicion.prepararPreciosEditando,
-    guardarPreciosPlan: (planId) =>
-      edicion.guardarPreciosPlan(planId, fechaRige || null),
+    guardarPreciosPlan: (planId) => edicion.guardarPreciosPlan(planId, fechaRige || null),
     fechaRige,
     setFechaRige,
     validarCelda: edicion.validarCelda,
     alternarEstadoPlan: operaciones.alternarEstadoPlan,
     duplicarPlan: operaciones.duplicarPlan,
     eliminarPlan: operaciones.eliminarPlan,
-    planHistorial,
-    filasHistorial,
-    cargandoHistorial,
-    verHistorial,
-    cerrarHistorial,
+    ...historial,
     obtenerPrecioSegunDuracion,
     reiniciar,
   };

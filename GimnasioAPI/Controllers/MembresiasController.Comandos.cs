@@ -22,7 +22,7 @@ public partial class MembresiasController
     // =========================================================
 
     [HttpPost]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<ActionResult<MembresiaDto>> PostMembresia(
         Membresia membresia)
     {
@@ -33,7 +33,8 @@ public partial class MembresiasController
 
         ReglasMembresia.RecalcularEstado(
             membresia,
-            DateTime.UtcNow.Date);
+            DateTime.UtcNow.Date,
+            tienePagoAprobado: false);
 
         membresia.PrecioAplicado =
             ReglasMembresia.CalcularPrecioSegunDuracion(
@@ -62,7 +63,7 @@ public partial class MembresiasController
     // =========================================================
 
     [HttpPut("{id}")]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<IActionResult> PutMembresia(
         int id,
         Membresia membresia,
@@ -93,15 +94,31 @@ public partial class MembresiasController
         existente.PlanId = membresia.PlanId;
         existente.FechaInicio = membresia.FechaInicio;
         existente.FechaFin = membresia.FechaFin;
+        existente.RenovacionAutomatica = membresia.RenovacionAutomatica;
+        existente.MetodoPagoAlmacenadoId = membresia.MetodoPagoAlmacenadoId;
+
+        if (membresia.Estado != 0)
+        {
+            existente.Estado = membresia.Estado;
+        }
 
         if (renovacion)
         {
             existente.UltimaRenovacion = DateTime.UtcNow;
         }
 
+        // Una renovación sella un período de cobro nuevo aún no
+        // pagado; una edición conserva el estado de sus pagos.
+        var tienePago = renovacion
+            ? false
+            : await _reglas.TienePagoAprobadoEnPeriodoAsync(
+                existente.Id,
+                existente.UltimaRenovacion);
+
         ReglasMembresia.RecalcularEstado(
             existente,
-            DateTime.UtcNow.Date);
+            DateTime.UtcNow.Date,
+            tienePago);
 
         existente.PrecioAplicado =
             membresia.PrecioAplicado > 0
@@ -113,6 +130,6 @@ public partial class MembresiasController
 
         await _context.SaveChangesAsync();
 
-        return NoContent();
+        return Ok(MapearDto(existente));
     }
 }

@@ -28,13 +28,15 @@
   }
 
   .sidebar-nav {
-    display: grid;
-
-    grid-template-columns:
-      repeat(2, 1fr);
+    gap: 14px;
   }
 
-  .logout-button {
+  .nav-grupo {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .nav-logout {
     margin-top: 18px;
   }
 
@@ -112,10 +114,6 @@
     flex-wrap: wrap;
 
     text-align: center;
-  }
-
-  .invitation-code {
-    font-size: 12px;
   }
 
   .delete-button {

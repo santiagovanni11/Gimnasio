@@ -4,34 +4,44 @@
 // Usado por la tabla y por los filtros de "por vencer".
 // =========================================================
 
-const MS_POR_DIA = 86400000;
+import { MS_POR_DIA, fechaDesdeValor } from "./fechas";
 
-/** Días completos entre hoy y la fecha de fin (negativo = vencida). */
+/**
+ * Días completos entre hoy y la fecha de fin (negativo = vencida).
+ * Acepta día calendario ("2026-08-30") e instantes; siempre
+ * opera en horario local para evitar corrimientos por UTC.
+ */
 export const diasParaVencer = (fechaFin) => {
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
 
-  const fin = new Date(fechaFin);
+  const fin = fechaDesdeValor(fechaFin);
   fin.setHours(0, 0, 0, 0);
 
   return Math.round((fin.getTime() - hoy.getTime()) / MS_POR_DIA);
 };
 
 /**
- * Chip de vencimiento para membresías ACTIVAS:
- * - rojo cuando quedan 7 días o menos
- * - amarillo cuando quedan 8 a 30
- * - null cuando hay tiempo de sobra (no satura la vista)
+ * Chip de vencimiento junto a la columna Vencimiento:
+ * - solo membresías ACTIVAS (las vencidas ya lo indican en su
+ *   columna Estado, y suspendidas/canceladas no corren contra
+ *   el calendario)
+ * - rojo cuando quedan 7 días o menos (incluye "vence hoy" y
+ *   "vence mañana")
+ * - amarillo cuando quedan 8 a 30 días ("30 días", "29 días"…)
+ * - null fuera de la ventana (no satura la vista)
  */
 export const chipVencimiento = (membresia) => {
+  if (Number(membresia.estado) !== 2) return null;
+
   const dias = diasParaVencer(membresia.fechaFin);
 
-  if (dias > 30) return null;
+  if (dias < 0 || dias > 30) return null;
 
   const texto =
     dias === 1 ? "vence mañana"
     : dias === 0 ? "vence hoy"
-    : `${dias} día${Math.abs(dias) === 1 ? "" : "s"}`;
+    : `${dias} día${dias === 1 ? "" : "s"}`;
 
   return {
     texto,

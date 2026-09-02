@@ -5,15 +5,26 @@
 
 import { apiRequest } from "./apiClient";
 
-const validarCredenciales = (email, password) => {
-  const emailNormalizado = email.trim();
+const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Email con formato válido y presente. */
+export const validarEmail = (email) => {
+  const emailNormalizado = String(email ?? "").trim();
 
   if (!emailNormalizado) {
     return "El email es obligatorio.";
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailNormalizado)) {
-    return "Ingresá un email válido.";
+  return EMAIL_VALIDO.test(emailNormalizado)
+    ? ""
+    : "Ingresá un email válido.";
+};
+
+const validarCredenciales = (email, password) => {
+  const errorEmail = validarEmail(email);
+
+  if (errorEmail) {
+    return errorEmail;
   }
 
   if (!password) {
@@ -62,5 +73,10 @@ export const authService = {
       method: "PUT",
       body: { passwordActual, passwordNueva },
     });
+  },
+
+  /** Datos propios del usuario autenticado (para el saludo). */
+  async obtenerPerfil() {
+    return apiRequest("Auth/perfil");
   },
 };

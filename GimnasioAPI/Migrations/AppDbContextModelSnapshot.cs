@@ -30,14 +30,33 @@ namespace GimnasioAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("DetalleMotivo")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
                     b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaModificacion")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("InscripcionClaseId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Motivo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<bool>("Presente")
                         .HasColumnType("bit");
+
+                    b.Property<string>("RegistradoPor")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<int?>("RegistradoPorId")
+                        .HasColumnType("int");
 
                     b.Property<int>("SocioId")
                         .HasColumnType("int");
@@ -49,6 +68,77 @@ namespace GimnasioAPI.Migrations
                     b.HasIndex("SocioId");
 
                     b.ToTable("Asistencias");
+                });
+
+            modelBuilder.Entity("GimnasioAPI.Models.AuditoriaMembresia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Accion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Detalle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MembresiaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RealizadoPorEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("RealizadoPorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SocioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditoriaMembresias");
+                });
+
+            modelBuilder.Entity("GimnasioAPI.Models.AuditoriaPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Accion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Detalle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PlanId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PlanNombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RealizadoPorEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("RealizadoPorId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditoriaPlanes");
                 });
 
             modelBuilder.Entity("GimnasioAPI.Models.AuditoriaUsuario", b =>
@@ -305,6 +395,9 @@ namespace GimnasioAPI.Migrations
                     b.Property<int>("Estado")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("FechaHasta")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("FechaInscripcion")
                         .HasColumnType("datetime2");
 
@@ -348,12 +441,18 @@ namespace GimnasioAPI.Migrations
                     b.Property<DateTime?>("FechaSuspension")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("MetodoPagoAlmacenadoId")
+                        .HasColumnType("int");
+
                     b.Property<int>("PlanId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("PrecioAplicado")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("RenovacionAutomatica")
+                        .HasColumnType("bit");
 
                     b.Property<int>("SocioId")
                         .HasColumnType("int");
@@ -363,11 +462,55 @@ namespace GimnasioAPI.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MetodoPagoAlmacenadoId");
+
                     b.HasIndex("PlanId");
 
                     b.HasIndex("SocioId");
 
                     b.ToTable("Membresias");
+                });
+
+            modelBuilder.Entity("GimnasioAPI.Models.MetodoPagoAlmacenado", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("AnioVencimiento")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Marca")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MesVencimiento")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SocioId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UltimosCuatro")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SocioId");
+
+                    b.ToTable("MetodosPagoAlmacenados");
                 });
 
             modelBuilder.Entity("GimnasioAPI.Models.Pago", b =>
@@ -378,8 +521,14 @@ namespace GimnasioAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AnuladoPor")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Estado")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("FechaAnulacion")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("FechaPago")
                         .HasColumnType("datetime2");
@@ -551,6 +700,9 @@ namespace GimnasioAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ContactoEmergencia")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("DNI")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -568,12 +720,18 @@ namespace GimnasioAPI.Migrations
                     b.Property<DateTime>("FechaNacimiento")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("FotoUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Telefono")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TelefonoEmergencia")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -717,6 +875,10 @@ namespace GimnasioAPI.Migrations
 
             modelBuilder.Entity("GimnasioAPI.Models.Membresia", b =>
                 {
+                    b.HasOne("GimnasioAPI.Models.MetodoPagoAlmacenado", "MetodoPagoAlmacenado")
+                        .WithMany()
+                        .HasForeignKey("MetodoPagoAlmacenadoId");
+
                     b.HasOne("GimnasioAPI.Models.Plan", "Plan")
                         .WithMany("Membresias")
                         .HasForeignKey("PlanId")
@@ -729,7 +891,20 @@ namespace GimnasioAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("MetodoPagoAlmacenado");
+
                     b.Navigation("Plan");
+
+                    b.Navigation("Socio");
+                });
+
+            modelBuilder.Entity("GimnasioAPI.Models.MetodoPagoAlmacenado", b =>
+                {
+                    b.HasOne("GimnasioAPI.Models.Socio", "Socio")
+                        .WithMany()
+                        .HasForeignKey("SocioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Socio");
                 });

@@ -2,17 +2,21 @@
 
 import jsPDF from "jspdf";
 import { autoTable } from "jspdf-autotable";
-import { formaPagoTexto, estadoPagoTexto, formatoMoneda } from "../pagos";
+import {
+  formaPagoTexto,
+  estadoPagoTexto,
+  formatoMoneda,
+  ESTADO_PAGO,
+} from "../pagos";
+import { fechaTexto } from "../fechas";
 
-const fechaTexto = (valor) =>
-  valor ? new Date(valor).toLocaleDateString("es-AR") : "";
-
-/** Solo aprobados/rechazados: excluye pendientes, cancelados y anulados. */
+/** Solo aprobados y rechazados: excluye pendientes, cancelados y anulados. */
 const pagosParaPdf = (pagos) =>
-  pagos.filter((pago) => {
-    const estado = Number(pago.estado);
-    return estado !== 1 && estado !== 4 && estado !== 5;
-  });
+  pagos.filter(
+    (pago) =>
+      Number(pago.estado) === ESTADO_PAGO.APROBADO ||
+      Number(pago.estado) === ESTADO_PAGO.RECHAZADO
+  );
 
 const agregarFiltrosAlPdf = (doc, filtros, yInicial) => {
   let y = yInicial;
@@ -63,8 +67,12 @@ export const exportarPagosPdf = (
   const doc = new jsPDF();
   const ahora = new Date();
 
-  const aprobados = pagos.filter((p) => Number(p.estado) === 2);
-  const rechazados = pagos.filter((p) => Number(p.estado) === 3);
+  const aprobados = pagos.filter(
+    (p) => Number(p.estado) === ESTADO_PAGO.APROBADO
+  );
+  const rechazados = pagos.filter(
+    (p) => Number(p.estado) === ESTADO_PAGO.RECHAZADO
+  );
   const totalCobrado = aprobados.reduce(
     (total, pago) => total + Number(pago.monto || 0),
     0

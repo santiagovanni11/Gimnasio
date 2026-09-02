@@ -1,5 +1,30 @@
 ﻿/* pagosDetalle.css - Ticket cuerpo, detalle de pago y responsive */
 
+/* =========================
+   FICHA SOCIO - CARNET
+========================= */
+
+.ficha-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ficha-header-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ficha-header-dni {
+  color: #8b929c;
+  font-size: 13px;
+}
+
+.ficha-avatar .avatar-dm {
+  border: 2px solid #2a3038;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
 .payment-ticket-body {
   display: grid;
   gap: 12px;
@@ -58,7 +83,7 @@
 }
 
 .payment-modal .primary-small-button {
-  box-shadow: 0 12px 24px rgba(227, 27, 35, 0.22);
+  box-shadow: 0 12px 24px rgba(47, 191, 113, 0.2);
 }
 
 .payment-modal .primary-small-button:hover,

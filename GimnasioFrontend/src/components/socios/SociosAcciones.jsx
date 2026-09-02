@@ -5,13 +5,20 @@
 function SociosAcciones({
   busqueda,
   setBusqueda,
-  verInactivos,
-  setVerInactivos,
+  mostrarTodos,
+  setMostrarTodos,
   puedeCrear,
   abrirFormulario,
   exportar,
   hayDatos,
+  abrirImportar,
+  seleccionados = [],
+  onToggleTodo,
+  onBajaMasiva,
+  onExportarSeleccionados,
 }) {
+  const tieneSeleccion = seleccionados.length > 0;
+
   return (
     <div className="section-actions">
       <div className="search-box">
@@ -26,12 +33,18 @@ function SociosAcciones({
       <label className="quick-range-button" style={{ cursor: "pointer" }}>
         <input
           type="checkbox"
-          checked={verInactivos}
-          onChange={(e) => setVerInactivos(e.target.checked)}
+          checked={mostrarTodos}
+          onChange={(e) => setMostrarTodos(e.target.checked)}
           style={{ marginRight: "6px" }}
         />
-        Mostrar inactivos
+        Mostrar todos los socios
       </label>
+
+      {hayDatos && (
+        <button type="button" className="export-button" onClick={onToggleTodo}>
+          {tieneSeleccion ? "Deseleccionar" : "Seleccionar todos"}
+        </button>
+      )}
 
       {puedeCrear && (
         <button
@@ -40,6 +53,18 @@ function SociosAcciones({
           onClick={abrirFormulario}
         >
           + Nuevo socio
+        </button>
+      )}
+
+      {tieneSeleccion && (
+        <button type="button" className="cancel-button" onClick={onBajaMasiva}>
+          Desactivar ({seleccionados.length})
+        </button>
+      )}
+
+      {tieneSeleccion && (
+        <button type="button" className="export-button" onClick={onExportarSeleccionados}>
+          Exportar ({seleccionados.length})
         </button>
       )}
 
@@ -52,6 +77,17 @@ function SociosAcciones({
       >
         Exportar CSV
       </button>
+
+      {puedeCrear && (
+        <button
+          type="button"
+          className="export-button"
+          onClick={abrirImportar}
+          title="Importar socios desde un CSV"
+        >
+          Importar CSV
+        </button>
+      )}
     </div>
   );
 }

@@ -14,7 +14,7 @@ public partial class AsistenciasController
 {
     // POST: api/Asistencias
     [HttpPost]
-    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    [Authorize(Roles = RolesGimnasio.TodosLosRoles)]
     public async Task<ActionResult<AsistenciaDto>> PostAsistencia(
         Asistencia asistencia)
     {
@@ -35,22 +35,13 @@ public partial class AsistenciasController
             inscripcion = await CargarInscripcionCompleta(
                 asistencia.InscripcionClaseId.Value);
 
-            if (inscripcion == null)
-            {
-                return BadRequest(
-                    "La inscripción indicada no existe.");
-            }
+            var error = ValidarInscripcionDeAsistencia(
+                inscripcion,
+                asistencia.SocioId);
 
-            if (inscripcion.SocioId != asistencia.SocioId)
+            if (error != null)
             {
-                return BadRequest(
-                    "La inscripción no pertenece al socio indicado.");
-            }
-
-            if (inscripcion.Estado == EstadoInscripcion.Cancelada)
-            {
-                return BadRequest(
-                    "No se puede registrar asistencia para una inscripción cancelada.");
+                return BadRequest(error);
             }
 
             // Evitar duplicados por inscripción y fecha.
@@ -59,18 +50,43 @@ public partial class AsistenciasController
                 asistencia.Fecha.Date,
                 excluirId: null);
 
-            if (duplicada)
+if (duplicada)
             {
                 return BadRequest(
                     "Ya existe una asistencia registrada para este socio en esta inscripción y fecha.");
             }
         }
+        else
+        {
+            // Asistencia general (sin inscripción): evitar
+            // duplicados por el mismo socio en el mismo día.
+            var marcaDelDia = await _context.Asistencias.AnyAsync(
+                a => a.SocioId == asistencia.SocioId &&
+                     a.Fecha.Date == asistencia.Fecha.Date);
 
-        asistencia.Fecha = asistencia.Fecha == default
+            if (marcaDelDia)
+            {
+                return BadRequest(
+                    "Ya existe una asistencia para este socio en esa fecha.");
+            }
+        }
+
+asistencia.Fecha = asistencia.Fecha == default
             ? DateTime.UtcNow
             : asistencia.Fecha;
 
+        AplicarAuditoria(asistencia);
+
         _context.Asistencias.Add(asistencia);
+
+        // Refleja el estado en la inscripción: asistió o no.
+        if (inscripcion != null)
+        {
+            inscripcion.Estado = asistencia.Presente
+                ? EstadoInscripcion.Asistio
+                : EstadoInscripcion.NoAsistio;
+        }
+
         await _context.SaveChangesAsync();
 
         var resultado = MapearDto(asistencia);

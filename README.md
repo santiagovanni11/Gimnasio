@@ -106,13 +106,13 @@ npm test
 
 | Módulo        | Funciones principales |
 |---------------|----------------------|
-| Socios        | CRUD, búsqueda por nombre/DNI/teléfono, ficha completa, baja lógica, cumpleaños del mes, alerta de vencimientos, export CSV |
-| Membresías    | Alta con precio según duración, filtro por estado, ordenamiento, renovación, cancelación con historial, suspensión/reactivación, export CSV |
+| Socios        | CRUD, búsqueda por nombre/DNI/teléfono, ficha completa, baja lógica, cumpleaños del mes, alerta de vencimientos, export/importación CSV, estadísticas y gráfico de altas por mes |
+| Membresías    | Alta con precio según duración, filtro por estado, ordenamiento, renovación, cancelación con historial, suspensión/reactivación, export CSV/PDF, ticket PDF, auditoría de cambios de estado (suspensión, reactivación, cancelación) |
 | Pagos         | Efectivo/transferencia/Mercado Pago/tarjeta (validación Luhn), rechazos, anulación con auditoría, saldos y morosos, cierre de caja diario, comparativa mensual, export CSV/PDF, ticket PDF |
 | Asistencias   | Registro de entradas (check-in), edición y baja, consulta histórica por socio |
 | Clases        | CRUD de clases con horarios múltiples, inscripción y cancelación de socios según plan |
 | Empleados     | CRUD con validaciones centralizadas (`EmpleadoValidaciones`) y baja lógica |
-| Planes        | Ciclo de vida (activo/inactivo), precios por duración con historial de cambios, beneficios y clases incluidas por plan |
+| Planes        | Ciclo de vida (activo/inactivo), precios por duración con historial de cambios, beneficios y clases incluidas por plan (catálogo y asignación), export CSV/PDF, auditoría de cambios (alta, edición, pausa/ reactivación, eliminación) |
 | Usuarios      | Listado, activar/desactivar, cambio de rol, reset de contraseña, desbloqueo, auditoría de acciones (solo Administrador), catálogo de roles |
 
 ## Roles

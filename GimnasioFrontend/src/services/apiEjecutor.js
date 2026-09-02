@@ -56,7 +56,13 @@ export const crearEjecutorApi = ({ onSesionExpirada }) => {
       return { datos };
     } catch (error) {
       console.error(etiquetaLog, error);
-      onError?.(mensajeRed);
+
+      // Detalle técnico entre paréntesis para diagnosticar
+      // rápido ("Failed to fetch" = red; otro texto = bug).
+      onError?.(
+        `${mensajeRed} (${error?.message ?? "sin detalle"})`
+      );
+
       return null;
     }
   };

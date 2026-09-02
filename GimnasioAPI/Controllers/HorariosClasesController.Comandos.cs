@@ -13,7 +13,7 @@ public partial class HorariosClasesController
 {
     // POST: api/HorariosClases — Solo Administrador.
     [HttpPost]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = RolesGimnasio.Administrador)]
     public async Task<ActionResult<HorarioClase>> PostHorario(
         HorarioClase horario)
     {
@@ -25,7 +25,6 @@ public partial class HorariosClasesController
         }
 
         horario.Activo = true;
-
         _context.HorariosClases.Add(horario);
         await _context.SaveChangesAsync();
 
@@ -37,7 +36,7 @@ public partial class HorariosClasesController
 
     // PUT: api/HorariosClases/5 — Solo Administrador.
     [HttpPut("{id}")]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = RolesGimnasio.Administrador)]
     public async Task<IActionResult> PutHorario(
         int id,
         HorarioClase horario)
@@ -47,7 +46,9 @@ public partial class HorariosClasesController
             return BadRequest();
         }
 
-        var error = await ValidarHorarioAsync(horario);
+        var error = await ValidarHorarioAsync(
+            horario,
+            excluirId: id);
 
         if (error != null)
         {
@@ -56,21 +57,12 @@ public partial class HorariosClasesController
 
         _context.Entry(horario).State = EntityState.Modified;
 
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            var sigue = await _context.HorariosClases
-                .AnyAsync(e => e.Id == id);
+        var resultado = await _context.GuardarAsync(() =>
+            _context.HorariosClases.AnyAsync(e => e.Id == id));
 
-            if (!sigue)
-            {
-                return NotFound();
-            }
-
-            throw;
+        if (resultado != null)
+        {
+            return resultado;
         }
 
         return NoContent();
@@ -78,7 +70,7 @@ public partial class HorariosClasesController
 
     // DELETE: api/HorariosClases/5 — Solo Administrador.
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = RolesGimnasio.Administrador)]
     public async Task<IActionResult> DeleteHorario(int id)
     {
         var horario = await _context.HorariosClases.FindAsync(id);
@@ -96,10 +88,12 @@ public partial class HorariosClasesController
 
     /// <summary>
     /// Valida coherencia horaria y existencia activa de la
-    /// clase y el empleado. Devuelve null si todo es válido.
+    /// clase y el profesor (sin solapamientos). Devuelve null
+    /// si todo es válido. excluirId: horario en edición.
     /// </summary>
     private async Task<string?> ValidarHorarioAsync(
-        HorarioClase horario)
+        HorarioClase horario,
+        int? excluirId = null)
     {
         if (horario.HoraFin <= horario.HoraInicio)
         {
@@ -124,6 +118,42 @@ public partial class HorariosClasesController
             return "El empleado no existe o está inactivo.";
         }
 
+        // Un profesor no puede estar en dos franjas que se
+        // superpongan el mismo día (aunque sean de otra clase).
+        var profesorOcupado = await ProfesorOcupadoAsync(
+            horario,
+            excluirId);
+
+        if (profesorOcupado)
+        {
+            return "El profesor ya está asignado a otra " +
+                "clase en ese día y horario.";
+        }
+
         return null;
+    }
+
+    /// <summary>
+    /// ¿Existe otro horario del mismo profesor, el mismo día,
+    /// cuya franja se superponga con la propuesta?
+    /// Tocarse en el borde no cuenta como superposición.
+    /// </summary>
+    private Task<bool> ProfesorOcupadoAsync(
+        HorarioClase horario,
+        int? excluirId)
+    {
+        var consulta = _context.HorariosClases.AsQueryable();
+
+        if (excluirId.HasValue)
+        {
+            consulta = consulta.Where(
+                h => h.Id != excluirId.Value);
+        }
+
+        return consulta.AnyAsync(h =>
+            h.EmpleadoId == horario.EmpleadoId &&
+            h.DiaSemana == horario.DiaSemana &&
+            h.HoraInicio < horario.HoraFin &&
+            horario.HoraInicio < h.HoraFin);
     }
 }

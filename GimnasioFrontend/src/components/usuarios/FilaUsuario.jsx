@@ -5,6 +5,8 @@
 // =========================================================
 
 import AccionesUsuario from "./AccionesUsuario";
+import Avatar from "../common/Avatar";
+import { fechaHoraTexto } from "../../utils/fechas";
 
 const formatoFecha = (valor) =>
   valor ? new Date(valor).toLocaleDateString("es-AR") : "-";
@@ -25,6 +27,8 @@ function FilaUsuario({
   desbloquear,
   eliminarUsuario,
   verAuditoria,
+  editarUsuario,
+  asignarClase,
 }) {
   const esMiCuenta = Number(usuario.id) === Number(miUsuarioId);
   const bloqueada = estaBloqueada(usuario);
@@ -37,16 +41,26 @@ function FilaUsuario({
   return (
     <tr>
       <td>
-        <div className="usuario-celda-principal">
-          {nombreCompleto}
-          {esMiCuenta && (
-            <em style={{ marginLeft: "6px", opacity: 0.7 }}>
-              (vos)
-            </em>
-          )}
-        </div>
+        <div className="celda-con-avatar">
+          <Avatar
+            nombre={usuario.nombre}
+            apellido={usuario.apellido}
+            email={usuario.email}
+          />
 
-        <small style={{ color: "#8b929c" }}>{usuario.email}</small>
+          <div>
+            <div className="usuario-celda-principal">
+              {nombreCompleto}
+              {esMiCuenta && (
+                <em style={{ marginLeft: "6px", opacity: 0.7 }}>
+                  (vos)
+                </em>
+              )}
+            </div>
+
+            <small style={{ color: "#8b929c" }}>{usuario.email}</small>
+          </div>
+        </div>
       </td>
 
       <td>
@@ -68,7 +82,7 @@ function FilaUsuario({
 
       <td title="Último inicio de sesión exitoso">
         {usuario.ultimoAcceso
-          ? new Date(usuario.ultimoAcceso).toLocaleString("es-AR")
+          ? fechaHoraTexto(usuario.ultimoAcceso)
           : "Nunca"}
       </td>
 
@@ -96,6 +110,8 @@ function FilaUsuario({
           desbloquear={desbloquear}
           eliminarUsuario={eliminarUsuario}
           verAuditoria={verAuditoria}
+          editarUsuario={editarUsuario}
+          asignarClase={asignarClase}
         />
       </td>
     </tr>

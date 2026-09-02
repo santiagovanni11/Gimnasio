@@ -1,7 +1,7 @@
-using System.Security.Claims;
 using GimnasioAPI.Data;
 using GimnasioAPI.DTOs;
 using GimnasioAPI.Models;
+using GimnasioAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,14 +9,13 @@ using Microsoft.EntityFrameworkCore;
 namespace GimnasioAPI.Controllers;
 
 /// <summary>
-/// Mutaciones de pagos: registro, actualización y anulación
-/// lógica con motivo obligatorio (auditoría).
+/// Mutaciones de pagos: registro, edición y anulación lógica.
 /// </summary>
 public partial class PagosController
 {
-    // POST: api/Pagos — Administrador y Recepcionista.
+    // POST: api/Pagos
     [HttpPost]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<ActionResult<PagoDto>> PostPago(Pago pago)
     {
         var membresia = await _context.Membresias
@@ -25,29 +24,20 @@ public partial class PagosController
             .FirstOrDefaultAsync(m => m.Id == pago.MembresiaId);
 
         if (membresia == null)
-        {
             return BadRequest("La membresía indicada no existe.");
-        }
 
-        if (pago.Monto <= 0)
-        {
-            return BadRequest("El monto debe ser mayor a cero.");
-        }
+        var errorMonto = PagosValidaciones.ValidarMonto(
+            pago.Monto, membresia.PrecioAplicado);
 
-        if (pago.Monto > membresia.PrecioAplicado)
-        {
-            return BadRequest(
-                "El monto del pago no puede ser mayor al precio de la membresía.");
-        }
+        if (errorMonto != null)
+            return BadRequest(errorMonto);
 
-        // Auditoría: quién registró el pago
-        pago.RegistradoPor =
-            User.FindFirst(ClaimTypes.Email)?.Value
-            ?? User.Identity?.Name
-            ?? "desconocido";
+        pago.RegistradoPor = _auditoria.ObtenerEmailActor();
 
         _context.Pagos.Add(pago);
         await _context.SaveChangesAsync();
+
+        await ActivarMembresiaSiAprobadaAsync(membresia, pago.Estado);
 
         return CreatedAtAction(
             nameof(GetPago),
@@ -55,74 +45,74 @@ public partial class PagosController
             MapearDto(pago));
     }
 
-    // PUT: api/Pagos/5 — Administrador y Recepcionista.
+    // PUT: api/Pagos/5
     [HttpPut("{id}")]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<IActionResult> PutPago(int id, Pago pago)
     {
         if (id != pago.Id)
-        {
             return BadRequest();
-        }
 
-        var membresiaExiste = await _context.Membresias
-            .AnyAsync(m => m.Id == pago.MembresiaId);
+        var membresia = await _context.Membresias
+            .FirstOrDefaultAsync(m => m.Id == pago.MembresiaId);
 
-        if (!membresiaExiste)
-        {
+        if (membresia == null)
             return BadRequest("La membresía indicada no existe.");
-        }
 
-        if (pago.Monto <= 0)
-        {
-            return BadRequest("El monto debe ser mayor a cero.");
-        }
+        var errorMonto = PagosValidaciones.ValidarMonto(
+            pago.Monto, membresia.PrecioAplicado);
+
+        if (errorMonto != null)
+            return BadRequest(errorMonto);
 
         _context.Entry(pago).State = EntityState.Modified;
 
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            var sigue = await _context.Pagos.AnyAsync(e => e.Id == id);
+        var resultado = await _context.GuardarAsync(
+            () => _context.Pagos.AnyAsync(e => e.Id == id));
 
-            if (!sigue)
-            {
-                return NotFound();
-            }
+        if (resultado != null)
+            return resultado;
 
-            throw;
-        }
+        await ActivarMembresiaSiAprobadaAsync(membresia, pago.Estado);
 
         return NoContent();
     }
 
+    private async Task ActivarMembresiaSiAprobadaAsync(
+        Membresia? membresia,
+        EstadoPago estadoPago)
+    {
+        if (membresia == null || estadoPago != EstadoPago.Aprobado)
+            return;
+
+        ReglasMembresia.RecalcularEstado(
+            membresia, DateTime.UtcNow, tienePagoAprobado: true);
+
+        await _context.SaveChangesAsync();
+    }
+
     // DELETE: api/Pagos/5?motivo=...
-    // SOLO Administrador. Anulación lógica con motivo obligatorio:
-    // el pago no se elimina, queda marcado como Anulado (auditoría).
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = RolesGimnasio.Administrador)]
     public async Task<IActionResult> DeletePago(
         int id,
         [FromQuery] string motivo)
     {
         if (string.IsNullOrWhiteSpace(motivo))
-        {
-            return BadRequest(
-                "El motivo de anulación es obligatorio.");
-        }
+            return BadRequest("El motivo de anulación es obligatorio.");
 
         var pago = await _context.Pagos.FindAsync(id);
 
         if (pago == null)
-        {
             return NotFound();
-        }
+
+        if (pago.Estado == EstadoPago.Anulado)
+            return BadRequest("El pago ya se encuentra anulado.");
 
         pago.Estado = EstadoPago.Anulado;
         pago.MotivoAnulacion = motivo.Trim();
+        pago.AnuladoPor = _auditoria.ObtenerEmailActor();
+        pago.FechaAnulacion = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
 

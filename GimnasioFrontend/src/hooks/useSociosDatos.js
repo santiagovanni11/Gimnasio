@@ -13,7 +13,7 @@ export function useSociosDatos({ onSesionExpirada }) {
   const [cargandoSocios, setCargandoSocios] = useState(false);
   const [errorSocios, setErrorSocios] = useState("");
   const [busquedaSocio, setBusquedaSocio] = useState("");
-  const [verInactivos, setVerInactivos] = useState(false);
+  const [mostrarTodos, setMostrarTodos] = useState(false);
 
   const [ejecutar] = useState(() =>
     crearEjecutorApi({ onSesionExpirada })
@@ -45,7 +45,7 @@ export function useSociosDatos({ onSesionExpirada }) {
   /** Los inactivos solo se muestran con el filtro explícito. */
   const sociosFiltrados = useMemo(() => {
     return socios.filter((socio) => {
-      if (!verInactivos && socio.activo === false) return false;
+      if (!mostrarTodos && socio.activo === false) return false;
 
       const texto = normalizarTextoBusqueda(busquedaSocio);
       if (!texto) return true;
@@ -60,13 +60,13 @@ export function useSociosDatos({ onSesionExpirada }) {
         normalizarTextoBusqueda(socio.telefono ?? "").includes(texto)
       );
     });
-  }, [socios, verInactivos, busquedaSocio]);
+  }, [socios, mostrarTodos, busquedaSocio]);
 
   const reiniciarDatos = () => {
     setSocios([]);
     setErrorSocios("");
     setBusquedaSocio("");
-    setVerInactivos(false);
+    setMostrarTodos(false);
     setCargandoSocios(false);
   };
 
@@ -78,8 +78,8 @@ export function useSociosDatos({ onSesionExpirada }) {
     setErrorSocios,
     busquedaSocio,
     setBusquedaSocio,
-    verInactivos,
-    setVerInactivos,
+    mostrarTodos,
+    setMostrarTodos,
     sociosFiltrados,
     obtenerSocios,
     reiniciarDatos,

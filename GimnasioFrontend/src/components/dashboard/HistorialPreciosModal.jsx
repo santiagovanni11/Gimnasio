@@ -4,6 +4,7 @@
 // =========================================================
 
 import { formatoMoneda } from "../../utils/pagos";
+import { fechaHoraTexto } from "../../utils/fechas";
 
 function HistorialPreciosModal({
   plan,
@@ -78,7 +79,7 @@ function FilaHistorial({ fila }) {
         }}
       >
         <strong>
-          {new Date(fila.fechaUtc).toLocaleString("es-AR")}
+          {fechaHoraTexto(fila.fechaUtc)}
         </strong>
 
         <span className={pendiente ? "status-warning" : "status-active"}>

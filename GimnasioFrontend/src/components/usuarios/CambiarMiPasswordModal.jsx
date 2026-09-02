@@ -9,11 +9,56 @@ function CambiarMiPasswordModal({
   camposCuenta,
   cambiandoPassword,
   errorMiCuenta,
+  exitoMiCuenta,
   cerrarMiCuenta,
   cambiarCampoCuenta,
   guardarMiPassword,
 }) {
   if (!miCuentaAbierto) return null;
+
+  if (exitoMiCuenta) {
+    return (
+      <div
+        className="payment-modal-backdrop"
+        onClick={cerrarMiCuenta}
+      >
+        <div
+          className="payment-modal"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="payment-ticket-header">
+            <div>
+              <span className="eyebrow">MI CUENTA</span>
+
+              <h3>Cambiar mi contraseña</h3>
+            </div>
+
+            <button
+              type="button"
+              className="close-button"
+              onClick={cerrarMiCuenta}
+            >
+              ×
+            </button>
+          </div>
+
+          <div className="payment-ticket-body">
+            <p className="success-message">{exitoMiCuenta}</p>
+          </div>
+
+          <div className="payment-modal-actions">
+            <button
+              type="button"
+              className="primary-button"
+              onClick={cerrarMiCuenta}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

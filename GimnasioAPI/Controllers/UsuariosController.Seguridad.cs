@@ -12,7 +12,7 @@ namespace GimnasioAPI.Controllers;
 /// </summary>
 public partial class UsuariosController
 {
-    // PUT: api/Usuarios/2/estado — Activa/desactiva (baja lógica).
+    // PUT: api/Usuarios/2/estado
     [HttpPut("{id:int}/estado")]
     public async Task<IActionResult> CambiarEstadoUsuario(
         int id,
@@ -22,9 +22,7 @@ public partial class UsuariosController
             .FirstOrDefaultAsync(u => u.Id == id);
 
         if (usuario == null)
-        {
             return NotFound("El usuario no existe.");
-        }
 
         if (!activo && usuario.Activo &&
             await _guard.EsUltimoAdministradorActivoAsync(usuario))
@@ -43,7 +41,7 @@ public partial class UsuariosController
         return NoContent();
     }
 
-    // PUT: api/Usuarios/2/rol — Cambia el rol (protege al último Admin activo).
+    // PUT: api/Usuarios/2/rol
     [HttpPut("{id:int}/rol")]
     public async Task<IActionResult> CambiarRolUsuario(
         int id,
@@ -53,28 +51,21 @@ public partial class UsuariosController
             .FirstOrDefaultAsync(u => u.Id == id);
 
         if (usuario == null)
-        {
             return NotFound("El usuario no existe.");
-        }
 
         var rolNuevo = await _context.Roles
             .FirstOrDefaultAsync(r =>
                 r.Id == dto.RolId && r.Activo);
 
         if (rolNuevo == null)
-        {
             return BadRequest("El rol indicado no existe o está inactivo.");
-        }
 
         if (usuario.RolId == rolNuevo.Id)
-        {
             return BadRequest("El usuario ya tiene ese rol.");
-        }
 
-        // Evitar dejar al sistema sin Administradores.
         var dejaDeSerAdmin =
             await _guard.EsRolAdministradorAsync(usuario.RolId) &&
-            rolNuevo.Nombre != "Administrador";
+            rolNuevo.Nombre != RolesGimnasio.Administrador;
 
         if (dejaDeSerAdmin && usuario.Activo &&
             await _guard.EsUltimoAdministradorActivoAsync(usuario))
@@ -92,7 +83,7 @@ public partial class UsuariosController
         return NoContent();
     }
 
-    // PUT: api/Usuarios/2/password — Reset de contraseña.
+    // PUT: api/Usuarios/2/password
     [HttpPut("{id:int}/password")]
     public async Task<IActionResult> ResetearPassword(
         int id,
@@ -102,19 +93,16 @@ public partial class UsuariosController
             CredencialesValidator.ValidarPassword(dto.Password);
 
         if (!string.IsNullOrEmpty(error))
-        {
             return BadRequest(error);
-        }
 
         var usuario = await _context.Usuarios
             .FirstOrDefaultAsync(u => u.Id == id);
 
         if (usuario == null)
-        {
             return NotFound("El usuario no existe.");
-        }
 
-        usuario.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+        usuario.PasswordHash =
+            BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
         await _context.SaveChangesAsync();
 
@@ -125,7 +113,7 @@ public partial class UsuariosController
         return NoContent();
     }
 
-    // DELETE: api/Usuarios/2 — Borrado físico del usuario.
+    // DELETE: api/Usuarios/2
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> EliminarUsuario(int id)
     {
@@ -133,9 +121,7 @@ public partial class UsuariosController
             .FirstOrDefaultAsync(u => u.Id == id);
 
         if (usuario == null)
-        {
             return NotFound();
-        }
 
         if (usuario.Activo &&
             await _guard.EsUltimoAdministradorActivoAsync(usuario))
@@ -143,7 +129,6 @@ public partial class UsuariosController
             return BadRequest("No se puede eliminar al último Administrador activo.");
         }
 
-        // Snapshot para la auditoría (sobrevive al borrado).
         var emailBaja = usuario.Email;
         var rolIdBaja = usuario.RolId;
 

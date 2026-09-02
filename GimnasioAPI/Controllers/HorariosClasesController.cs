@@ -25,7 +25,7 @@ public partial class HorariosClasesController : ControllerBase
 
     // GET: api/HorariosClases
     [HttpGet]
-    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    [Authorize(Roles = RolesGimnasio.TodosLosRoles)]
     public async Task<ActionResult<IEnumerable<HorarioClaseDto>>> GetHorarios()
     {
         var horarios = await CargarConRelaciones().ToListAsync();
@@ -34,7 +34,7 @@ public partial class HorariosClasesController : ControllerBase
 
     // GET: api/HorariosClases/5
     [HttpGet("{id}")]
-    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    [Authorize(Roles = RolesGimnasio.TodosLosRoles)]
     public async Task<ActionResult<HorarioClaseDto>> GetHorario(int id)
     {
         var horario = await CargarConRelaciones()

@@ -4,13 +4,14 @@
 // contrato que consumen las páginas. Sin lógica propia.
 // =========================================================
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { crearEjecutorApi } from "../services/apiEjecutor";
 import { useMembresiasFormulario } from "./useMembresiasFormulario";
 import { useMembresiasDatos } from "./useMembresiasDatos";
 import { crearGuardadoMembresia } from "./useMembresiaGuardar";
 import { crearBajasMembresias } from "./useMembresiasBajas";
 import { crearEstadosMembresias } from "./useMembresiasEstados";
+import { crearRenovacionRapida } from "./crearRenovacionRapida";
 
 export function useMembresias(opciones) {
   const {
@@ -25,6 +26,8 @@ export function useMembresias(opciones) {
   } = opciones || {};
 
   const formulario = useMembresiasFormulario();
+  const formularioRef = useRef(formulario);
+  formularioRef.current = formulario;
 
   const datos = useMembresiasDatos({
     onSesionExpirada,
@@ -38,7 +41,7 @@ export function useMembresias(opciones) {
   const notificar = (texto) => notificarOpciones?.(texto);
 
   const guardar = crearGuardadoMembresia({
-    formulario, datos, ejecutar, notificar,
+    getFormulario: () => formularioRef.current, datos, ejecutar, notificar,
     getPlanes, obtenerPrecioSegunDuracion, alMembresiaCreada,
   });
 
@@ -56,6 +59,18 @@ export function useMembresias(opciones) {
     datos.setErrorMembresias("");
     formulario.prepararRenovacionMembresia(membresia);
   };
+
+  /** Renovación en un clic + oferta de cobro inmediato. */
+  const { renovarRapido } = crearRenovacionRapida({
+    ejecutar,
+    notificar,
+    avisarError: (texto) => datos.setErrorMembresias(texto),
+    obtenerMembresias: datos.obtenerMembresias,
+    getPlanes,
+    obtenerPrecioSegunDuracion,
+    abrirFormularioRenovacion: prepararRenovacionMembresia,
+    alRenovada: alMembresiaCreada,
+  });
 
   /** Nueva membresía desde la ficha del socio (cambia sección). */
   const abrirFormularioDesdeSocio = (socioId) => {
@@ -83,10 +98,10 @@ export function useMembresias(opciones) {
 
     abrirFormularioDesdeSocio,
     prepararRenovacionMembresia,
+    renovarRapido,
     crearMembresia,
     eliminarMembresia: bajas.eliminarMembresia,
     cancelarMembresia: bajas.cancelarMembresia,
-    sincronizarSocioEliminado: bajas.sincronizarSocioEliminado,
     suspenderMembresia: estados.suspenderMembresia,
     reactivarMembresia: estados.reactivarMembresia,
     reiniciar,

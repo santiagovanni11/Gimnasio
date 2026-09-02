@@ -1,15 +1,17 @@
 // =========================================================
 // FORMULARIO DE PAGO — Checkout de cobros
-// Piezas de UI en PagoCampos; tarjeta en PagoFormTarjeta.
+// Orquesta el formulario; los campos principales viven en
+// PagoCampos (CamposPrincipales) y la tarjeta en
+// PagoFormTarjeta.
 // =========================================================
 
 import PagoFormTarjeta from "./PagoFormTarjeta";
-import { PagoEncabezado, Campo, AccionesPago } from "./PagoCampos";
-
-const formatearMonto = (valor) =>
-  `$${new Intl.NumberFormat("es-AR", {
-    maximumFractionDigits: 0,
-  }).format(Number(valor || 0))}`;
+import {
+  PagoEncabezado,
+  AccionesPago,
+  CamposPrincipales,
+} from "./PagoCampos";
+import { persistirMetodoPagoSiCorresponde } from "../../utils/pagosCheckout/persistirMetodoPago";
 
 function PagoForm(props) {
   const {
@@ -58,78 +60,42 @@ function PagoForm(props) {
     }));
   };
 
+  /** Cambiar la forma de pago reinicia el estado a Aprobado. */
+  const cambiarFormaPago = (valor) =>
+    setFormPago((prev) => ({
+      ...prev,
+      formaPago: valor,
+      estado: "2",
+    }));
+
+  /**
+   * Envía el formulario y, al cobrar con tarjeta nueva, guarda
+   * el método de pago del socio para la renovación automática.
+   */
+  const manejarEnvio = async (event) => {
+    if (enEdicion) {
+      await guardarPagoEditado(event);
+      return;
+    }
+    await registrarPago(event);
+    await persistirMetodoPagoSiCorresponde(formPago, membresias);
+  };
+
   return (
-    <div className="form-card payment-checkout-card">
+    <div id="checkout-pago" className="form-card payment-checkout-card">
       <PagoEncabezado enEdicion={enEdicion} pagoEditando={pagoEditando} />
 
       <form
-        onSubmit={enEdicion ? guardarPagoEditado : registrarPago}
+        onSubmit={manejarEnvio}
         className="payment-form-grid"
       >
-        <Campo label="Membresía">
-          <select
-            value={formPago.membresiaId}
-            onChange={(e) => cambiarMembresia(e.target.value)}
-          >
-            <option value="">Seleccionar membresía</option>
-
-            {disponibles.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.socioNombre} {m.socioApellido} - {m.planNombre}
-              </option>
-            ))}
-          </select>
-        </Campo>
-
-        <Campo label="Monto">
-          <input
-            type="text"
-            className="payment-monto-input"
-            value={formatearMonto(formPago.monto)}
-            placeholder="$60.000"
-            readOnly
-          />
-        </Campo>
-
-        <Campo label="Forma de pago">
-          <select
-            value={formPago.formaPago}
-            onChange={(e) =>
-              setFormPago((prev) => ({
-                ...prev,
-                formaPago: e.target.value,
-                estado: "2",
-              }))
-            }
-          >
-            <option value="1">Efectivo</option>
-            <option value="2">Transferencia</option>
-            <option value="3">Mercado Pago</option>
-            <option value="4">Tarjeta débito</option>
-            <option value="5">Tarjeta crédito</option>
-          </select>
-        </Campo>
-
-        <Campo label="Fecha">
-          <input
-            type="date"
-            value={formPago.fechaPago}
-            onChange={(e) =>
-              actualizarCampo("fechaPago", e.target.value)
-            }
-          />
-        </Campo>
-
-        <Campo label="Referencia">
-          <input
-            type="text"
-            value={formPago.referencia}
-            onChange={(e) =>
-              actualizarCampo("referencia", e.target.value)
-            }
-            placeholder="Ej: OP-1024"
-          />
-        </Campo>
+        <CamposPrincipales
+          disponibles={disponibles}
+          formPago={formPago}
+          cambiarMembresia={cambiarMembresia}
+          cambiarFormaPago={cambiarFormaPago}
+          actualizarCampo={actualizarCampo}
+        />
 
         {requiereTarjeta && (
           <PagoFormTarjeta

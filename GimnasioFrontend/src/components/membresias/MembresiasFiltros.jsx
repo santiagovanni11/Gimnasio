@@ -9,6 +9,9 @@ function MembresiasFiltros({
   setFiltroEstado,
   filtroVencimiento,
   setFiltroVencimiento,
+  filtroPlan,
+  setFiltroPlan,
+  planes = [],
 }) {
   return (
     <div className="section-actions" style={{ marginBottom: "1rem" }}>
@@ -42,6 +45,17 @@ function MembresiasFiltros({
         <option value="">Vencimiento: todos</option>
         <option value="7">Por vencer (7 días)</option>
         <option value="30">Por vencer (30 días)</option>
+      </select>
+
+      <select
+        value={filtroPlan}
+        onChange={(e) => setFiltroPlan(e.target.value)}
+        className="filter-select"
+      >
+        <option value="">Plan: todos</option>
+        {planes.map((plan) => (
+          <option key={plan.id} value={plan.nombre}>{plan.nombre}</option>
+        ))}
       </select>
     </div>
   );

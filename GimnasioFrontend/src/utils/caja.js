@@ -1,9 +1,9 @@
 // =========================================================
-// UTILIDADES DE CIERRE DE CAJA
-// Cálculo y exportación del cierre diario por forma de pago.
+// CIERRE DE CAJA — CÁLCULOS
+// Agregación de cobros aprobados por forma de pago, para un
+// día o para un rango. La exportación a PDF vive en cajaPdf.
 // =========================================================
 
-import jsPDF from "jspdf";
 import {
   FORMA_PAGO,
   formaPagoTexto,
@@ -11,20 +11,25 @@ import {
   soloValidos,
 } from "./pagos";
 
-/**
- * Calcula el cierre de caja para una fecha (ISO yyyy-mm-dd).
- * Solo pagos aprobados y vigentes (no anulados).
- */
-export const calcularCierreCaja = (pagos = [], fechaISO) => {
-  const delDia = soloValidos(pagos).filter(
-    (pago) =>
-      esAprobado(pago) &&
-      (pago.fechaPago || "").slice(0, 10) === fechaISO
-  );
+/** Pagos aprobados cuya fecha cae entre dos ISO (inclusive). */
+export const pagosEntreFechas = (
+  pagos = [],
+  desdeISO,
+  hastaISO
+) =>
+  soloValidos(pagos).filter((pago) => {
+    const dia = (pago.fechaPago || "").slice(0, 10);
 
-  const formas = Object.values(FORMA_PAGO)
+    return (
+      esAprobado(pago) && dia >= desdeISO && dia <= hastaISO
+    );
+  });
+
+/** Sumariza pagos por forma de pago (solo con movimiento). */
+const agregarPorForma = (pagos = []) =>
+  Object.values(FORMA_PAGO)
     .map((forma) => {
-      const items = delDia.filter(
+      const items = pagos.filter(
         (pago) => Number(pago.formaPago) === forma
       );
 
@@ -40,73 +45,40 @@ export const calcularCierreCaja = (pagos = [], fechaISO) => {
     })
     .filter((item) => item.cantidad > 0);
 
+const totalizar = (pagos = []) =>
+  pagos.reduce((total, pago) => total + Number(pago.monto || 0), 0);
+
+/**
+ * Cierre de un día (ISO yyyy-mm-dd).
+ * Shape: { fecha, formas, cantidad, total }.
+ */
+export const calcularCierreCaja = (pagos = [], fechaISO) => {
+  const delDia = pagosEntreFechas(pagos, fechaISO, fechaISO);
+
   return {
     fecha: fechaISO,
-    formas,
+    formas: agregarPorForma(delDia),
     cantidad: delDia.length,
-    total: delDia.reduce(
-      (total, pago) => total + Number(pago.monto || 0),
-      0
-    ),
+    total: totalizar(delDia),
   };
 };
 
 /**
- * Exporta el cierre de caja como PDF.
+ * Cierre de un rango inclusivo (dos ISO).
+ * Shape: { desde, hasta, formas, cantidad, total }.
  */
-export const exportarCierrePdf = (cierre, responsable) => {
-  if (!cierre || !cierre.cantidad) return;
+export const calcularCierreRango = (
+  pagos = [],
+  desdeISO,
+  hastaISO
+) => {
+  const delRango = pagosEntreFechas(pagos, desdeISO, hastaISO);
 
-  const doc = new jsPDF();
-  const formatoMoneda = new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    minimumFractionDigits: 2,
-  });
-
-  let y = 20;
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  doc.text("CIERRE DE CAJA DIARIO", 14, y);
-
-  y += 8;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.text(`Fecha: ${cierre.fecha}`, 14, y);
-
-  y += 6;
-  doc.text(`Responsable: ${responsable || "-"}`, 14, y);
-
-  y += 6;
-  doc.text(
-    `Generado: ${new Date().toLocaleString("es-AR")}`,
-    14,
-    y
-  );
-
-  y += 10;
-
-  cierre.formas.forEach((item) => {
-    doc.text(item.nombre, 14, y);
-    doc.text(`${item.cantidad} pago(s)`, 80, y);
-    doc.text(formatoMoneda.format(item.monto), 196, y, {
-      align: "right",
-    });
-    y += 7;
-  });
-
-  y += 4;
-  doc.setDrawColor(150);
-  doc.line(14, y, 196, y);
-
-  y += 8;
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
-  doc.text("TOTAL", 14, y);
-  doc.text(formatoMoneda.format(cierre.total), 196, y, {
-    align: "right",
-  });
-
-  doc.save(`cierre_caja_${cierre.fecha}.pdf`);
+  return {
+    desde: desdeISO,
+    hasta: hastaISO,
+    formas: agregarPorForma(delRango),
+    cantidad: delRango.length,
+    total: totalizar(delRango),
+  };
 };

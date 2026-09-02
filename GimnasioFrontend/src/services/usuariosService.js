@@ -1,7 +1,7 @@
 // =========================================================
 // SERVICIO DE USUARIOS
-// Gestión de cuentas: listado, roles, estados, reset de
-// contraseña y auditoría.
+// Gestión de cuentas: alta, edición, listado, roles, estados,
+// reset de contraseña y auditoría.
 // =========================================================
 
 import { apiRequest } from "./apiClient";
@@ -9,6 +9,19 @@ import { apiRequest } from "./apiClient";
 export const usuariosService = {
   async obtenerUsuarios() {
     return apiRequest("Usuarios");
+  },
+
+  /** Alta manual de una cuenta (Administrador). */
+  async crear(payload) {
+    return apiRequest("Usuarios", { method: "POST", body: payload });
+  },
+
+  /** Edición de datos; password vacía = sin cambio. */
+  async actualizar(id, payload) {
+    return apiRequest(`Usuarios/${id}`, {
+      method: "PUT",
+      body: payload,
+    });
   },
 
   async cambiarEstado(id, activo) {

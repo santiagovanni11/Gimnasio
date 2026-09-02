@@ -18,43 +18,14 @@ public partial class UsuariosController
     [HttpPost]
     public async Task<IActionResult> CrearUsuario(CrearUsuarioDto dto)
     {
-        var error = ValidarCredenciales(dto.Email, dto.Password);
+        var resultado = await _altas.CrearAsync(dto);
 
-        if (!string.IsNullOrEmpty(error))
+        if (resultado.Error != null)
         {
-            return BadRequest(error);
+            return BadRequest(resultado.Error);
         }
 
-        var emailNormalizado = dto.Email.Trim();
-
-        if (await EmailEnUsoAsync(emailNormalizado))
-        {
-            return BadRequest("Ya existe un usuario con ese email.");
-        }
-
-        if (!await RolActivoExisteAsync(dto.RolId))
-        {
-            return BadRequest(
-                "El rol indicado no existe o está inactivo.");
-        }
-
-        var usuario = new Usuario
-        {
-            Email = emailNormalizado,
-            PasswordHash =
-                BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Nombre = dto.Nombre?.Trim(),
-            Apellido = dto.Apellido?.Trim(),
-            RolId = dto.RolId,
-            FechaCreacion = DateTime.UtcNow,
-            Activo = true
-        };
-
-        _context.Usuarios.Add(usuario);
-        await _context.SaveChangesAsync();
-
-        await _auditoria.RegistrarAsync(
-            _context, AccionesAuditoriaUsuario.Creacion, usuario);
+        var usuario = resultado.Usuario!;
 
         return CreatedAtAction(
             nameof(GetUsuario),
@@ -85,11 +56,25 @@ public partial class UsuariosController
             return NotFound("El usuario no existe.");
         }
 
-        var error = ValidarCredenciales(dto.Email, dto.Password);
+        var errorEmail = CredencialesValidator.ValidarEmail(
+            dto.Email);
 
-        if (!string.IsNullOrEmpty(error))
+        if (!string.IsNullOrEmpty(errorEmail))
         {
-            return BadRequest(error);
+            return BadRequest(errorEmail);
+        }
+
+        // Contraseña opcional en edición: vacía = sin cambio.
+        var cambiaPassword =
+            !string.IsNullOrWhiteSpace(dto.Password);
+
+        var errorPassword = cambiaPassword
+            ? CredencialesValidator.ValidarPassword(dto.Password)
+            : string.Empty;
+
+        if (!string.IsNullOrEmpty(errorPassword))
+        {
+            return BadRequest(errorPassword);
         }
 
         var emailNormalizado = dto.Email.Trim();
@@ -118,8 +103,9 @@ public partial class UsuariosController
         }
 
         usuario.Email = emailNormalizado;
-        usuario.PasswordHash =
-            BCrypt.Net.BCrypt.HashPassword(dto.Password);
+        usuario.PasswordHash = cambiaPassword
+            ? BCrypt.Net.BCrypt.HashPassword(dto.Password!)
+            : usuario.PasswordHash;
         usuario.Nombre = dto.Nombre?.Trim();
         usuario.Apellido = dto.Apellido?.Trim();
         usuario.RolId = dto.RolId;

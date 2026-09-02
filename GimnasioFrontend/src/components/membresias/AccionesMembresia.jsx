@@ -17,6 +17,7 @@ function AccionesMembresia({
   reactivar,
   cancelar,
   eliminar,
+  verDetalle,
 }) {
   const estado = Number(membresia.estado);
 
@@ -34,21 +35,19 @@ function AccionesMembresia({
       <button
         type="button"
         className="edit-button"
+        onClick={() => verDetalle?.(membresia)}
+        title="Ver detalle completo"
+      >
+        Ver
+      </button>
+
+      <button
+        type="button"
+        className="edit-button"
         onClick={() => abrirEdicion(membresia)}
       >
         Editar
       </button>
-
-      {puedeRenovar && (
-        <button
-          type="button"
-          className="approve-button"
-          onClick={() => renovar(membresia)}
-          title="Renovar con el mismo socio y plan"
-        >
-          Renovar
-        </button>
-      )}
 
       {(estado === ESTADO_MEMBRESIA.ACTIVA ||
         estado === ESTADO_MEMBRESIA.PENDIENTE) && (

@@ -52,6 +52,10 @@ public class AsistenciaConfig : IEntityTypeConfiguration<Asistencia>
     {
         b.Property(a => a.Id).ValueGeneratedOnAdd();
 
+        b.Property(a => a.Motivo).HasMaxLength(20);
+        b.Property(a => a.DetalleMotivo).HasMaxLength(300);
+        b.Property(a => a.RegistradoPor).HasMaxLength(256);
+
         b.HasOne(a => a.Socio)
             .WithMany()
             .HasForeignKey(a => a.SocioId)

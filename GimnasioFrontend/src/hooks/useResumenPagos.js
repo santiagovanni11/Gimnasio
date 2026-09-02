@@ -9,10 +9,12 @@ import {
   getMembresiasRechazadasIds,
   totalAprobadoDelPeriodoPorMembresia,
 } from "../utils/pagosPeriodo";
+import { calcularSaldoPorPago } from "../utils/saldosPagos";
 import {
-  calcularMorosos,
-  calcularSaldoPorPago,
-} from "../utils/saldosPagos";
+  ESTADO_MEMBRESIA,
+  getMembresiasConSaldoPendiente,
+} from "../utils/membresias";
+import { diasParaVencer } from "../utils/vencimientosMembresia";
 
 export function useResumenPagos({ pagos, membresias }) {
   /** pagoId -> { pagado, saldo } del período vigente. */
@@ -35,7 +37,7 @@ export function useResumenPagos({ pagos, membresias }) {
 
   const morosos = useMemo(
     () =>
-      calcularMorosos(
+      getMembresiasConSaldoPendiente(
         membresias,
         pagadoPorMembresia,
         rechazadasIds
@@ -43,5 +45,18 @@ export function useResumenPagos({ pagos, membresias }) {
     [membresias, pagadoPorMembresia, rechazadasIds]
   );
 
-  return { saldoPorPago, morosos };
+  /** Activas que vencen hoy (0) o mañana (1). */
+  const porVencer = useMemo(
+    () =>
+      membresias
+        .filter(
+          (m) =>
+            Number(m.estado) === ESTADO_MEMBRESIA.ACTIVA &&
+            [0, 1].includes(diasParaVencer(m.fechaFin))
+        )
+        .sort((a, b) => diasParaVencer(a.fechaFin) - diasParaVencer(b.fechaFin)),
+    [membresias]
+  );
+
+  return { saldoPorPago, morosos, porVencer };
 }

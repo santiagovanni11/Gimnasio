@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="GimnasioAPI.Settings" />
+    <Using Include="GimnasioAPI.Extensions" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
 
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />

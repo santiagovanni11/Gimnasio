@@ -8,6 +8,8 @@ import { useState } from "react";
 import { sociosService } from "../services/sociosService";
 import { crearEjecutorApi } from "../services/apiEjecutor";
 import { dialogoSistema } from "../services/servicioDialogos";
+import { obtenerNombre, obtenerApellido } from "../services/almacenSesion";
+import { registrarCambioSocio } from "../utils/sociosMetadata";
 import { useSociosFormulario } from "./useSociosFormulario";
 import { useSociosDatos } from "./useSociosDatos";
 import { crearOperacionesSocios } from "./crearOperacionesSocios";
@@ -33,6 +35,8 @@ export function useSocios(opciones) {
   const alternarEstadoSocio = async (socio) => {
     const nuevoEstado = socio.activo === false;
     const accion = nuevoEstado ? "reactivar" : "desactivar";
+    const nombreCompleto = `${socio.nombre || ""} ${socio.apellido || ""}`.trim();
+    const autor = [obtenerNombre(), obtenerApellido()].filter(Boolean).join(" ") || "Sistema";
 
     const aceptado = await dialogoSistema.confirmar({
       titulo:
@@ -59,42 +63,19 @@ export function useSocios(opciones) {
 
     if (!resultado) return;
 
+    registrarCambioSocio(
+      Number(socio.id),
+      nuevoEstado ? "Reactivación" : "Desactivación",
+      nombreCompleto || `socio ${socio.id}`,
+      autor
+    );
+
     formulario.setMensajeSocio(
       nuevoEstado
         ? "Socio reactivado correctamente."
         : "Socio desactivado correctamente."
     );
     await datos.obtenerSocios();
-  };
-
-  /** Elimina el socio; devuelve su id o null si no procedió. */
-  const eliminarSocio = async (socio) => {
-    const aceptado = await dialogoSistema.confirmar({
-      titulo: "Eliminar socio",
-      mensaje:
-        `¿BORRAR definitivamente al socio ${socio.nombre} ${socio.apellido}? ` +
-        "Esta acción no se puede deshacer.",
-      textoAceptar: "Eliminar definitivamente",
-      tono: "peligro",
-    });
-
-    if (!aceptado) return null;
-    datos.setErrorSocios("");
-
-    const resultado = await ejecutar({
-      peticion: () => sociosService.eliminarSocio(socio.id),
-      onError: datos.setErrorSocios,
-      mensajePermiso:
-        "No tenés permisos para borrar socios. Solo un Administrador puede hacerlo.",
-      mensajeError:
-        (status) =>
-          `No se pudo borrar el socio. Código HTTP: ${status}`,
-      mensajeRed:
-        "No se pudo conectar con la API para borrar el socio.",
-      etiquetaLog: "Error al eliminar socio:",
-    });
-
-    return resultado ? socio.id : null;
   };
 
   const reiniciar = () => {
@@ -108,7 +89,6 @@ export function useSocios(opciones) {
     crearSocio: operaciones.crearSocio,
     actualizarSocio: operaciones.actualizarSocio,
     alternarEstadoSocio,
-    eliminarSocio,
     reiniciar,
   };
 }

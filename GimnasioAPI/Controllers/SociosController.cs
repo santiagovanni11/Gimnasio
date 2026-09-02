@@ -1,5 +1,6 @@
 using GimnasioAPI.Data;
 using GimnasioAPI.Models;
+using GimnasioAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -30,11 +31,19 @@ public partial class SociosController : ControllerBase
     // =========================================================
 
     [HttpGet]
-    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    [Authorize(Roles = RolesGimnasio.TodosLosRoles)]
     public async Task<IActionResult> GetSocios()
     {
         var hoy = DateTime.UtcNow.Date;
         var limitePorVencer = hoy.AddDays(7);
+
+        var sinAcceso = await _context.Membresias
+            .SinAccesoAClases(hoy)
+            .Select(m => m.SocioId)
+            .Distinct()
+            .ToListAsync();
+
+        var sinAccesoIds = new HashSet<int>(sinAcceso);
 
         var socios = await _context.Socios
             .Select(s => new
@@ -47,6 +56,9 @@ public partial class SociosController : ControllerBase
                 s.Telefono,
                 s.Email,
                 s.Direccion,
+                s.FotoUrl,
+                s.ContactoEmergencia,
+                s.TelefonoEmergencia,
                 s.FechaAlta,
                 s.Activo,
 
@@ -72,7 +84,31 @@ public partial class SociosController : ControllerBase
             })
             .ToListAsync();
 
-        return Ok(socios);
+        // El flag se calcula en memoria: sin acceso a clases cuando
+        // la membresía vigente tiene un plan que NO incluye el
+        // beneficio "Acceso a clases".
+        var resultado = socios
+            .Select(s => new
+            {
+                s.Id,
+                s.Nombre,
+                s.Apellido,
+                s.DNI,
+                s.FechaNacimiento,
+                s.Telefono,
+                s.Email,
+                s.Direccion,
+                s.FotoUrl,
+                s.ContactoEmergencia,
+                s.TelefonoEmergencia,
+                s.FechaAlta,
+                s.Activo,
+                s.Membresia,
+                SinAccesoAClases = sinAccesoIds.Contains(s.Id),
+            })
+            .ToList();
+
+        return Ok(resultado);
     }
 
     // =========================================================
@@ -80,7 +116,7 @@ public partial class SociosController : ControllerBase
     // =========================================================
 
     [HttpGet("{id}")]
-    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    [Authorize(Roles = RolesGimnasio.TodosLosRoles)]
     public async Task<ActionResult<Socio>> GetSocio(int id)
     {
         var socio = await _context.Socios

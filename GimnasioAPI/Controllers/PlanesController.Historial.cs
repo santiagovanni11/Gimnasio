@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using GimnasioAPI.Data;
 using GimnasioAPI.DTOs;
 using GimnasioAPI.Models;
@@ -21,7 +20,7 @@ public partial class PlanesController
     // =========================================================
 
     [HttpGet("{id}/precios/historial")]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = RolesGimnasio.Administrador)]
     public async Task<IActionResult> GetHistorialPrecios(int id)
     {
         var filas = await _context.HistorialPreciosPlanes
@@ -49,14 +48,6 @@ public partial class PlanesController
     // REGISTRO Y APLICACIÓN (usado por Comandos y Consultas)
     // =========================================================
 
-    /// <summary>Email del usuario autenticado (auditoría).</summary>
-    private string UsuarioActual()
-    {
-        return User.FindFirst(ClaimTypes.Email)?.Value
-            ?? User.Identity?.Name
-            ?? "desconocido";
-    }
-
     /// <summary>
     /// Registra el cambio. Si VigenteDesde es futura queda
     /// Pendiente; si no, se aplica al plan inmediatamente.
@@ -73,7 +64,7 @@ public partial class PlanesController
         var fila = new HistorialPrecioPlan
         {
             PlanId = planId,
-            Usuario = UsuarioActual(),
+            Usuario = _auditoria.ObtenerEmailActor(),
             FechaUtc = DateTime.UtcNow,
             Estado = programado ? "Pendiente" : "Aplicada",
             VigenteDesde = precios.VigenteDesde,
@@ -103,8 +94,8 @@ public partial class PlanesController
 
     /// <summary>
     /// Aplica de forma perezosa los cambios Pendientes cuyo
-    //  día de vigencia llegó (patrón igual que el recálculo
-    ///  automático de estados de membresías).
+    /// día de vigencia llegó (patrón igual que el recálculo
+    /// automático de estados de membresías).
     /// </summary>
     private async Task AplicarPendientesVencidosAsync()
     {

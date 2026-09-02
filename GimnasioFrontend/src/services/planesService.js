@@ -21,6 +21,31 @@ export const planesService = {
     return apiRequest(`Planes/${planId}/precios/historial`);
   },
 
+  /** Cambios programados aún no vigentes (todos los planes). */
+  async cambiosPendientes() {
+    return apiRequest("Planes/precios/pendientes");
+  },
+
+  /** Anula un cambio programado que aún no rige. */
+  async anularCambioPendiente(id) {
+    return apiRequest(`Planes/precios/pendientes/${id}`, {
+      method: "DELETE",
+    });
+  },
+
+  /** Catálogo de beneficios y clases activos para asociar. */
+  async referencias() {
+    return apiRequest("Planes/referencias");
+  },
+
+  /** Reemplaza beneficios y clases asociados a un plan. */
+  async asignarBeneficiosClases(id, beneficios, clases) {
+    return apiRequest(`Planes/${id}/beneficios-clases`, {
+      method: "PUT",
+      body: { beneficios, clases },
+    });
+  },
+
   async cambiarEstado(id, activo) {
     return apiRequest(`Planes/${id}/estado`, {
       method: "PUT",

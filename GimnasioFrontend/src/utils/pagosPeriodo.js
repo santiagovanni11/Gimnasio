@@ -7,18 +7,42 @@
 // =========================================================
 
 import { ESTADO_PAGO } from "./pagos";
+import { aISO } from "./fechas";
 
-/** Timestamp del sello, o null si la membresía no tiene. */
+/**
+ * Sello del período como día calendario local (yyyy-mm-dd),
+ * o null si la membresía no tiene.
+ */
 const selloDe = (membresia) => {
   const sello = membresia?.ultimaRenovacion;
-  return sello ? new Date(sello).getTime() : null;
+  if (!sello) return null;
+
+  const fecha = new Date(sello);
+  return Number.isNaN(fecha.getTime()) ? null : aISO(fecha);
 };
 
-/** ¿El pago entra en la ventana del sello? Sin sello, sí. */
+/** Día calendario (yyyy-mm-dd) de una fecha, en horario local. */
+const diaDe = (valor) => {
+  const texto = String(valor || "");
+
+  // Fecha sin hora ("2026-08-22" o "...T00:00:00"): representa
+  // un día calendario, no un instante; se usa tal cual.
+  if (/^\d{4}-\d{2}-\d{2}/.test(texto)) return texto.slice(0, 10);
+
+  const fecha = new Date(texto);
+  return Number.isNaN(fecha.getTime()) ? "" : aISO(fecha);
+};
+
+/**
+ * ¿El pago entra en la ventana del sello? Se compara por DÍA
+ * calendario: los pagos se registran con fecha sin hora y el
+ * sello guarda la hora exacta del alta/renovación, así que un
+ * cobro hecho el mismo día pertenece al período vigente.
+ * Sin sello, el pago cuenta.
+ */
 const pagoEnPeriodo = (pago, sello) =>
   sello === null ||
-  !pago.fechaPago ||
-  new Date(pago.fechaPago).getTime() >= sello;
+  diaDe(pago.fechaPago) >= sello;
 
 /** Mapa membresiaId -> { aprobados, rechazados } del período. */
 export const conteoPagosPorPeriodo = (pagos = [], membresias = []) => {
@@ -49,16 +73,36 @@ export const conteoPagosPorPeriodo = (pagos = [], membresias = []) => {
 };
 
 /**
- * IDs de membresías rechazadas: con al menos un pago
- * RECHAZADO del período y ningún APROBADO en él.
+ * IDs de membresías rechazadas: una membresía queda rechazada
+ * solo cuando el último intento de cobro del período actual
+ * está rechazado. Si después se aprueba, se limpia sola.
  */
 export const getMembresiasRechazadasIds = (pagos = [], membresias = []) => {
-  const conteo = conteoPagosPorPeriodo(pagos, membresias);
-
   const ids = new Set();
+  const sellos = new Map(
+    (membresias ?? []).map((m) => [Number(m.id), selloDe(m)])
+  );
 
-  conteo.forEach((fila, id) => {
-    if (fila.rechazados > 0 && fila.aprobados === 0) {
+  const pagosPorMembresia = new Map();
+  (pagos ?? []).forEach((pago, index) => {
+    const id = Number(pago.membresiaId);
+    if (!Number.isFinite(id)) return;
+    if (!pagoEnPeriodo(pago, sellos.get(id))) return;
+
+    const items = pagosPorMembresia.get(id) ?? [];
+    items.push({ ...pago, __index: index });
+    pagosPorMembresia.set(id, items);
+  });
+
+  pagosPorMembresia.forEach((items, id) => {
+    const ultimo = [...items].sort((a, b) => {
+      const fechaA = new Date(a.fechaPago || 0).getTime();
+      const fechaB = new Date(b.fechaPago || 0).getTime();
+      if (fechaB !== fechaA) return fechaB - fechaA;
+      return Number(b.__index) - Number(a.__index);
+    })[0];
+
+    if (Number(ultimo?.estado) === ESTADO_PAGO.RECHAZADO) {
       ids.add(id);
     }
   });

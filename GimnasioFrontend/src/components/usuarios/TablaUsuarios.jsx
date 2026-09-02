@@ -16,6 +16,8 @@ function TablaUsuarios({
   desbloquear,
   eliminarUsuario,
   verAuditoria,
+  editarUsuario,
+  asignarClase,
 }) {
   return (
     <div className="table-wrapper">
@@ -44,6 +46,8 @@ function TablaUsuarios({
               desbloquear={desbloquear}
               eliminarUsuario={eliminarUsuario}
               verAuditoria={verAuditoria}
+              editarUsuario={editarUsuario}
+              asignarClase={asignarClase}
             />
           ))}
         </tbody>

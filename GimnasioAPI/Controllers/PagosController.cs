@@ -1,6 +1,7 @@
-﻿using GimnasioAPI.Data;
+using GimnasioAPI.Data;
 using GimnasioAPI.DTOs;
 using GimnasioAPI.Models;
+using GimnasioAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,24 +18,28 @@ namespace GimnasioAPI.Controllers;
 public partial class PagosController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly AuditoriaUsuariosService _auditoria;
 
-    public PagosController(AppDbContext context)
+    public PagosController(
+        AppDbContext context,
+        AuditoriaUsuariosService auditoria)
     {
         _context = context;
+        _auditoria = auditoria;
     }
 
-    // GET: api/Pagos — Administrador y Recepcionista.
+    // GET: api/Pagos � Administrador y Recepcionista.
     [HttpGet]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<ActionResult<IEnumerable<PagoDto>>> GetPagos()
     {
         var pagos = await CargarConRelaciones().ToListAsync();
         return Ok(pagos.Select(MapearDto));
     }
 
-    // GET: api/Pagos/5 — Administrador y Recepcionista.
+    // GET: api/Pagos/5 � Administrador y Recepcionista.
     [HttpGet("{id}")]
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize(Roles = RolesGimnasio.Administracion)]
     public async Task<ActionResult<PagoDto>> GetPago(int id)
     {
         var pago = await CargarConRelaciones()
@@ -57,7 +62,7 @@ public partial class PagosController : ControllerBase
                 .ThenInclude(m => m.Plan);
     }
 
-    /// <summary>Proyección estándar de un pago a su DTO.</summary>
+    /// <summary>Proyecci�n est�ndar de un pago a su DTO.</summary>
     internal static PagoDto MapearDto(Pago p)
     {
         return new PagoDto
@@ -84,7 +89,10 @@ public partial class PagosController : ControllerBase
             Observaciones = p.Observaciones,
 
             RegistradoPor = p.RegistradoPor,
-            MotivoAnulacion = p.MotivoAnulacion
+            MotivoAnulacion = p.MotivoAnulacion,
+
+            AnuladoPor = p.AnuladoPor,
+            FechaAnulacion = p.FechaAnulacion
         };
     }
 }

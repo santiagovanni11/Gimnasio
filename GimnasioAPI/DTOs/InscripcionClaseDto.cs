@@ -28,5 +28,11 @@ public class InscripcionClaseDto
 
     public DateTime FechaInscripcion { get; set; }
 
+    /// <summary>Vigencia opcional definida en el alta/edición.</summary>
+    public DateTime? FechaHasta { get; set; }
+
+    /// <summary>Cálculo perezoso: la vigencia ya pasó.</summary>
+    public bool Vencida { get; set; }
+
     public EstadoInscripcion Estado { get; set; }
 }

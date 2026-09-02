@@ -12,8 +12,8 @@ import {
   calcularTotalDelMes,
   calcularIngresosTotales,
   contarPorEstado,
-  ESTADO_PAGO,
 } from "../../utils/resumenCaja";
+import { ESTADO_PAGO } from "../../utils/pagos";
 import { hoyISO } from "../../utils/fechas";
 import { formatoMoneda } from "../../utils/pagos";
 import {

@@ -24,5 +24,9 @@ public class MembresiaDto
 
     public DateTime? UltimaRenovacion { get; set; }
 
+    public bool RenovacionAutomatica { get; set; }
+
+    public int? MetodoPagoAlmacenadoId { get; set; }
+
     public DateTime FechaCreacion { get; set; }
 }

@@ -24,11 +24,11 @@ public class AdministradorGuardService
         return _context.Roles
             .AnyAsync(r =>
                 r.Id == rolId &&
-                r.Nombre == "Administrador");
+                r.Nombre == RolesGimnasio.Administrador);
     }
 
     /// <summary>Cantidad de administradores activos de un rol.</summary>
-    public Task<int> ContarAdministradoresActivosAsync(int rolId)
+    private Task<int> ContarAdministradoresActivosAsync(int rolId)
     {
         return _context.Usuarios
             .CountAsync(u =>

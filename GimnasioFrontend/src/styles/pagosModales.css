@@ -15,32 +15,31 @@
 
   padding: 24px;
 
-  background: rgba(8, 11, 15, 0.72);
+  background: rgba(5, 6, 9, 0.7);
   backdrop-filter: blur(6px);
 }
 
 .payment-modal {
   width: min(92vw, 520px);
 
-  border: 1px solid rgba(140, 152, 166, 0.2);
-  border-radius: 24px;
+  border: 1px solid var(--line-fuerte);
+  border-radius: var(--radio-lg);
 
-  background: linear-gradient(180deg, rgba(21, 25, 32, 0.98), rgba(12, 16, 21, 1));
+  background: linear-gradient(180deg, var(--surface-2), var(--surface));
 
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(255, 255, 255, 0.02);
+  box-shadow: var(--sombra-lg);
 
   overflow: hidden;
+  animation: modal-entrada 0.22s ease;
 }
 
 .payment-modal-alert {
-  border-color: rgba(227, 27, 35, 0.38);
-  background: linear-gradient(180deg, rgba(30, 15, 16, 0.98), rgba(14, 15, 19, 1));
+  border-color: rgba(251, 113, 133, 0.4);
+  background: linear-gradient(180deg, rgba(34, 18, 21, 0.98), var(--surface));
 }
 
 .payment-modal-ticket {
-  border-color: rgba(110, 126, 147, 0.28);
+  border-color: rgba(140, 152, 166, 0.28);
 }
 
 .payment-alert-header,
@@ -59,7 +58,7 @@
 .payment-ticket-header h3 {
   margin: 8px 0 0;
 
-  color: #f3f5f7;
+  color: var(--texto);
   font-size: 24px;
   line-height: 1.2;
 }
@@ -72,12 +71,12 @@
   align-items: center;
   justify-content: center;
 
-  border: 1px solid rgba(227, 27, 35, 0.4);
+  border: 1px solid rgba(251, 113, 133, 0.4);
   border-radius: 16px;
 
-  background: rgba(227, 27, 35, 0.1);
+  background: rgba(251, 113, 133, 0.12);
 
-  color: #ff8a8f;
+  color: var(--peligro);
   font-size: 28px;
   font-weight: 900;
 }
@@ -85,8 +84,23 @@
 .payment-alert-message {
   padding: 18px 22px 8px;
 
-  color: #dfe4ea;
+  color: var(--texto-muted);
   font-size: 15px;
   line-height: 1.6;
+}
+
+/* =========================
+   CIERRE DE CAJA (día/rango)
+========================= */
+
+.cierre-modos,
+.cierre-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cierre-modos {
+  margin-bottom: 14px;
 }
 

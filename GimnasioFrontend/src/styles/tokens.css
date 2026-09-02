@@ -1,0 +1,74 @@
+/* =========================================================
+   tokens.css — Variables de diseño, reset y fondo global
+   Capa pura de identidad: colores, tipografía, radios y el
+   fondo de la aplicación. Sin reglas de componente.
+   ========================================================= */
+
+:root {
+  --fuente-titulo: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --fuente-texto: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --ink-950: #07090c;
+  --ink-900: #0b0e12;
+  --ink-850: #12161c;
+  --surface: #161b22;
+  --surface-2: #1c222b;
+  --surface-3: #252c37;
+  --line: rgba(255, 255, 255, 0.07);
+  --line-fuerte: rgba(255, 255, 255, 0.13);
+
+  --texto: #eaf0f5;
+  --texto-muted: #97a1ad;
+  --texto-dim: #69727d;
+
+  --accent: #2fbf71;
+  --accent-hover: #4fd98c;
+  --accent-tinta: #052013;
+  --accent-suave: rgba(47, 191, 113, 0.12);
+  --accent-borde: rgba(47, 191, 113, 0.32);
+
+  --exito: #34d399;
+  --peligro: #fb7185;
+  --aviso: #fbbf24;
+  --info: #60a5fa;
+
+  --radio-sm: 10px;
+  --radio: 14px;
+  --radio-lg: 20px;
+  --radio-xl: 28px;
+
+  --sombra-sm: 0 6px 18px rgba(0, 0, 0, 0.35);
+  --sombra: 0 18px 50px rgba(0, 0, 0, 0.45);
+  --sombra-lg: 0 30px 80px rgba(0, 0, 0, 0.55);
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--fuente-texto);
+  color: var(--texto);
+  background:
+    radial-gradient(1100px 680px at 100% -10%, rgba(47, 191, 113, 0.06), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(96, 165, 250, 0.05), transparent 55%),
+    linear-gradient(180deg, var(--ink-900), var(--ink-950));
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}

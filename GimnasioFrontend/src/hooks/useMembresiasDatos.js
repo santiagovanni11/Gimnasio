@@ -87,14 +87,6 @@ export function useMembresiasDatos({
     });
   }, [membresias, busquedaMembresia]);
 
-  /** Quita del listado local las membresías de un socio. */
-  const quitarMembresiasDeSocio = (socioId) => {
-    const id = Number(socioId);
-    setMembresias((prev) =>
-      prev.filter((m) => Number(m.socioId) !== id)
-    );
-  };
-
   return {
     membresias,
     setMembresias,
@@ -105,6 +97,5 @@ export function useMembresiasDatos({
     setBusquedaMembresia,
     membresiasFiltradas,
     obtenerMembresias,
-    quitarMembresiasDeSocio,
   };
 }

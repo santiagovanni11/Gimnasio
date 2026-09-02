@@ -29,6 +29,10 @@ function TablaMembresias({
   reactivarMembresia,
   cancelarMembresia,
   eliminarMembresia,
+  verDetalle,
+  seleccionadas = [],
+  onToggleSeleccion,
+  pagos = [],
 }) {
   const th = (campo, texto) => (
     <ThOrdenable
@@ -45,6 +49,24 @@ function TablaMembresias({
       <table>
         <thead>
           <tr>
+            <th style={{ width: "30px" }}>
+              <input
+                type="checkbox"
+                title="Seleccionar para renovar"
+                aria-label="Seleccionar para renovar"
+                checked={membresias.length > 0 && membresias.every((m) => seleccionadas.includes(Number(m.id)))}
+                onChange={() => {
+                  const ids = membresias.map((m) => Number(m.id));
+                  if (ids.every((id) => seleccionadas.includes(id))) {
+                    ids.forEach((id) => onToggleSeleccion?.(id));
+                    return;
+                  }
+                  ids.forEach((id) => {
+                    if (!seleccionadas.includes(id)) onToggleSeleccion?.(id);
+                  });
+                }}
+              />
+            </th>
             {th("socioNombre", "Socio")}
             {th("planNombre", "Plan")}
             {th("precioAplicado", "Precio")}
@@ -56,13 +78,32 @@ function TablaMembresias({
         </thead>
 
         <tbody>
-          {membresias.map((membresia) => (
+          {membresias.map((membresia) => {
+            const deuda = Number(membresia.precioAplicado || 0) - pagos
+              .filter((pago) => Number(pago.membresiaId) === Number(membresia.id) && Number(pago.estado) === 2)
+              .reduce((sum, pago) => sum + Number(pago.monto || 0), 0);
+
+            return (
             <tr key={membresia.id}>
+              <td>
+                <input
+                  type="checkbox"
+                  title="Seleccionar para renovar"
+                  aria-label={`Seleccionar ${membresia.socioNombre} ${membresia.socioApellido} para renovar`}
+                  checked={seleccionadas.includes(Number(membresia.id))}
+                  onChange={() => onToggleSeleccion?.(membresia.id)}
+                />
+              </td>
               <td>
                 {membresia.socioNombre} {membresia.socioApellido}
               </td>
 
-              <td>{membresia.planNombre}</td>
+              <td>
+                {membresia.planNombre}
+                {membresia.renovacionAutomatica && (
+                  <span className="chip-auto">Renov. auto</span>
+                )}
+              </td>
 
               <td>
                 ${Number(membresia.precioAplicado).toLocaleString("es-AR", {
@@ -82,6 +123,7 @@ function TablaMembresias({
                 <span className={claseEstado(Number(membresia.estado))}>
                   {estadoMembresiaTexto(membresia.estado)}
                 </span>
+                {deuda > 0 && <span className="status-warning" style={{ marginLeft: "6px" }}>Deuda</span>}
               </td>
 
               <td>
@@ -93,10 +135,12 @@ function TablaMembresias({
                   reactivar={reactivarMembresia}
                   cancelar={cancelarMembresia}
                   eliminar={eliminarMembresia}
+                  verDetalle={verDetalle}
                 />
               </td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     </div>

@@ -29,8 +29,13 @@ public class AppDbContext : DbContext
     public DbSet<Membresia> Membresias { get; set; }
     public DbSet<Pago> Pagos { get; set; }
     public DbSet<Asistencia> Asistencias { get; set; }
+    public DbSet<MetodoPagoAlmacenado> MetodosPagoAlmacenados { get; set; }
 
     public DbSet<AuditoriaUsuario> AuditoriaUsuarios { get; set; }
+
+    public DbSet<AuditoriaMembresia> AuditoriaMembresias { get; set; }
+
+    public DbSet<AuditoriaPlan> AuditoriaPlanes { get; set; }
 
     public DbSet<HistorialPrecioPlan> HistorialPreciosPlanes { get; set; }
 

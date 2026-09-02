@@ -14,7 +14,7 @@ namespace GimnasioAPI.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class EmpleadosController : ControllerBase
+public partial class EmpleadosController : ControllerBase
 {
     private readonly AppDbContext _context;
 
@@ -24,7 +24,7 @@ public class EmpleadosController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    [Authorize(Roles = RolesGimnasio.TodosLosRoles)]
     public async Task<ActionResult<IEnumerable<Empleado>>> GetEmpleados()
     {
         return await _context.Empleados
@@ -33,7 +33,7 @@ public class EmpleadosController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize(Roles = "Administrador,Recepcionista,Profesor")]
+    [Authorize(Roles = RolesGimnasio.TodosLosRoles)]
     public async Task<ActionResult<Empleado>> GetEmpleado(int id)
     {
         var empleado = await _context.Empleados
@@ -48,7 +48,7 @@ public class EmpleadosController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = RolesGimnasio.Administrador)]
     public async Task<ActionResult<Empleado>> PostEmpleado(
         Empleado empleado)
     {
@@ -59,13 +59,9 @@ public class EmpleadosController : ControllerBase
             return BadRequest(error);
         }
 
-        var dniExiste = await _context.Empleados
-            .AnyAsync(e => e.DNI == empleado.DNI);
-
-        if (dniExiste)
+        if (await DniEnUsoAsync(empleado.DNI))
         {
-            return BadRequest(
-                "Ya existe un empleado con ese DNI.");
+            return BadRequest("Ya existe un empleado con ese DNI.");
         }
 
         empleado.FechaIngreso = DateTime.UtcNow;
@@ -81,7 +77,7 @@ public class EmpleadosController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = RolesGimnasio.Administrador)]
     public async Task<IActionResult> PutEmpleado(
         int id,
         Empleado empleado)
@@ -106,12 +102,7 @@ public class EmpleadosController : ControllerBase
             return NotFound();
         }
 
-        var dniExiste = await _context.Empleados
-            .AnyAsync(e =>
-                e.DNI == empleado.DNI &&
-                e.Id != id);
-
-        if (dniExiste)
+        if (await DniEnUsoAsync(empleado.DNI, excluirId: id))
         {
             return BadRequest("Ya existe otro empleado con ese DNI.");
         }
@@ -119,18 +110,12 @@ public class EmpleadosController : ControllerBase
         _context.Entry(empleado).State =
             EntityState.Modified;
 
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!await EmpleadoExistsAsync(id))
-            {
-                return NotFound();
-            }
+        var resultado = await _context.GuardarAsync(
+            () => EmpleadoExistsAsync(id));
 
-            throw;
+        if (resultado != null)
+        {
+            return resultado;
         }
 
         return NoContent();
@@ -138,7 +123,7 @@ public class EmpleadosController : ControllerBase
 
     /// <summary>Baja lógica: el empleado deja de estar activo.</summary>
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = RolesGimnasio.Administrador)]
     public async Task<IActionResult> DeleteEmpleado(int id)
     {
         var empleado = await _context.Empleados
@@ -160,4 +145,10 @@ public class EmpleadosController : ControllerBase
     {
         return _context.Empleados.AnyAsync(e => e.Id == id);
     }
+
+    /// <summary>Unicidad de DNI, opcionalmente excluyendo un Id.</summary>
+    private Task<bool> DniEnUsoAsync(string dni, int? excluirId = null)
+        => _context.Empleados.AnyAsync(e =>
+            e.DNI == dni &&
+            (excluirId == null || e.Id != excluirId));
 }

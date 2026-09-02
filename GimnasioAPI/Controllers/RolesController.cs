@@ -8,7 +8,7 @@ namespace GimnasioAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Administrador")]
+[Authorize(Roles = RolesGimnasio.Administrador)]
 public class RolesController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -70,11 +70,7 @@ public class RolesController : ControllerBase
         var roles = await _context.Roles
             .Where(r =>
                 r.Activo &&
-                (
-                    r.Nombre == "Administrador" ||
-                    r.Nombre == "Recepcionista" ||
-                    r.Nombre == "Profesor"
-                ))
+                RolesGimnasio.RegistroPermitido.Contains(r.Nombre))
             .Select(r => new
             {
                 r.Id,
@@ -133,8 +129,4 @@ public class RolesController : ControllerBase
             rol);
     }
 }
-
-
-
-
 

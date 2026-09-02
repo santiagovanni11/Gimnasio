@@ -1,18 +1,30 @@
 import { useState } from "react";
 import { formatoMoneda } from "../../utils/pagos";
-import { calcularCierreCaja, exportarCierrePdf } from "../../utils/caja";
-import { hoyISO } from "../../utils/fechas";
+import {
+  calcularCierreCaja,
+  calcularCierreRango,
+} from "../../utils/caja";
+import { exportarCierrePdf } from "../../utils/cajaPdf";
+import { hoyISO, rangoSemanaActual } from "../../utils/fechas";
 import { obtenerRol } from "../../services/almacenSesion";
+import CierreCajaRangoCampos from "./CierreCajaRangoCampos";
 
 /**
- * Modal de cierre de caja diario: totales por forma de pago
- * para la fecha seleccionada, con exportación a PDF.
+ * Modal de cierre de caja: totales por forma de pago para
+ * un día o para un rango (semana/mes), con exportación a PDF.
  */
 export default function CierreCajaModal({ pagos = [], onClose }) {
+  const [modo, setModo] = useState("dia");
   const [fecha, setFecha] = useState(hoyISO());
+  const [rango, setRango] = useState(rangoSemanaActual);
 
-  const cierre = calcularCierreCaja(pagos, fecha);
+  const cierre =
+    modo === "dia"
+      ? calcularCierreCaja(pagos, fecha)
+      : calcularCierreRango(pagos, rango.desde, rango.hasta);
+
   const responsable = obtenerRol() || "-";
+  const esDia = modo === "dia";
 
   return (
     <div className="payment-modal-backdrop" onClick={onClose}>
@@ -23,7 +35,7 @@ export default function CierreCajaModal({ pagos = [], onClose }) {
         <div className="payment-ticket-header">
           <div>
             <span className="eyebrow">CIERRE DE CAJA</span>
-            <h3>Resumen diario</h3>
+            <h3>Resumen {esDia ? "diario" : "por período"}</h3>
           </div>
           <button type="button" className="close-button" onClick={onClose}>
             ×
@@ -31,14 +43,38 @@ export default function CierreCajaModal({ pagos = [], onClose }) {
         </div>
 
         <div className="payment-ticket-body">
-          <div className="ticket-row">
-            <span>Fecha</span>
-            <input
-              type="date"
-              value={fecha}
-              onChange={(event) => setFecha(event.target.value)}
-            />
+          <div className="cierre-modos">
+            <button
+              type="button"
+              className={esDia ? "primary-small-button" : "secondary-button"}
+              onClick={() => setModo("dia")}
+            >
+              Por día
+            </button>
+            <button
+              type="button"
+              className={esDia ? "secondary-button" : "primary-small-button"}
+              onClick={() => setModo("rango")}
+            >
+              Por rango
+            </button>
           </div>
+
+          {esDia ? (
+            <div className="ticket-row">
+              <span>Fecha</span>
+              <input
+                type="date"
+                className="input-fecha"
+                value={fecha}
+                max={hoyISO()}
+                onChange={(event) => setFecha(event.target.value)}
+              />
+            </div>
+          ) : (
+            <CierreCajaRangoCampos rango={rango} setRango={setRango} />
+          )}
+
           <div className="ticket-row">
             <span>Responsable</span>
             <strong>{responsable}</strong>
@@ -46,7 +82,8 @@ export default function CierreCajaModal({ pagos = [], onClose }) {
 
           {cierre.formas.length === 0 ? (
             <p className="empty-state">
-              No hay cobros registrados para esta fecha.
+              No hay cobros registrados{" "}
+              {esDia ? "para esta fecha." : "en este período."}
             </p>
           ) : (
             cierre.formas.map((item) => (
@@ -60,7 +97,7 @@ export default function CierreCajaModal({ pagos = [], onClose }) {
           )}
 
           <div className="ticket-row total-row">
-            <span>Total del día</span>
+            <span>{esDia ? "Total del día" : "Total del período"}</span>
             <strong>{formatoMoneda(cierre.total)}</strong>
           </div>
         </div>

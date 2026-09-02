@@ -1,5 +1,3 @@
-using GimnasioAPI.Models;
-
 namespace GimnasioAPI.Models;
 
 /// <summary>
