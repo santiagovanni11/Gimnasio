@@ -32,7 +32,8 @@
   gap: 8px;
 }
 
-.selector-grupo .info-message {
+.selector-grupo .info-message,
+.selector-grupo .selector-vacio {
   margin: 0;
   font-size: 13px;
 }
