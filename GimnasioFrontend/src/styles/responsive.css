@@ -1,107 +1,134 @@
 ﻿/* =========================================================
-   responsive.css - Media queries generales.
-   Se importa al final, gana la cascada sobre los parciales.
-========================================================= */
+   responsive.css — Media queries responsivas (ultimo import).
+   Cobertura: sidebar, topbar, grids, tablas, filtros,
+   modales, login. Sobreescribe reglas previas en cascada.
+   ========================================================= */
 
-/* ===== Breakpoints grandes (≤1100px / ≤1024px / ≤900px) ===== */
-
-@media (max-width: 1100px) {
-  .search-box { width: 240px; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
+/* ===== TABLETS (≤1024px) ===== */
 @media (max-width: 1024px) {
-  .main-content { padding: 24px; }
-  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-  .topbar-actions { flex-wrap: wrap; }
-}
-
-@media (max-width: 900px) {
-  .sidebar { width: 200px; padding: 18px 14px; }
+  .sidebar { width: 220px; padding: 18px 14px; }
   .nav-item { padding: 9px 10px; font-size: 13px; }
+  .nav-item-icon { width: 28px; height: 28px; }
+  .main-content { padding: 24px; }
+  .search-box { width: 220px; }
+  .kpi-grid, .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* ===== Móvil / tablets verticales (≤768px) ===== */
-
+/* ===== MOVIL (≤768px) ===== */
 @media (max-width: 768px) {
+  /* Shell: columna */
   .app-layout { flex-direction: column; }
+  .main-content { padding: 16px; min-width: 0; }
+  .content-card { min-width: 0; padding: 16px; }
+  .form-card { padding: 16px; }
 
-  /* Sidebar como barra superior compacta y navegable.
-     Fila 1: logo (izquierda) + cerrar sesión (derecha).
-     Fila 2: navegación horizontal desplazable. */
+  /* Sidebar: barra superior compacta, nav horizontal scrollable */
   .sidebar {
     position: sticky; top: 0; z-index: 500;
     width: 100%; min-height: auto;
-    display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px;
-    padding: 10px 12px;
+    flex-direction: column; flex-wrap: wrap; align-items: center;
+    gap: 0; padding: 8px 12px;
     border-right: none; border-bottom: 1px solid var(--line);
   }
-  .sidebar-cabecera { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 2px 4px; }
+  .sidebar-cabecera { display: flex; align-items: center; gap: 8px; padding: 4px 4px 6px; }
   .marca-sub { display: none; }
-  .sidebar-nav { order: 3; flex: 1 1 100%; flex-direction: row; align-items: center; gap: 8px; overflow-x: auto; padding: 2px 2px 4px; -webkit-overflow-scrolling: touch; }
+  .sidebar-nav {
+    display: flex; flex-direction: row; align-items: center;
+    gap: 4px; width: 100%;
+    overflow-x: auto; overflow-y: hidden;
+    padding: 4px 0 6px; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .sidebar-nav::-webkit-scrollbar { display: none; }
   .nav-grupo { display: contents; }
   .nav-grupo-titulo { display: none; }
-  .nav-item { flex: 0 0 auto; flex-direction: column; gap: 4px; width: auto; padding: 6px 10px; border-radius: 10px; font-size: 11px; }
+  .nav-item {
+    flex: 0 0 auto; flex-direction: column;
+    gap: 3px; width: auto; padding: 5px 8px;
+    border-radius: 8px; font-size: 10px; text-align: center;
+  }
   .nav-item-texto { white-space: nowrap; }
-  .nav-item-icon { width: 28px; height: 28px; border-radius: 8px; }
-  .sidebar-pie { position: static; flex-direction: row; align-items: center; margin: 0 0 0 auto; padding: 0; border-top: none; }
+  .nav-item-icon { width: 26px; height: 26px; border-radius: 7px; }
+  .sidebar-pie {
+    display: flex; flex-direction: row; align-items: center;
+    gap: 6px; margin: 0; padding: 0; border-top: none;
+  }
   .sidebar-pie .user-card { display: none; }
-  .nav-logout { width: auto; flex-direction: row; gap: 6px; padding: 8px 12px; white-space: nowrap; }
-  .nav-logout span { font-size: 12px; }
+  .nav-logout {
+    width: auto; flex-direction: row;
+    gap: 4px; padding: 5px 8px; white-space: nowrap; font-size: 11px;
+  }
+  .nav-logout span { font-size: 11px; }
 
-  .main-content { padding: 16px; }
-  .topbar { margin-bottom: 18px; }
-  .topbar .titulo h1 { font-size: 24px; }
-  .section-header { margin-bottom: 16px; padding-bottom: 16px; }
-  .content-card, .form-card { padding: 16px; }
+  /* Topbar: wrap si no cabe */
+  .topbar { flex-wrap: wrap; align-items: flex-start; gap: 10px; margin-bottom: 16px; }
+  .topbar .titulo h1 { font-size: 22px; }
+
+  /* Section headers: apilar */
+  .section-header {
+    flex-direction: column; align-items: stretch;
+    gap: 10px; margin-bottom: 14px; padding-bottom: 14px;
+  }
+  .section-actions { flex-wrap: wrap; gap: 8px; width: 100%; }
+  .search-box { width: 100%; }
+  .section-actions button, .section-header button { width: 100%; }
+
+  /* Filtros apilados */
+  .filter-group { flex-direction: column; align-items: stretch; gap: 6px; }
+  .filter-select, .filter-date, .filter-input { width: 100%; min-width: 0; max-width: 100%; }
+  .quick-range-group { flex-wrap: wrap; }
+
+  /* Grillas: reducir columnas */
   .kpi-grid, .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .welcome-card { padding: 22px; gap: 16px; }
-  .welcome-card h2 { font-size: 26px; }
+  .welcome-card { flex-direction: column; gap: 14px; padding: 20px; min-height: auto; }
+  .welcome-card h2 { font-size: 24px; }
+  .welcome-mark { display: none; }
+  .inicio-grid { flex-direction: column; }
   .panel-inicio { flex-basis: 100%; }
 
-  /* Tablas: scroll contenido. Modales: hoja inferior. */
-  .content-card { min-width: 0; }
-  .table-wrapper { max-width: 100%; }
-  th, td { padding: 12px 14px; }
-  .payment-modal-backdrop { padding: 0; align-items: flex-end; }
+  /* Tablas */
+  th, td { padding: 10px 12px; font-size: 13px; }
+  .table-actions { gap: 6px; }
+
+  /* Formularios */
+  .form-grid { grid-template-columns: 1fr; }
+  .form-actions { flex-direction: column-reverse; }
+  .form-actions button { width: 100%; }
+  .form-card-header { flex-direction: column; gap: 10px; }
+
+  /* Modales: hoja inferior */
+  .modal-sistema-velo, .payment-modal-backdrop { padding: 0; align-items: flex-end; }
+  .modal-sistema {
+    max-width: 100%; width: 100%;
+    border-radius: var(--radio-lg) var(--radio-lg) 0 0;
+    max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
   .payment-modal { width: 100%; max-height: 92vh; border-radius: var(--radio-lg) var(--radio-lg) 0 0; }
+  .payment-form-grid { grid-template-columns: 1fr; }
+  .payment-summary-grid { grid-template-columns: 1fr; }
+  .payment-breakdown-grid { grid-template-columns: 1fr; }
 
-  /* Filtros y paneles apilados */
-  .filter-group { flex-direction: column; align-items: stretch; }
-  .filter-select, .filter-date, .filter-input { width: 100%; min-width: 0; }
-  .quick-range-group { flex-wrap: wrap; }
-  .inicio-grid { flex-direction: column; }
-
-  /* Login: solo la tarjeta sobre el fondo, sin hero que se amontone */
+  /* Login */
   .login-hero-contenido { display: none; }
-  .login-container { padding: 24px 20px; }
-  .login-card { padding: 32px 24px; }
-  .login-header { margin-bottom: 28px; }
-  .login-footer { margin-top: 24px; }
-}
+  .login-container { padding: 20px 16px; }
+  .login-card { padding: 28px 20px; max-width: 100%; }
+  .login-header { margin-bottom: 22px; }
+  .login-footer { margin-top: 20px; }
 
-/* ===== Celulares (≤600px) ===== */
-
-@media (max-width: 600px) {
-  .main-content { padding: 12px; }
-  .content-card, .form-card { padding: 14px; }
-  .kpi-grid, .stats-grid { grid-template-columns: 1fr; }
-  .bar-row { grid-template-columns: 40px 1fr 34px; }
-  .section-actions button, .section-header button { width: 100%; }
-  .form-actions button, .primary-small-button, .secondary-button, .primary-button { width: 100%; }
-  .welcome-card h2 { font-size: 24px; }
+  /* Accesos rapidos */
   .accesos-rapidos { flex-direction: column; }
   .acceso-boton { width: 100%; justify-content: flex-start; }
-  th, td { padding: 10px 12px; font-size: 13px; }
 }
 
-/* ===== Celulares muy chicos (≤420px) ===== */
-
-@media (max-width: 420px) {
+/* ===== CELULARES CHICOS (≤480px) ===== */
+@media (max-width: 480px) {
   .main-content { padding: 10px; }
-  .topbar .titulo h1 { font-size: 21px; }
   .content-card, .form-card { padding: 12px; }
-  .stat-card strong, .kpi-valor { font-size: 26px; }
-  .login-card { padding: 26px 18px; }
+  .topbar .titulo h1 { font-size: 20px; }
+  .stat-card strong, .kpi-valor { font-size: 24px; }
+  .kpi-grid, .stats-grid { grid-template-columns: 1fr; }
+  .login-card { padding: 24px 16px; }
   .login-card .input-group input, .login-card .input-group select, .campo-password-control input { height: 44px; }
+  th, td { padding: 8px 10px; font-size: 12px; }
+  .bar-row { grid-template-columns: 36px 1fr 30px; }
 }
