@@ -1,0 +1,38 @@
+/* =========================================================
+   SELECTOR DE BENEFICIOS / CLASES (modal de plan)
+   Layout de los grupos del checklist de beneficios y clases.
+   ========================================================= */
+
+.selector-beneficios-clases {
+  display: grid;
+  gap: 14px;
+}
+
+.selector-grupo {
+  background: var(--surface-2);
+  border: 1px solid var(--line-fuerte);
+  border-radius: var(--radio);
+  padding: 12px 14px;
+}
+
+.selector-grupo h4 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--texto-suave);
+}
+
+.selector-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.selector-grupo .info-message {
+  margin: 0;
+  font-size: 13px;
+}
