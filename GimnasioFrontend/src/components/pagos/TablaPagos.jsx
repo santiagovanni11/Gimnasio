@@ -27,7 +27,7 @@ export default function TablaPagos({
   }
 
   return (
-    <div className="table-wrapper">
+    <div className="table-wrapper tabla-pagos">
       <table>
         <thead>
           <tr>
@@ -48,15 +48,15 @@ export default function TablaPagos({
             const saldoInfo = saldoPorPago?.get(Number(pago.id));
             return (
             <tr key={pago.id}>
-              <td>
+              <td data-label="Socio">
                 {pago.socioNombre} {pago.socioApellido}
               </td>
-              <td>
+              <td data-label="Membresía">
                 <span className={getPlanBadgeClase(planNombre)}>{planNombre}</span>
                 {pago.referencia?.startsWith("AUTO-") && <span className="chip-auto">Renov. auto</span>}
               </td>
-              <td>{formatoMoneda(pago.monto)}</td>
-              <td>
+              <td data-label="Monto">{formatoMoneda(pago.monto)}</td>
+              <td data-label="Pagado">
                 {saldoInfo ? (
                   saldoInfo.saldo > 0 ? (
                     <span
@@ -72,13 +72,13 @@ export default function TablaPagos({
                   "-"
                 )}
               </td>
-              <td>{formaPagoTexto(pago.formaPago)}</td>
-              <td>
+              <td data-label="Forma">{formaPagoTexto(pago.formaPago)}</td>
+              <td data-label="Fecha">
                 {pago.fechaPago
                   ? new Date(pago.fechaPago).toLocaleDateString("es-AR")
                   : "-"}
               </td>
-              <td>
+              <td data-label="Estado">
                 <span
                   className={
                     esAnulado(pago)
@@ -95,7 +95,7 @@ export default function TablaPagos({
                   {estadoPagoTexto(pago.estado)}
                 </span>
               </td>
-              <td>
+              <td data-label="Acciones">
                 <div className="table-actions">
                   <button
                     type="button"

@@ -1,0 +1,42 @@
+/* =========================================================
+   responsiveTablaPagos.css — Tabla de pagos en móvil.
+   Convierte la tabla de pagos en tarjetas apiladas para
+   pantallas chicas (Android/iOS) y evita el scroll horizontal.
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .tabla-pagos table,
+  .tabla-pagos tbody,
+  .tabla-pagos tr,
+  .tabla-pagos td { display: block; width: 100%; box-sizing: border-box; }
+
+  .tabla-pagos thead { display: none; }
+
+  .tabla-pagos tr {
+    border: 1px solid var(--line);
+    border-radius: var(--radio);
+    padding: 4px 8px;
+    margin-bottom: 12px;
+    background: var(--surface);
+  }
+
+  .tabla-pagos td {
+    border: none;
+    padding: 6px 8px;
+    text-align: right;
+    white-space: normal;
+  }
+
+  .tabla-pagos td::before {
+    content: attr(data-label);
+    float: left;
+    color: var(--texto-muted);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .tabla-pagos .table-actions { justify-content: flex-end; }
+  .tabla-pagos .table-actions button { min-height: 40px; }
+}

@@ -87,6 +87,7 @@
   .panel-inicio { flex-basis: 100%; }
 
   /* Tablas */
+  .table-wrapper { width: 100%; max-width: 100%; }
   th, td { padding: 10px 12px; font-size: 13px; }
   .table-actions { gap: 6px; }
 
