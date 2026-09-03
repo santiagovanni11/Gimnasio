@@ -13,6 +13,20 @@
   background: var(--ink-950);
 }
 
+/* Fondo difuminado: llena las bandas que deja "contain" con
+   la misma imagen ampliada y desenfocada (efecto tipo reproductor
+   de video). La foto principal sigue viéndose COMPLETA y nítida
+   encima, sin espacio negro alrededor en ninguna pantalla. */
+.login-hero::before {
+  content: "";
+  position: absolute;
+  inset: -40px;
+  z-index: 0;
+  background: url("/Imagenes/horizontal.jpg") center / cover no-repeat;
+  filter: blur(28px) brightness(0.55) saturate(1.1);
+  transform: scale(1.05);
+}
+
 /* El <picture> es solo contenedor: no debe intervenir en el layout */
 .login-hero-picture {
   display: contents;
@@ -25,7 +39,7 @@
   height: 100%;
   object-fit: contain;
   object-position: center;
-  z-index: 0;
+  z-index: 1;
 }
 
 .login-hero-overlay {
@@ -52,6 +66,11 @@
 @media (max-width: 768px) {
   .login-hero-foto {
     object-position: 50% 0;
+  }
+
+  /* El fondo difuminado usa la version vertical en movil */
+  .login-hero::before {
+    background-image: url("/Imagenes/vertical.jpg");
   }
 }
 
