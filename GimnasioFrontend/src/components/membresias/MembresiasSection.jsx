@@ -10,26 +10,22 @@ import EncabezadoMembresias from "./EncabezadoMembresias";
 import TarjetasResumenMembresias from "./TarjetasResumenMembresias";
 import RecuperacionPanel from "./RecuperacionPanel";
 import FormularioMembresia from "./FormularioMembresia";
-import TablaMembresias from "./TablaMembresias";
 import MembresiasFiltros from "./MembresiasFiltros";
 import DetalleMembresiaModal from "./DetalleMembresiaModal";
 import ProximosVencimientos from "./ProximosVencimientos";
-import ResumenIngresosMembresias from "./ResumenIngresosMembresias";
+import RenovacionMasivaBarra from "./RenovacionMasivaBarra";
+import ListadoMembresias from "./ListadoMembresias";
 import AuditoriaMembresias from "./AuditoriaMembresias";
-import EstadosLista from "../common/EstadosLista";
 import { useVisibilidadMembresias } from "../../hooks/useVisibilidadMembresias";
 
 function MembresiasSection(props) {
   const {
-    puedeCrearSocios,
-    setMensaje, setErrorMembresias,
+    puedeCrearSocios, setMensaje, setErrorMembresias,
     setMostrarFormularioMembresia, mostrarFormularioMembresia,
     membresiaEditando, cerrarFormularioMembresia,
     abrirEdicionMembresia, cancelarMembresia,
-    suspenderMembresia, reactivarMembresia,
-    eliminarMembresia,
-    renovarRapido, obtenerPlanes,
-    socioSeleccionado, setSocioSeleccionado,
+    suspenderMembresia, reactivarMembresia, eliminarMembresia,
+    renovarRapido, obtenerPlanes, socioSeleccionado, setSocioSeleccionado,
     membresias, membresiasFiltradas, membresiasRechazadasIds,
     planes, cargandoPlanes, errorPlanes,
     setMembresiaExistente, setMostrarAvisoMembresiaExistente,
@@ -38,11 +34,9 @@ function MembresiasSection(props) {
     calcularFechasMembresia, duracionMembresia, setDuracionMembresia,
     fechaInicioMembresia, setFechaInicioMembresia, fechaFinMembresia,
     crearMembresia, guardandoMembresia,
-    metodoPagoAlmacenadoId, setMetodoPagoAlmacenadoId,
-    modoRenovacion,
+    metodoPagoAlmacenadoId, setMetodoPagoAlmacenadoId, modoRenovacion,
     cargandoMembresias, errorMembresias,
-    busquedaMembresia, setBusquedaMembresia,
-    pagos,
+    busquedaMembresia, setBusquedaMembresia, pagos,
   } = props;
 
   const [membreDetalle, setMembreDetalle] = useState(null);
@@ -103,24 +97,12 @@ function MembresiasSection(props) {
 
       <RecuperacionPanel membresias={membresias} onRenovar={renovarRapido} />
       <ProximosVencimientos membresias={membresias} onRenovar={renovarRapido} />
-      <ResumenIngresosMembresias membresias={membresias} pagos={pagos ?? []} />
 
-      {seleccionadas.length > 0 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", margin: "0.75rem 0" }}>
-          <small style={{ color: "var(--texto-muted)" }}>
-            Las casillas marcadas se utilizan para renovar varias membresías a la vez.
-          </small>
-          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-            <button type="button" className="primary-small-button" onClick={renovarSeleccionadas}>
-              Renovar seleccionadas ({seleccionadas.length})
-            </button>
-            <button type="button" className="secondary-button" onClick={() => setSeleccionadas([])}>
-              Limpiar selección
-            </button>
-          </div>
-        </div>
-      )}
-
+      <RenovacionMasivaBarra
+        cantidad={seleccionadas.length}
+        onRenovar={renovarSeleccionadas}
+        onLimpiar={() => setSeleccionadas([])}
+      />
       {mostrarFormularioMembresia && (
         <FormularioMembresia
           membresiaEditando={membresiaEditando}
@@ -142,31 +124,19 @@ function MembresiasSection(props) {
         />
       )}
 
-      <section className="content-card">
-        <EstadosLista
-          cargando={cargandoMembresias} error={errorMembresias}
-          total={membresias.length} filtrados={membresiasVisibles.length}
-          mensajeCargando="Cargando membresías..."
-          mensajeVacio="No hay membresías registradas."
-          mensajeSinResultado="No se encontraron membresías para los filtros seleccionados."
-        />
-        {!cargandoMembresias && !errorMembresias && membresiasVisibles.length > 0 && (
-          <TablaMembresias
-            membresias={membresiasVisibles} orden={orden} toggleOrden={toggleOrden}
-            abrirEdicionMembresia={abrirEdicionMembresia}
-            prepararRenovacionMembresia={renovarRapido}
-            suspenderMembresia={suspenderMembresia} reactivarMembresia={reactivarMembresia}
-            cancelarMembresia={cancelarMembresia} eliminarMembresia={eliminarMembresia}
-            verDetalle={setMembreDetalle}
-            seleccionadas={seleccionadas}
-            onToggleSeleccion={toggleSeleccion}
-            pagos={pagos ?? []}
-          />
-        )}
-      </section>
-
+      <ListadoMembresias
+        cargandoMembresias={cargandoMembresias} errorMembresias={errorMembresias}
+        membresias={membresias} membresiasVisibles={membresiasVisibles}
+        orden={orden} toggleOrden={toggleOrden}
+        abrirEdicionMembresia={abrirEdicionMembresia}
+        prepararRenovacionMembresia={renovarRapido}
+        suspenderMembresia={suspenderMembresia} reactivarMembresia={reactivarMembresia}
+        cancelarMembresia={cancelarMembresia} eliminarMembresia={eliminarMembresia}
+        verDetalle={setMembreDetalle}
+        seleccionadas={seleccionadas} onToggleSeleccion={toggleSeleccion}
+        pagos={pagos ?? []}
+      />
       <AuditoriaMembresias membresias={membresias} />
-
       {membreDetalle && (
         <DetalleMembresiaModal
           membresia={membreDetalle} membresias={membresias}

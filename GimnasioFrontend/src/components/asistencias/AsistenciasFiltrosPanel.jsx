@@ -35,7 +35,7 @@ function AsistenciasFiltrosPanel({ horarios = [], clases = [], filtros, setFiltr
           <select
             value={filtros.claseId}
             onChange={(e) => setFiltros((prev) => ({ ...prev, claseId: e.target.value }))}
-            style={{ minWidth: 180 }}
+            style={{ minWidth: 180, maxWidth: "100%" }}
           >
             <option value="">Todas las clases</option>
             {clasesFiltradas.map((claseId) => (
@@ -48,7 +48,7 @@ function AsistenciasFiltrosPanel({ horarios = [], clases = [], filtros, setFiltr
           <select
             value={filtros.profesor}
             onChange={(e) => setFiltros((prev) => ({ ...prev, profesor: e.target.value }))}
-            style={{ minWidth: 180 }}
+            style={{ minWidth: 180, maxWidth: "100%" }}
           >
             <option value="">Todos los profesores</option>
             {profesores.map((nombre) => (

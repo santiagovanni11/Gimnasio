@@ -52,6 +52,7 @@
 
 body {
   min-height: 100vh;
+  overflow-x: clip;
   font-family: var(--fuente-texto);
   color: var(--texto);
   background:

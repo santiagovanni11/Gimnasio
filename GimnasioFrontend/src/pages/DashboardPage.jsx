@@ -5,6 +5,7 @@
 // dominio se inicializan acá y se pasan ya resueltos.
 // =========================================================
 
+import { useState } from "react";
 import Sidebar from "../components/layout/Sidebar";
 import ContenidoDashboard from "../components/dashboard/ContenidoDashboard";
 import { useUsuarios } from "../hooks/useUsuarios";
@@ -15,6 +16,9 @@ import { useInactividadSesion } from "../hooks/useInactividadSesion";
 
 export default function DashboardPage({ app }) {
   const { rol, seccion, membresias, membresiasRechazadasIds } = app;
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  const alternarMenu = () => setMenuAbierto((v) => !v);
+  const cerrarMenu = () => setMenuAbierto(false);
 
   const gestionUsuarios = useUsuarios(
     rol === "Administrador" && seccion === "usuarios"
@@ -53,12 +57,23 @@ export default function DashboardPage({ app }) {
 
   return (
     <div className="app-layout">
+      {menuAbierto && (
+        <button
+          type="button"
+          className="sidebar-velo"
+          onClick={cerrarMenu}
+          aria-label="Cerrar menú"
+        />
+      )}
+
       <Sidebar
         rol={rol}
         seccion={seccion}
+        abierto={menuAbierto}
         cambiarSeccion={app.cambiarSeccion}
         permisos={permisos}
         cerrarSesion={app.cerrarSesion}
+        onNavegar={cerrarMenu}
       />
 
       <main className="main-content">
@@ -72,6 +87,8 @@ export default function DashboardPage({ app }) {
             vigencia,
             permisos,
             membresiasActivasCount,
+            menuAbierto,
+            onToggleMenu: alternarMenu,
           }}
         />
       </main>

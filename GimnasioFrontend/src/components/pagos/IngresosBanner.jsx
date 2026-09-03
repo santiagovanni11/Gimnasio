@@ -35,7 +35,7 @@ function IngresosBanner({ pagos = [] }) {
         onChange={(e) => setVista(e.target.value)}
         className="filter-select"
         aria-label="Filtrar ingresos"
-        style={{ minWidth: "160px" }}
+        style={{ minWidth: "160px", maxWidth: "100%" }}
       >
         <option value="aprobados">Aprobados</option>
         <option value="todos">Todos</option>

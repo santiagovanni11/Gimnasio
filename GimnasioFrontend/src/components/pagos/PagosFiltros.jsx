@@ -21,7 +21,7 @@ function PagosFiltros({
 
   return (
     <div className="section-actions" style={{ margin: "1.5rem 0", flexWrap: "wrap" }}>
-      <div className="search-box" style={{ minWidth: "240px" }}>
+      <div className="search-box">
         <input
           type="text"
           value={busquedaPago}

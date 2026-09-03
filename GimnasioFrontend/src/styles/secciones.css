@@ -48,7 +48,9 @@
 .search-box {
   position: relative;
   width: 290px;
-  flex-shrink: 0;
+  max-width: 100%;
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 .search-box::before {

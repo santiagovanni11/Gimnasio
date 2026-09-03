@@ -2,6 +2,7 @@
 
 .table-wrapper {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--line);
   border-radius: var(--radio-lg);
   background: var(--surface);
@@ -60,4 +61,22 @@ tbody tr:hover {
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+/* Tabla simple dentro de tarjetas/modales (ficha de socio) */
+.tabla-simple {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* En móvil: menos ancho mínimo y texto que puede envolver,
+   para que las tablas livianas quepan sin scroll eterno. */
+@media (max-width: 768px) {
+  table { min-width: 620px; }
+  td { white-space: normal; }
+
+  /* Las tablas dentro de modales (ya angostos) no fuerzan scroll:
+     se compactan y el wrapper de su sección scrollea si hace falta. */
+  .payment-modal table,
+  .modal-sistema table { min-width: 0; }
 }

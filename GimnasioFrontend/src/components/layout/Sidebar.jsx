@@ -44,13 +44,18 @@ const GRUPOS = [
   },
 ];
 
-function Sidebar({ rol, seccion, cambiarSeccion, permisos, cerrarSesion }) {
+function Sidebar({ rol, seccion, abierto = false, cambiarSeccion, permisos, cerrarSesion, onNavegar }) {
   const esAdmin = rol === "Administrador";
   const visible = (item) =>
     item.admin ? esAdmin : item.permiso ? permisos[item.permiso] : true;
 
+  const navegar = (id) => {
+    cambiarSeccion(id);
+    onNavegar?.();
+  };
+
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${abierto ? "is-abierto" : ""}`}>
       <div className="sidebar-cabecera">
         <Logo size={42} />
         <div className="marca">
@@ -72,7 +77,7 @@ function Sidebar({ rol, seccion, cambiarSeccion, permisos, cerrarSesion }) {
                   key={i.id}
                   type="button"
                   className={`nav-item ${seccion === i.id ? "is-active" : ""}`}
-                  onClick={() => cambiarSeccion(i.id)}
+                  onClick={() => navegar(i.id)}
                 >
                   <span className="nav-item-icon">{i.icono}</span>
                   <span className="nav-item-texto">{i.texto}</span>

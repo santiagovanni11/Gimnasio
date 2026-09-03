@@ -66,4 +66,5 @@
    aquí solo el ancho propio del panel. */
 .campo-vigencia .input-fecha {
   width: 180px;
+  max-width: 100%;
 }

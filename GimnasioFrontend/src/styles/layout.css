@@ -79,3 +79,24 @@
   background: rgba(251, 113, 133, 0.1);
   border-color: rgba(251, 113, 133, 0.34); color: var(--peligro);
 }
+
+/* =========================
+   MENÚ MÓVIL (drawer)
+   El botón hamburguesa y el velo solo se activan en
+   pantallas chicas (ver responsive.css). En escritorio
+   ambos permanecen ocultos.
+========================= */
+.titulo-con-menu {
+  display: flex; align-items: center; gap: 12px; min-width: 0;
+}
+.menu-toggle {
+  display: none; flex-direction: column; justify-content: center; gap: 4px;
+  width: 44px; height: 44px; padding: 0 11px; flex-shrink: 0;
+  border: 1px solid var(--line-fuerte); border-radius: 10px;
+  background: var(--surface-2); cursor: pointer;
+}
+.menu-toggle span {
+  display: block; width: 100%; height: 2px; border-radius: 2px;
+  background: var(--texto);
+}
+.sidebar-velo { display: none; }

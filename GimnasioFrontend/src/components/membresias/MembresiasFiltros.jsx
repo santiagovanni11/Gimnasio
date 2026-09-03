@@ -15,7 +15,7 @@ function MembresiasFiltros({
 }) {
   return (
     <div className="section-actions" style={{ marginBottom: "1rem" }}>
-      <div className="search-box" style={{ minWidth: "240px" }}>
+      <div className="search-box">
         <input
           type="text"
           value={busquedaMembresia}

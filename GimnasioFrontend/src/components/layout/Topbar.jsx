@@ -13,13 +13,26 @@ const TITULOS = {
   asistencias: { titulo: "Asistencias", sub: "Registro diario de ingreso" },
 };
 
-function Topbar({ seccion, rol, onAbrirMiCuenta }) {
+function Topbar({ seccion, rol, onAbrirMiCuenta, menuAbierto = false, onToggleMenu }) {
   const info = TITULOS[seccion] ?? { titulo: "Gimnasio", sub: "Administración" };
 
   return (
     <header className="topbar">
       <div className="titulo">
-        <h1>{info.titulo}</h1>
+        <div className="titulo-con-menu">
+          <button
+            type="button"
+            className="menu-toggle"
+            onClick={onToggleMenu}
+            aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={menuAbierto}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+          <h1>{info.titulo}</h1>
+        </div>
         <p>{info.sub}</p>
       </div>
 

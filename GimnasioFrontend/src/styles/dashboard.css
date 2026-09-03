@@ -22,7 +22,7 @@
   max-width: 620px;
   margin: 12px 0;
   font-family: var(--fuente-titulo);
-  font-size: 36px;
+  font-size: clamp(26px, 2.6vw + 14px, 36px);
   line-height: 1.08;
   letter-spacing: -0.4px;
 }

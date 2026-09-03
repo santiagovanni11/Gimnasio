@@ -26,6 +26,8 @@ function ContenidoDashboard({ app, dash }) {
     miCuenta,
     vigencia,
     permisos,
+    menuAbierto,
+    onToggleMenu,
   } = dash;
 
   const refrescarInicio = useCallback(() => {
@@ -51,6 +53,8 @@ function ContenidoDashboard({ app, dash }) {
         seccion={seccion}
         rol={app.rol}
         onAbrirMiCuenta={miCuenta.abrirMiCuenta}
+        menuAbierto={menuAbierto}
+        onToggleMenu={onToggleMenu}
       />
 
       {seccion === "inicio" && (

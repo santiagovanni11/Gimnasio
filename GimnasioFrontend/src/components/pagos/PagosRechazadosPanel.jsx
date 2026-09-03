@@ -35,7 +35,7 @@ function PagosRechazadosPanel({ pagos = [], onReintentar, onCancelarRevision, on
       </div>
 
       <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "1rem" }}>
-        <div className="search-box" style={{ minWidth: "240px" }}>
+        <div className="search-box">
           <input
             type="text"
             value={busqueda}

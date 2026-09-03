@@ -31,7 +31,7 @@
 .payment-summary-card.danger strong { color: #ff8a8f; }
 
 /* Modal detalle pagos */
-.modal-tabla-scroll { max-height: 220px; overflow-y: auto; border: 1px solid #262c34; border-radius: 12px; }
+.modal-tabla-scroll { max-height: 220px; overflow: auto; -webkit-overflow-scrolling: touch; border: 1px solid #262c34; border-radius: 12px; }
 .modal-tabla-scroll table { width: 100%; }
 .modal-tabla-scroll td, .modal-tabla-scroll th { padding: 8px 12px; font-size: 13px; }
 .modal-tabla-scroll tbody tr + tr { border-top: 1px solid #1d232b; }
