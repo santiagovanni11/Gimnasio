@@ -1,0 +1,88 @@
+/* =========================================================
+   responsiveFormularios.css — mejoras mobiles para
+   formularios, modales y botones (Chrome Android + Safari iOS).
+   Se importa DESPUES de responsive.css: gana en cascada.
+   ========================================================= */
+
+@media (max-width: 768px) {
+  /* Inputs 16px: evita el zoom automatico de iOS Safari
+     al enfocar, que desacomoda la vista. */
+  .input-group input,
+  .input-group select,
+  .input-group textarea,
+  .form-card input,
+  .form-card select,
+  .payment-modal input,
+  .payment-modal select,
+  .modal-sistema input,
+  .modal-sistema select {
+    font-size: 16px;
+  }
+
+  /* El body de los modales de pago scrollea independiente
+     del modal (botones de accion siempre visibles). */
+  .payment-modal .payment-ticket-body,
+  .payment-modal .payment-modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Botones tactiles comodos y no cortados */
+  .modal-sistema button,
+  .payment-modal button,
+  .form-actions button,
+  .form-card button {
+    min-height: 44px;
+    padding: 10px 16px;
+    white-space: normal;
+  }
+
+  .payment-modal-actions,
+  .form-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 16px;
+    position: sticky;
+    bottom: 0;
+    background: var(--surface-2);
+    z-index: 2;
+  }
+
+  .payment-modal-actions button,
+  .form-actions button { flex: 1 1 100%; }
+
+  /* Evita desbordes horizontales dentro de modales */
+  .payment-form-grid,
+  .form-grid {
+    grid-template-columns: 1fr !important;
+    min-width: 0;
+  }
+
+  .payment-modal .input-group,
+  .modal-sistema .input-group {
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* Etiquetas y textos de formulario legibles */
+  .input-group label,
+  .form-card label {
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .table-actions button,
+  .acciones-fila button,
+  .btn-borrar-item {
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .payment-modal { padding-bottom: 0; }
+  .modal-sistema { padding: 18px; }
+  .payment-ticket-header h3 { font-size: 18px; }
+}
