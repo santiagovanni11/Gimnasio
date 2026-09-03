@@ -45,27 +45,33 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Botones de accion (Guardar/Cancelar/etc.) comodos,
-     bien alineados y nunca cortados. */
-  .payment-modal-actions,
-  .form-actions,
-  .payment-modal .payment-modal-actions {
+  /* Botones de accion: en formularios reales se apilan a ancho
+     completo; en modales de pago/ticket se mantienen en linea,
+     alineados y comodos (sin quedar gigantes). */
+  .form-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    padding: 14px 16px;
-    position: sticky;
-    bottom: 0;
-    background: var(--surface-2);
-    border-top: 1px solid var(--line);
-    z-index: 2;
+    padding: 6px 0 0;
   }
 
-  .payment-modal-actions button,
   .form-actions button {
     flex: 1 1 100%;
     min-height: 48px;
-    font-size: 15px;
+  }
+
+  .payment-modal-actions,
+  .payment-modal .payment-modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    padding: 16px;
+  }
+
+  .payment-modal-actions button {
+    min-height: 44px;
     padding: 0 16px;
     white-space: normal;
   }
@@ -94,12 +100,12 @@
     white-space: nowrap;
   }
 
-  /* Botones generales dentro de modales y formularios */
-  .modal-sistema button,
-  .payment-modal button,
-  .form-card button {
+  /* Botones de texto dentro de modales: area tactil comoda
+     sin deformar el close-button ni los botones chicos. */
+  .modal-sistema button:not(.close-button),
+  .payment-modal button:not(.close-button):not(.btn-borrar-item),
+  .form-card button:not(.close-button) {
     min-height: 44px;
-    padding: 10px 16px;
     white-space: normal;
   }
 
