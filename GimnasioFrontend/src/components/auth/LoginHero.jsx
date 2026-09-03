@@ -8,11 +8,16 @@ import { Logo, Logotipo } from "../../assets/Marca";
 function LoginHero() {
   return (
     <section className="login-hero">
-      <img
-        className="login-hero-foto"
-        src="/Imagenes/Entrenamiento.png"
-        alt="Personas entrenando en el gimnasio"
-      />
+      <picture className="login-hero-picture">
+        {/* Celulares y tablets verticales: foto 9:16 completa */}
+        <source media="(max-width: 768px)" srcSet="/Imagenes/vertical.jpg" />
+        {/* Notebooks y monitores: foto 16:9 completa */}
+        <img
+          className="login-hero-foto"
+          src="/Imagenes/horizontal.jpg"
+          alt="Personas entrenando en el gimnasio"
+        />
+      </picture>
       <div className="login-hero-overlay" />
 
       <div className="login-hero-contenido">

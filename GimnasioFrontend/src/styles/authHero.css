@@ -13,6 +13,11 @@
   background: var(--ink-950);
 }
 
+/* El <picture> es solo contenedor: no debe intervenir en el layout */
+.login-hero-picture {
+  display: contents;
+}
+
 .login-hero-foto {
   position: absolute;
   inset: 0;
