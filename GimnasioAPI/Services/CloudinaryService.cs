@@ -1,5 +1,8 @@
 namespace GimnasioAPI.Services;
 
+using System.Net.Http.Headers;
+using System.Text;
+
 /// <summary>
 /// Sube imágenes (fotos de socios) a Cloudinary usando un
 /// "unsigned upload preset". No requiere generar firma; el
@@ -29,7 +32,9 @@ public class CloudinaryService
 
     /// <summary>
     /// Sube un archivo a Cloudinary y devuelve la URL pública.
-    /// Lanza una excepción si algo falla.
+    /// Construye el multipart manualmente (sin usar
+    /// MultipartFormDataContent) para asegurar que todos los
+    /// campos de texto lleguen correctamente a Cloudinary.
     /// </summary>
     public async Task<string> SubirFotoAsync(
         Stream contenido,
@@ -43,19 +48,36 @@ public class CloudinaryService
                 "faltan CLOUDINARY_CLOUD_NAME / CLOUDINARY_UPLOAD_PRESET).");
         }
 
-        using var form = new MultipartFormDataContent();
+        var boundary = Guid.NewGuid().ToString("N");
+        var lf = "\r\n";
 
-        var archivoContent = new StreamContent(contenido);
-        form.Add(archivoContent, "file", nombreOriginal);
+        using var body = new MemoryStream();
 
-        form.Add(new StringContent(CloudName!), "cloud_name");
-        form.Add(new StringContent(UploadPreset!), "upload_preset");
+        // Campos de texto: cloud_name y upload_preset
+        EscribirCampoTexto(body, boundary, "cloud_name", CloudName!);
+        EscribirCampoTexto(body, boundary, "upload_preset", UploadPreset!);
 
-        var endpoint =
-            $"https://api.cloudinary.com/v1_1/{CloudName}/image/upload";
+        // Campo de archivo
+        EscribirEncabezadoArchivo(
+            body, boundary, "file", nombreOriginal, "application/octet-stream");
+        await contenido.CopyToAsync(body, ct);
+        Escribir(body, lf);
 
-        using var respuesta =
-            await _http.PostAsync(endpoint, form, ct);
+        // Cierre del multipart
+        Escribir(body, $"--{boundary}--{lf}");
+
+        body.Position = 0;
+
+        using var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"https://api.cloudinary.com/v1_1/{CloudName}/image/upload");
+
+        request.Content = new StreamContent(body);
+        request.Content.Headers.ContentType =
+            MediaTypeHeaderValue.Parse(
+                $"multipart/form-data; boundary={boundary}");
+
+        using var respuesta = await _http.SendAsync(request, ct);
 
         var cuerpo = await respuesta.Content.ReadAsStringAsync(ct);
 
@@ -73,5 +95,33 @@ public class CloudinaryService
         return url
             ?? throw new InvalidOperationException(
                 "Cloudinary no devolvió una URL.");
+    }
+
+    private static void EscribirCampoTexto(
+        Stream cuerpo, string boundary, string nombre, string valor)
+    {
+        var bytes = Encoding.UTF8.GetBytes(
+            $"--{boundary}\r\n" +
+            $"Content-Disposition: form-data; name=\"{nombre}\"\r\n\r\n" +
+            valor +
+            "\r\n");
+        cuerpo.Write(bytes, 0, bytes.Length);
+    }
+
+    private static void EscribirEncabezadoArchivo(
+        Stream cuerpo, string boundary, string nombre,
+        string nombreArchivo, string contentType)
+    {
+        var bytes = Encoding.UTF8.GetBytes(
+            $"--{boundary}\r\n" +
+            $"Content-Disposition: form-data; name=\"{nombre}\"; filename=\"{nombreArchivo}\"\r\n" +
+            $"Content-Type: {contentType}\r\n\r\n");
+        cuerpo.Write(bytes, 0, bytes.Length);
+    }
+
+    private static void Escribir(Stream cuerpo, string cadena)
+    {
+        var bytes = Encoding.UTF8.GetBytes(cadena);
+        cuerpo.Write(bytes, 0, bytes.Length);
     }
 }
