@@ -1,10 +1,11 @@
 namespace GimnasioAPI.Services;
 
 /// <summary>
-/// Sube imágenes (fotos de socios) a Cloudinary usando su API
-/// HTTP multipart. Devuelve la URL pública permanente de la
-/// imagen, lista para guardarse en FotoUrl del socio.
-/// Las credenciales se leen de configuración (CLOUDINARY_*).
+/// Sube imágenes (fotos de socios) a Cloudinary usando un
+/// "unsigned upload preset". No requiere generar firma; el
+/// preset se crea en Cloudinary con Signing Mode = Unsigned.
+/// Las credenciales y el nombre del preset se leen de
+/// configuración (CLOUDINARY_*).
 /// </summary>
 public class CloudinaryService
 {
@@ -21,12 +22,10 @@ public class CloudinaryService
 
     public bool Configurado =>
         !string.IsNullOrWhiteSpace(CloudName) &&
-        !string.IsNullOrWhiteSpace(ApiKey) &&
-        !string.IsNullOrWhiteSpace(ApiSecret);
+        !string.IsNullOrWhiteSpace(UploadPreset);
 
     private string? CloudName => _config["CLOUDINARY_CLOUD_NAME"];
-    private string? ApiKey => _config["CLOUDINARY_API_KEY"];
-    private string? ApiSecret => _config["CLOUDINARY_API_SECRET"];
+    private string? UploadPreset => _config["CLOUDINARY_UPLOAD_PRESET"];
 
     /// <summary>
     /// Sube un archivo a Cloudinary y devuelve la URL pública.
@@ -41,15 +40,8 @@ public class CloudinaryService
         {
             throw new InvalidOperationException(
                 "Cloudinary no está configurado (" +
-                "faltan CLOUDINARY_CLOUD_NAME / API_KEY / API_SECRET).");
+                "faltan CLOUDINARY_CLOUD_NAME / CLOUDINARY_UPLOAD_PRESET).");
         }
-
-        var carpeta = "gimnasio/fotos";
-        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-        var firma = FirmarCloudinary(
-            $"cloud_name={CloudName}&folder={carpeta}&timestamp={timestamp}",
-            ApiSecret!);
 
         using var form = new MultipartFormDataContent();
 
@@ -57,11 +49,7 @@ public class CloudinaryService
         form.Add(archivoContent, "file", nombreOriginal);
 
         form.Add(new StringContent(CloudName!), "cloud_name");
-        form.Add(new StringContent(ApiKey!), "api_key");
-        form.Add(new StringContent(timestamp.ToString()), "timestamp");
-        form.Add(new StringContent(firma), "signature");
-        form.Add(new StringContent(carpeta), "folder");
-        form.Add(new StringContent("rw_auto"), "resource_type");
+        form.Add(new StringContent(UploadPreset!), "upload_preset");
 
         var endpoint =
             $"https://api.cloudinary.com/v1_1/{CloudName}/image/upload";
@@ -85,19 +73,5 @@ public class CloudinaryService
         return url
             ?? throw new InvalidOperationException(
                 "Cloudinary no devolvió una URL.");
-    }
-
-    /// <summary>
-    /// Genera la firma SHA-1 que exige la API de Cloudinary.
-    /// </summary>
-    internal static string FirmarCloudinary(
-        string paraFirmar,
-        string apiSecret)
-    {
-        using var sha = System.Security.Cryptography.SHA1.Create();
-        var bytes = System.Text.Encoding.UTF8.GetBytes(
-            paraFirmar + apiSecret);
-        var hash = sha.ComputeHash(bytes);
-        return Convert.ToHexString(hash).ToLowerInvariant();
     }
 }
