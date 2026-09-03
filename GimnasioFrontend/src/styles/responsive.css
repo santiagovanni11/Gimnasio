@@ -26,26 +26,28 @@
 @media (max-width: 768px) {
   .app-layout { flex-direction: column; }
 
-  /* Sidebar como barra superior compacta y navegable */
+  /* Sidebar como barra superior compacta y navegable.
+     Fila 1: logo (izquierda) + cerrar sesión (derecha).
+     Fila 2: navegación horizontal desplazable. */
   .sidebar {
     position: sticky; top: 0; z-index: 500;
     width: 100%; min-height: auto;
-    display: flex; flex-direction: column; gap: 10px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px;
     padding: 10px 12px;
     border-right: none; border-bottom: 1px solid var(--line);
   }
-  .sidebar-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 2px 4px; }
+  .sidebar-cabecera { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 2px 4px; }
   .marca-sub { display: none; }
-  .sidebar-nav { flex: none; flex-direction: row; align-items: center; gap: 8px; overflow-x: auto; padding: 2px 2px 4px; -webkit-overflow-scrolling: touch; }
+  .sidebar-nav { order: 3; flex: 1 1 100%; flex-direction: row; align-items: center; gap: 8px; overflow-x: auto; padding: 2px 2px 4px; -webkit-overflow-scrolling: touch; }
   .nav-grupo { display: contents; }
   .nav-grupo-titulo { display: none; }
   .nav-item { flex: 0 0 auto; flex-direction: column; gap: 4px; width: auto; padding: 6px 10px; border-radius: 10px; font-size: 11px; }
   .nav-item-texto { white-space: nowrap; }
   .nav-item-icon { width: 28px; height: 28px; border-radius: 8px; }
-  .sidebar-pie { position: absolute; right: 10px; top: 10px; flex-direction: row; align-items: center; border-top: none; margin-top: 0; padding-top: 0; }
+  .sidebar-pie { position: static; flex-direction: row; align-items: center; margin: 0 0 0 auto; padding: 0; border-top: none; }
   .sidebar-pie .user-card { display: none; }
-  .nav-logout { width: auto; flex-direction: column; gap: 3px; padding: 6px 8px; }
-  .nav-logout span { font-size: 10px; }
+  .nav-logout { width: auto; flex-direction: row; gap: 6px; padding: 8px 12px; white-space: nowrap; }
+  .nav-logout span { font-size: 12px; }
 
   .main-content { padding: 16px; }
   .topbar { margin-bottom: 18px; }
@@ -69,6 +71,13 @@
   .filter-select, .filter-date, .filter-input { width: 100%; min-width: 0; }
   .quick-range-group { flex-wrap: wrap; }
   .inicio-grid { flex-direction: column; }
+
+  /* Login: solo la tarjeta sobre el fondo, sin hero que se amontone */
+  .login-hero-contenido { display: none; }
+  .login-container { padding: 24px 20px; }
+  .login-card { padding: 32px 24px; }
+  .login-header { margin-bottom: 28px; }
+  .login-footer { margin-top: 24px; }
 }
 
 /* ===== Celulares (≤600px) ===== */
@@ -93,4 +102,6 @@
   .topbar .titulo h1 { font-size: 21px; }
   .content-card, .form-card { padding: 12px; }
   .stat-card strong, .kpi-valor { font-size: 26px; }
+  .login-card { padding: 26px 18px; }
+  .login-card .input-group input, .login-card .input-group select, .campo-password-control input { height: 44px; }
 }
