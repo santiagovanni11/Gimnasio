@@ -3,11 +3,11 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copia el proyecto y restaura dependencias (cachea capas)
-COPY GimnasioAPI/GimnasioAPI.csproj ./
+COPY GimnasioAPI.csproj ./
 RUN dotnet restore
 
 # Copia el resto del código del backend y compila
-COPY GimnasioAPI/ ./
+COPY . ./
 RUN dotnet publish -c Release -o /app/publish
 
 # Etapa de ejecución
