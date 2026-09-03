@@ -1,0 +1,11 @@
+# .NET
+**/bin/
+**/obj/
+.vs/
+
+# Node
+node_modules/
+**/node_modules/
+
+# Render / build artifacts
+.git/

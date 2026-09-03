@@ -20,6 +20,8 @@ builder.Services.AddOpenApi();
 
 // Servicios de negocio
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<CloudinaryService>();
 builder.Services.AddScoped<AdministradorGuardService>();
 builder.Services.AddScoped<ReglasMembresia>();
 builder.Services.AddScoped<LoginGuardService>();
@@ -72,10 +74,16 @@ builder.Services.AddAuthentication(
 builder.Services.AddAuthorization();
 
 // CORS: solo orígenes permitidos por configuración
-var allowedOrigins = builder.Configuration
-    .GetSection("AllowedOrigins")
-    .Get<string[]>()
-    ?? new[] { "http://localhost:5173", "http://127.0.0.1:5173" };
+var allowedOriginsCsv = builder.Configuration["ALLOWED_ORIGINS"];
+var allowedOrigins = allowedOriginsCsv is not null
+    ? allowedOriginsCsv
+        .Split(',', StringSplitOptions.RemoveEmptyEntries)
+        .Select(o => o.Trim())
+        .ToArray()
+    : builder.Configuration
+        .GetSection("AllowedOrigins")
+        .Get<string[]>()
+        ?? new[] { "http://localhost:5173", "http://127.0.0.1:5173" };
 
 builder.Services.AddCors(options =>
 {
@@ -97,6 +105,15 @@ builder.Services.AddControllers()
     });
 
 var app = builder.Build();
+
+// Aplica migraciones y crea los roles base en el arranque.
+using (var scope = app.Services.CreateScope())
+{
+    await InicializacionBaseDatos.InicializarAsync(
+        scope,
+        app.Configuration,
+        app.Logger);
+}
 
 // OpenAPI solamente en desarrollo
 if (app.Environment.IsDevelopment())
