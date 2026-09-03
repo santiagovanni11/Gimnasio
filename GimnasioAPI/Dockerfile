@@ -16,6 +16,10 @@ WORKDIR /app
 
 EXPOSE 10000
 
+# Desactiva la recarga en caliente de configuración para evitar
+# superar el límite de inotify en entornos tipo Render Free.
+ENV DOTNET_hostBuilder__reloadConfigOnChange=false
+
 COPY --from=build /app/publish ./
 
 # Escucha en el puerto de la variable PORT (que inyecta Render) o 10000.

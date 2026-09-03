@@ -13,6 +13,14 @@ using Microsoft.IdentityModel.Tokens;
 // servicio de renovación automática.
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
+// Desactiva la recarga en caliente de appsettings (reloadOnChange).
+// En entornos con límite de inotify (p. ej. Render Free) el
+// FileSystemWatcher de configuración supera el límite y aborta el
+// arranque. Como en producción la configuración viene de variables
+// de entorno, la recarga no aporta nada.
+Environment.SetEnvironmentVariable(
+    "DOTNET_hostBuilder__reloadConfigOnChange", "false");
+
 var builder = WebApplication.CreateBuilder(args);
 
 // OpenAPI
