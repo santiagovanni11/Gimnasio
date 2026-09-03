@@ -45,19 +45,21 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Botones de accion: en formularios reales se apilan a ancho
-     completo; en modales de pago/ticket se mantienen en linea,
-     alineados y comodos (sin quedar gigantes). */
+  /* Botones de accion en formularios: en linea, alineados a la
+     derecha, area tactil comoda, NUNCA a ancho completo (evita
+     que queden gigantes en Chrome/Safari). */
   .form-actions {
     display: flex;
     flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
     gap: 10px;
     padding: 6px 0 0;
   }
 
   .form-actions button {
-    flex: 1 1 100%;
-    min-height: 48px;
+    min-height: 44px;
+    white-space: normal;
   }
 
   .payment-modal-actions,
