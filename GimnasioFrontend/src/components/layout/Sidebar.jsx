@@ -35,7 +35,7 @@ const GRUPOS = [
     titulo: "Finanzas",
     items: [
       { id: "pagos", texto: "Pagos", icono: <IconoPagos />, permiso: "puedeVerPagos" },
-      { id: "precios", texto: "Precios", icono: <IconoPrecios />, admin: true },
+      { id: "precios", texto: "Planes y precios", icono: <IconoPrecios />, admin: true },
     ],
   },
   {

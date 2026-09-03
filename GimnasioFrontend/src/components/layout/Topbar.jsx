@@ -7,7 +7,7 @@ const TITULOS = {
   socios: { titulo: "Socios", sub: "Personas registradas y su estado" },
   membresias: { titulo: "Membresías", sub: "Planes y vigencia de cada socio" },
   pagos: { titulo: "Pagos", sub: "Cobros, caja y morosos" },
-  precios: { titulo: "Precios", sub: "Configuración de planes y beneficios" },
+  precios: { titulo: "Planes y precios", sub: "Configuración de planes y beneficios" },
   usuarios: { titulo: "Usuarios", sub: "Accesos y roles del equipo" },
   clases: { titulo: "Clases", sub: "Catálogo y horarios" },
   asistencias: { titulo: "Asistencias", sub: "Registro diario de ingreso" },

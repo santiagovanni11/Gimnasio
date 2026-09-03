@@ -8,12 +8,17 @@ export default function SelectorBeneficiosClases({
   onToggleB,
   onToggleC,
 }) {
+  const mensajeVacio = (titulo) =>
+    titulo === "Beneficios incluidos"
+      ? "No hay beneficios en el catálogo. Podés crear uno en el campo de arriba."
+      : "No hay clases en el catálogo. Creá una clase para poder sumarla a este plan.";
+
   const renderGrupo = (titulo, items, seleccion, onToggle) => (
     <div className="selector-grupo">
       <h4>{titulo}</h4>
 
       {items.length === 0 ? (
-        <small className="info-message">No hay opciones disponibles.</small>
+        <small className="info-message">{mensajeVacio(titulo)}</small>
       ) : (
         <ul className="selector-lista">
           {items.map((item) => (
@@ -33,8 +38,7 @@ export default function SelectorBeneficiosClases({
     </div>
   );
 
-  return (
-    <div className="selector-beneficios-clases">
+  return (    <div className="selector-beneficios-clases">
       {renderGrupo(
         "Beneficios incluidos",
         beneficios,
