@@ -1,7 +1,7 @@
 /* EditorBeneficiosClasesPlan - Modal para asociar beneficios/clases */
 
+import { useState } from "react";
 import SelectorBeneficiosClases from "./SelectorBeneficiosClases";
-import CamposNuevaEntrada from "./CamposNuevaEntrada";
 
 export default function EditorBeneficiosClasesPlan({
   abierto,
@@ -16,45 +16,82 @@ export default function EditorBeneficiosClasesPlan({
   toggleC,
   guardar,
   crearBeneficio,
-  crearClase,
   cerrar,
 }) {
+  const [nuevoBeneficio, setNuevoBeneficio] = useState("");
+
   if (!abierto || !plan) return null;
 
   return (
-    <div className="payment-modal-backdrop" onClick={cerrar}>
-      <div className="payment-modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="payment-modal-backdrop"
+        onClick={cerrar}
+      >
+      <div
+        className="payment-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="payment-ticket-header">
           <div>
             <span className="eyebrow">PLAN</span>
             <h3>Beneficios y clases · {plan.nombre}</h3>
           </div>
 
-          <button type="button" className="close-button" onClick={cerrar}>
+          <button
+            type="button"
+            className="close-button"
+            onClick={cerrar}
+          >
             ×
           </button>
         </div>
 
         <div style={{ padding: "16px 22px 0" }}>
           <h4 style={{ marginBottom: "10px" }}>
-            ¿Falta en el catálogo?
+            ¿Falta un beneficio en el catálogo?
           </h4>
 
-          <CamposNuevaEntrada
-            titulo="Nuevo beneficio"
-            placeholder="Ej: Acceso a sauna"
-            etiquetaBoton="Añadir beneficio"
-            creando={creando}
-            onCrear={crearBeneficio}
-          />
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              alignItems: "flex-end",
+              flexWrap: "wrap",
+            }}
+          >
+            <div
+              className="input-group"
+              style={{ flex: "1 1 240px", marginBottom: 0 }}
+            >
+              <label htmlFor="nuevo-beneficio">Nombre</label>
+              <input
+                id="nuevo-beneficio"
+                type="text"
+                placeholder="Ej: Acceso a sauna"
+                value={nuevoBeneficio}
+                onChange={(e) => setNuevoBeneficio(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    crearBeneficio(nuevoBeneficio);
+                    setNuevoBeneficio("");
+                  }
+                }}
+              />
+            </div>
 
-          <CamposNuevaEntrada
-            titulo="Nueva clase"
-            placeholder="Ej: Yoga"
-            etiquetaBoton="Añadir clase"
-            creando={creando}
-            onCrear={crearClase}
-          />
+            <button
+              type="button"
+              className="primary-small-button"
+              disabled={creando}
+              onClick={() => {
+                crearBeneficio(nuevoBeneficio);
+                setNuevoBeneficio("");
+              }}
+            >
+              {creando ? "Agregando..." : "Añadir beneficio"}
+            </button>
+          </div>
 
           <small
             className="info-message"
@@ -77,7 +114,11 @@ export default function EditorBeneficiosClasesPlan({
         </div>
 
         <div className="payment-modal-actions">
-          <button type="button" className="secondary-button" onClick={cerrar}>
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={cerrar}
+          >
             Cancelar
           </button>
 
