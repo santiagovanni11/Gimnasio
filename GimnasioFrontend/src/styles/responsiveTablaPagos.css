@@ -2,7 +2,7 @@
    responsiveTablaPagos.css — Tabla de pagos en móvil.
    Convierte la tabla de pagos en tarjetas apiladas para
    pantallas chicas (Android/iOS) y evita el scroll horizontal.
-   Usa el patrón flexbox estandar (compatible Chrome + Safari)
+   Patrón: td flex con etiqueta ::before fija + .td-valor.
    ========================================================= */
 
 @media (max-width: 600px) {
@@ -19,36 +19,43 @@
 
   .tabla-pagos td {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
+    align-items: baseline;
+    gap: 12px;
     border-bottom: 1px solid var(--line);
     padding: 9px 0;
     font-size: 13px;
-    white-space: normal;
-    text-align: right;
   }
 
   .tabla-pagos td::before {
     content: attr(data-label);
-    flex: 0 0 auto;
+    flex: 0 0 84px;
     font-weight: 700;
     font-size: 11px;
     letter-spacing: 0.3px;
     text-transform: uppercase;
     color: var(--texto-muted);
-    text-align: left;
+  }
+
+  .tabla-pagos .td-valor {
+    flex: 1;
+    min-width: 0;
+    text-align: right;
+    white-space: normal;
   }
 
   .tabla-pagos td:last-child { border-bottom: none; }
 
   .tabla-pagos td[data-label="Acciones"] {
     display: block;
-    text-align: left;
-    padding-top: 4px;
+    padding-top: 6px;
   }
 
-  .tabla-pagos td[data-label="Acciones"] .table-actions {
+  .tabla-pagos td[data-label="Acciones"]::before {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .tabla-pagos .table-actions {
     flex-wrap: wrap;
     justify-content: flex-start;
     gap: 6px;

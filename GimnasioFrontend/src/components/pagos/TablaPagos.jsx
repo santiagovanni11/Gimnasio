@@ -49,50 +49,52 @@ export default function TablaPagos({
             return (
             <tr key={pago.id}>
               <td data-label="Socio">
-                {pago.socioNombre} {pago.socioApellido}
+                <span className="td-valor">{pago.socioNombre} {pago.socioApellido}</span>
               </td>
               <td data-label="Membresía">
-                <span className={getPlanBadgeClase(planNombre)}>{planNombre}</span>
-                {pago.referencia?.startsWith("AUTO-") && <span className="chip-auto">Renov. auto</span>}
+                <span className="td-valor">
+                  <span className={getPlanBadgeClase(planNombre)}>{planNombre}</span>
+                  {pago.referencia?.startsWith("AUTO-") && <span className="chip-auto">Renov. auto</span>}
+                </span>
               </td>
-              <td data-label="Monto">{formatoMoneda(pago.monto)}</td>
+              <td data-label="Monto"><span className="td-valor">{formatoMoneda(pago.monto)}</span></td>
               <td data-label="Pagado">
-                {saldoInfo ? (
-                  saldoInfo.saldo > 0 ? (
-                    <span
-                      className="status-warning"
-                      title={`Saldo pendiente: ${formatoMoneda(saldoInfo.saldo)}`}
-                    >
-                      {formatoMoneda(saldoInfo.pagado)}
-                    </span>
+                <span className="td-valor">
+                  {saldoInfo ? (
+                    saldoInfo.saldo > 0 ? (
+                      <span
+                        className="status-warning"
+                        title={`Saldo pendiente: ${formatoMoneda(saldoInfo.saldo)}`}
+                      >
+                        {formatoMoneda(saldoInfo.pagado)}
+                      </span>
+                    ) : (
+                      formatoMoneda(saldoInfo.pagado)
+                    )
                   ) : (
-                    formatoMoneda(saldoInfo.pagado)
-                  )
-                ) : (
-                  "-"
-                )}
+                    "-"
+                  )}
+                </span>
               </td>
-              <td data-label="Forma">{formaPagoTexto(pago.formaPago)}</td>
-              <td data-label="Fecha">
-                {pago.fechaPago
-                  ? new Date(pago.fechaPago).toLocaleDateString("es-AR")
-                  : "-"}
-              </td>
+              <td data-label="Forma"><span className="td-valor">{formaPagoTexto(pago.formaPago)}</span></td>
+              <td data-label="Fecha"><span className="td-valor">{pago.fechaPago ? new Date(pago.fechaPago).toLocaleDateString("es-AR") : "-"}</span></td>
               <td data-label="Estado">
-                <span
-                  className={
-                    esAnulado(pago)
-                      ? "status-inactive"
-                      : Number(pago.estado) === 2
-                      ? "status-active"
-                      : Number(pago.estado) === 1
-                      ? "status-warning"
-                      : Number(pago.estado) === 3
-                      ? "status-rejected"
-                      : "status-inactive"
-                  }
-                >
-                  {estadoPagoTexto(pago.estado)}
+                <span className="td-valor">
+                  <span
+                    className={
+                      esAnulado(pago)
+                        ? "status-inactive"
+                        : Number(pago.estado) === 2
+                        ? "status-active"
+                        : Number(pago.estado) === 1
+                        ? "status-warning"
+                        : Number(pago.estado) === 3
+                        ? "status-rejected"
+                        : "status-inactive"
+                    }
+                  >
+                    {estadoPagoTexto(pago.estado)}
+                  </span>
                 </span>
               </td>
               <td data-label="Acciones">
