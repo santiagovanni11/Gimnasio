@@ -1,7 +1,9 @@
 /* =========================================================
-   responsiveFormularios.css — mejoras mobiles para
-   formularios, modales y botones (Chrome Android + Safari iOS).
+   responsiveFormularios.css — mejoras moviles para
+   formularios, modales, botones y textos.
    Se importa DESPUES de responsive.css: gana en cascada.
+   Objetivo: aspecto tactil profesional en Chrome Android
+   y Safari iOS.
    ========================================================= */
 
 @media (max-width: 768px) {
@@ -19,8 +21,22 @@
     font-size: 16px;
   }
 
-  /* El body de los modales de pago scrollea independiente
-     del modal (botones de accion siempre visibles). */
+  /* Etiquetas mas legibles en movil */
+  .input-group label,
+  .form-card label,
+  .modal-sistema label,
+  .payment-modal label {
+    font-size: 15px;
+    margin-bottom: 7px;
+    letter-spacing: 0.1px;
+  }
+
+  .input-group small {
+    font-size: 13px;
+  }
+
+  /* El cuerpo del modal scrollea independiente del modal
+     (header fijo arriba, botones de accion abajo). */
   .payment-modal .payment-ticket-body,
   .payment-modal .payment-modal-body {
     flex: 1 1 auto;
@@ -29,29 +45,63 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Botones tactiles comodos y no cortados */
-  .modal-sistema button,
-  .payment-modal button,
-  .form-actions button,
-  .form-card button {
-    min-height: 44px;
-    padding: 10px 16px;
-    white-space: normal;
-  }
-
+  /* Botones de accion (Guardar/Cancelar/etc.) comodos,
+     bien alineados y nunca cortados. */
   .payment-modal-actions,
-  .form-actions {
+  .form-actions,
+  .payment-modal .payment-modal-actions {
+    display: flex;
     flex-wrap: wrap;
     gap: 10px;
     padding: 14px 16px;
     position: sticky;
     bottom: 0;
     background: var(--surface-2);
+    border-top: 1px solid var(--line);
     z-index: 2;
   }
 
   .payment-modal-actions button,
-  .form-actions button { flex: 1 1 100%; }
+  .form-actions button {
+    flex: 1 1 100%;
+    min-height: 48px;
+    font-size: 15px;
+    padding: 0 16px;
+    white-space: normal;
+  }
+
+  /* Botones de fila (editar/borrar/ver/aprobar) compactos
+     y alineados, sin desbordar la tabla. */
+  .table-actions,
+  .acciones-fila {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .table-actions .edit-button,
+  .table-actions .delete-button,
+  .table-actions .view-button,
+  .table-actions .approve-button,
+  .table-actions .cancel-button,
+  .table-actions .export-button {
+    height: 40px;
+    padding: 0 12px;
+    font-size: 13px;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  /* Botones generales dentro de modales y formularios */
+  .modal-sistema button,
+  .payment-modal button,
+  .form-card button {
+    min-height: 44px;
+    padding: 10px 16px;
+    white-space: normal;
+  }
 
   /* Evita desbordes horizontales dentro de modales */
   .payment-form-grid,
@@ -61,28 +111,30 @@
   }
 
   .payment-modal .input-group,
-  .modal-sistema .input-group {
+  .modal-sistema .input-group,
+  .form-card .input-group {
     min-width: 0;
     width: 100%;
   }
 
-  /* Etiquetas y textos de formulario legibles */
-  .input-group label,
-  .form-card label {
-    font-size: 15px;
-    line-height: 1.4;
-  }
-
-  .table-actions button,
-  .acciones-fila button,
   .btn-borrar-item {
-    min-width: 40px;
-    min-height: 40px;
+    min-width: 56px;
+    height: 36px;
   }
 }
 
 @media (max-width: 480px) {
   .payment-modal { padding-bottom: 0; }
   .modal-sistema { padding: 18px; }
-  .payment-ticket-header h3 { font-size: 18px; }
+  .payment-ticket-header h3,
+  .payment-alert-header h3 { font-size: 18px; }
+
+  .table-actions .edit-button,
+  .table-actions .delete-button,
+  .table-actions .view-button,
+  .table-actions .approve-button,
+  .table-actions .cancel-button {
+    padding: 0 10px;
+    font-size: 12px;
+  }
 }
