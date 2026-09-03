@@ -6,8 +6,8 @@
 
 import { useState } from "react";
 import { planesService } from "../services/planesService";
-import { beneficiosService } from "../services/beneficiosService";
 import { crearEjecutorApi } from "../services/apiEjecutor";
+import { useAccionesBeneficio } from "./useAccionesBeneficio";
 
 export function useEditorBeneficiosClases({
   onSesionExpirada,
@@ -22,11 +22,18 @@ export function useEditorBeneficiosClases({
   const [seleccionB, setSeleccionB] = useState([]);
   const [seleccionC, setSeleccionC] = useState([]);
   const [guardando, setGuardando] = useState(false);
-  const [creando, setCreando] = useState(false);
 
   const [ejecutar] = useState(() =>
     crearEjecutorApi({ onSesionExpirada })
   );
+
+  const acciones = useAccionesBeneficio({
+    onSesionExpirada,
+    setError,
+    setMensaje,
+    setBeneficiosDisp,
+    setSeleccionB,
+  });
 
   const abrir = async (planSeleccionado) => {
     setPlan(planSeleccionado);
@@ -102,35 +109,6 @@ export function useEditorBeneficiosClases({
     cerrar();
     if (alExito) await alExito();
   };
-  const crearBeneficio = async (nombre) => {
-    const texto = (nombre ?? "").trim();
-    if (!texto) {
-      setError("El nombre del beneficio es obligatorio.");
-      return;
-    }
-
-    setCreando(true);
-    const resultado = await ejecutar({
-      peticion: () => beneficiosService.crearBeneficio(texto),
-      onError: setError,
-      mensajePermiso: "No tenés permisos para crear beneficios.",
-      mensajeError: "No se pudo crear el beneficio.",
-      mensajeRed: "No se pudo conectar con la API.",
-      etiquetaLog: "Error al crear beneficio:",
-    });
-    setCreando(false);
-    if (!resultado) return;
-    const nuevo = resultado.datos;
-    setBeneficiosDisp((prev) =>
-      prev.some((b) => b.id === nuevo.id)
-        ? prev
-        : [...prev, { id: nuevo.id, nombre: nuevo.nombre }]
-    );
-    setSeleccionB((prev) =>
-      prev.includes(nuevo.id) ? prev : [...prev, nuevo.id]
-    );
-    setMensaje(`Beneficio "${nuevo.nombre}" agregado al plan.`);
-  };
   return {
     abierto,
     plan,
@@ -139,12 +117,14 @@ export function useEditorBeneficiosClases({
     seleccionB,
     seleccionC,
     guardando,
-    creando,
     abrir,
     cerrar,
     toggleB,
     toggleC,
     guardar,
-    crearBeneficio,
+    crearBeneficio: acciones.crearBeneficio,
+    eliminarBeneficio: acciones.eliminarBeneficio,
+    creando: acciones.creando,
+    eliminando: acciones.eliminando,
   };
 }

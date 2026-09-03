@@ -37,3 +37,42 @@
   margin: 0;
   font-size: 13px;
 }
+
+.selector-lista li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.selector-lista label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-borrar-item {
+  border: 1px solid var(--line-fuerte);
+  background: transparent;
+  color: var(--texto-suave);
+  font-size: 12px;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.btn-borrar-item:hover:not(:disabled) {
+  color: #d9534f;
+  border-color: #d9534f;
+  background: rgba(217, 83, 79, 0.08);
+}
+
+.btn-borrar-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

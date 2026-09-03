@@ -13,4 +13,9 @@ export const beneficiosService = {
       body: { nombre, descripcion },
     });
   },
+
+  /** Baja lógica de un beneficio del catálogo. */
+  async eliminarBeneficio(id) {
+    return apiRequest(`Beneficios/${id}`, { method: "DELETE" });
+  },
 };

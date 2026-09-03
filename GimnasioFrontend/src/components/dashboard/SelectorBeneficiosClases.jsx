@@ -1,6 +1,7 @@
 /* SelectorBeneficiosClases - Checklist de beneficios y clases */
 /* Cada grupo se muestra en su propia tarjeta para evitar
-   superposición cuando no hay beneficios o clases. */
+   superposición cuando no hay beneficios o clases.
+   Los beneficios del catálogo tienen botón "Borrar". */
 
 export default function SelectorBeneficiosClases({
   beneficios = [],
@@ -9,6 +10,8 @@ export default function SelectorBeneficiosClases({
   seleccionC = [],
   onToggleB,
   onToggleC,
+  onEliminarBeneficio,
+  eliminandoBeneficioId,
 }) {
   const renderGrupo = (titulo, items, seleccion, onToggle) => (
     <div className="selector-grupo">
@@ -28,6 +31,21 @@ export default function SelectorBeneficiosClases({
                 />
                 {item.nombre}
               </label>
+              {titulo === "Beneficios incluidos" && (
+                <button
+                  type="button"
+                  className="btn-borrar-item"
+                  title="Borrar beneficio"
+                  onClick={() => onEliminarBeneficio?.(item.id)}
+                  disabled={
+                    eliminandoBeneficioId === item.id
+                  }
+                >
+                  {eliminandoBeneficioId === item.id
+                    ? "Borrando..."
+                    : "Borrar"}
+                </button>
+              )}
             </li>
           ))}
         </ul>

@@ -12,6 +12,7 @@ export default function EditorBeneficiosClasesPlan({
   seleccionC = [],
   guardando = false,
   creando = false,
+  eliminarBeneficio,
   toggleB,
   toggleC,
   guardar,
@@ -19,6 +20,13 @@ export default function EditorBeneficiosClasesPlan({
   cerrar,
 }) {
   const [nuevoBeneficio, setNuevoBeneficio] = useState("");
+  const [borrandoId, setBorrandoId] = useState(null);
+
+  const alBorrar = async (id) => {
+    setBorrandoId(id);
+    await eliminarBeneficio(id);
+    setBorrandoId(null);
+  };
 
   if (!abierto || !plan) return null;
 
@@ -110,6 +118,8 @@ export default function EditorBeneficiosClasesPlan({
             seleccionC={seleccionC}
             onToggleB={toggleB}
             onToggleC={toggleC}
+            onEliminarBeneficio={alBorrar}
+            eliminandoBeneficioId={borrandoId}
           />
         </div>
 
