@@ -8,10 +8,15 @@
 
 @media (max-width: 768px) {
   /* Inputs 16px: evita el zoom automatico de iOS Safari
-     al enfocar, que desacomoda la vista. */
+     al enfocar, que desacomoda la vista. Se incluyen los
+     selectores de login/registro porque .login-card
+     .input-group input (14px) gana por especificidad. */
   .input-group input,
   .input-group select,
   .input-group textarea,
+  .login-card .input-group input,
+  .login-card .input-group select,
+  .campo-password-control input,
   .form-card input,
   .form-card select,
   .payment-modal input,
@@ -128,6 +133,13 @@
   .btn-borrar-item {
     min-width: 56px;
     height: 36px;
+  }
+
+  /* Boton ver/ocultar contraseña: area tactil comoda dentro
+     del input de 46px del login. */
+  .campo-password-toggle {
+    min-height: 36px;
+    padding: 0 12px;
   }
 }
 
