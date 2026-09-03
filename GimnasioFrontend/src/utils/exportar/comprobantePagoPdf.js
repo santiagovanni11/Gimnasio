@@ -10,6 +10,7 @@ import {
   estadoPagoTexto,
 } from "../pagos";
 import { fechaDesdeUtc } from "../fechas";
+import { encabezadoForza, pieForza } from "./pdfBranding";
 
 /** Fecha local larga (ej: "25 de agosto de 2026"). */
 const fechaLarga = (valor) =>
@@ -35,19 +36,10 @@ export const exportarComprobantePagoPdf = (
 
   const doc = new jsPDF();
 
-  let y = 20;
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  doc.text("COMPROBANTE DE PAGO", 14, y);
-
-  y += 8;
-  doc.setFontSize(11);
-  doc.text(numeroComprobante(pago.id), 14, y);
-
-  y += 8;
-  doc.setDrawColor(150);
-  doc.line(14, y, 196, y);
+  let y = encabezadoForza(doc, {
+    titulo: "Comprobante de pago",
+    subtitulo: numeroComprobante(pago.id),
+  });
 
   const filas = [
     ["Socio", socioTexto(pago)],
@@ -59,7 +51,6 @@ export const exportarComprobantePagoPdf = (
     ["Registrado por", pago.registradoPor || "-"],
   ];
 
-  y += 10;
   filas.forEach(([etiqueta, valor]) => {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
@@ -72,6 +63,7 @@ export const exportarComprobantePagoPdf = (
   });
 
   y += 4;
+  doc.setDrawColor(150);
   doc.line(14, y, 196, y);
 
   y += 10;
@@ -82,14 +74,7 @@ export const exportarComprobantePagoPdf = (
     align: "right",
   });
 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
-  doc.setTextColor(130);
-  doc.text(
-    `Emitido el ${new Date().toLocaleString("es-AR")}`,
-    14,
-    285
-  );
+  pieForza(doc, 1, 1, "Comprobante de pago");
 
   doc.save(`comprobante_pago_${pago.id}.pdf`);
 };

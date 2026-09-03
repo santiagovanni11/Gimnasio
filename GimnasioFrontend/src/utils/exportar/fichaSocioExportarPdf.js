@@ -14,6 +14,7 @@ import {
   seccionHistorialMembresias,
   seccionPagos,
 } from "./fichaSocioPdfPiezas";
+import { pieForza } from "./pdfBranding";
 
 /** Dibuja la ficha completa sobre el documento. */
 const armarFicha = (doc, datos) => {
@@ -41,5 +42,12 @@ export const descargarFichaSocioPdf = (datos) => {
   const doc = new jsPDF();
 
   armarFicha(doc, datos);
+
+  const paginas = doc.internal.getNumberOfPages();
+  for (let pagina = 1; pagina <= paginas; pagina++) {
+    doc.setPage(pagina);
+    pieForza(doc, pagina, paginas, "Ficha del socio");
+  }
+
   doc.save(nombreArchivo(datos.socio));
 };

@@ -3,6 +3,7 @@
 import jsPDF from "jspdf";
 import { autoTable } from "jspdf-autotable";
 import { formatoMoneda } from "../pagos";
+import { encabezadoForza, pieForza } from "./pdfBranding";
 
 export const exportarPlanesPdf = (planes = []) => {
   if (!planes.length) return;
@@ -10,25 +11,17 @@ export const exportarPlanesPdf = (planes = []) => {
   const doc = new jsPDF();
   const ahora = new Date();
 
-  doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
-  doc.text("CONFIGURACIÓN DE PRECIOS", 14, 18);
-
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  doc.text("Sistema de gestión del gimnasio", 14, 25);
-  doc.text(
-    `Generado: ${ahora.toLocaleDateString("es-AR")} ${ahora.toLocaleTimeString(
+  const y0 = encabezadoForza(doc, {
+    titulo: "Configuración de precios",
+    subtitulo: `Generado: ${ahora.toLocaleDateString("es-AR")} ${ahora.toLocaleTimeString(
       "es-AR",
       { hour: "2-digit", minute: "2-digit" }
     )}`,
-    14,
-    31
-  );
+  });
 
   const activos = planes.filter((p) => p.activo !== false).length;
 
-  let y = 42;
+  let y = y0;
   doc.setFontSize(11);
   doc.text(`Total de planes: ${planes.length}`, 14, y);
   doc.text(`Activos: ${activos}`, 14, y + 7);
@@ -57,15 +50,7 @@ export const exportarPlanesPdf = (planes = []) => {
   const paginas = doc.internal.getNumberOfPages();
   for (let pagina = 1; pagina <= paginas; pagina++) {
     doc.setPage(pagina);
-    const alto = doc.internal.pageSize.height;
-    doc.setFontSize(8);
-    doc.text(`Página ${pagina} de ${paginas}`, 14, alto - 10);
-    doc.text(
-      "Listado generado desde el sistema de gestión del gimnasio.",
-      196,
-      alto - 10,
-      { align: "right" }
-    );
+    pieForza(doc, pagina, paginas, "Configuración de precios");
   }
 
   doc.save(`precios_${new Date().toISOString().slice(0, 10)}.pdf`);

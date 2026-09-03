@@ -9,6 +9,7 @@ import {
   ESTADO_PAGO,
 } from "../pagos";
 import { fechaTexto } from "../fechas";
+import { encabezadoForza, pieForza } from "./pdfBranding";
 
 /** Solo aprobados y rechazados: excluye pendientes, cancelados y anulados. */
 const pagosParaPdf = (pagos) =>
@@ -78,23 +79,15 @@ export const exportarPagosPdf = (
     0
   );
 
-  doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
-  doc.text("RESUMEN DE PAGOS", 14, 18);
-
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  doc.text("Sistema de gestión del gimnasio", 14, 25);
-  doc.text(
-    `Generado: ${ahora.toLocaleDateString("es-AR")} ${ahora.toLocaleTimeString(
+  const y0 = encabezadoForza(doc, {
+    titulo: "Resumen de pagos",
+    subtitulo: `Generado: ${ahora.toLocaleDateString("es-AR")} ${ahora.toLocaleTimeString(
       "es-AR",
       { hour: "2-digit", minute: "2-digit" }
     )}`,
-    14,
-    31
-  );
+  });
 
-  let y = agregarFiltrosAlPdf(doc, { fechaDesde, fechaHasta, filtroPlan, filtroFormaPago }, 42);
+  let y = agregarFiltrosAlPdf(doc, { fechaDesde, fechaHasta, filtroPlan, filtroFormaPago }, y0);
 
   y += 4;
   doc.setFontSize(11);
@@ -131,15 +124,7 @@ export const exportarPagosPdf = (
   const paginas = doc.internal.getNumberOfPages();
   for (let pagina = 1; pagina <= paginas; pagina++) {
     doc.setPage(pagina);
-    const alto = doc.internal.pageSize.height;
-    doc.setFontSize(8);
-    doc.text(`Página ${pagina} de ${paginas}`, 14, alto - 10);
-    doc.text(
-      "Resumen generado desde el sistema de gestión del gimnasio.",
-      196,
-      alto - 10,
-      { align: "right" }
-    );
+    pieForza(doc, pagina, paginas, "Resumen de pagos");
   }
 
   doc.save(`resumen_pagos_${new Date().toISOString().slice(0, 10)}.pdf`);

@@ -5,10 +5,17 @@
 
 import jsPDF from "jspdf";
 import { formatoMoneda } from "./pagos";
+import {
+  MARCA,
+  COLOR_PRINCIPAL,
+  COLOR_GRIS,
+  COLOR_LINEA,
+} from "./exportar/pdfBranding";
 
 const ANCHO = 80;
 const MARGEN = 8;
 const CENTRO = ANCHO / 2;
+const COLOR_OSCURO_TICKET = [18, 26, 22];
 
 const linea = (doc, y) => {
   doc.setDrawColor(200);
@@ -40,21 +47,25 @@ export const descargarTicketPdf = (ticket) => {
     format: [ANCHO, 150],
   });
 
-  let y = 14;
+  let y = 16;
 
-  // Encabezado
+  // Encabezado FORZA
+  doc.setFillColor(...COLOR_OSCURO_TICKET);
+  doc.rect(0, 0, ANCHO, 24, "F");
+  doc.setFillColor(...COLOR_PRINCIPAL);
+  doc.rect(0, 24, ANCHO, 2, "F");
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.text("GYM", CENTRO, y, { align: "center" });
-
-  y += 5;
+  doc.setFontSize(16);
+  doc.setTextColor(...COLOR_PRINCIPAL);
+  doc.text(MARCA, CENTRO, 13, { align: "center" });
+  y += 6;
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
-  doc.setTextColor(110);
+  doc.setTextColor(215, 225, 218);
   doc.text("Comprobante de pago", CENTRO, y, { align: "center" });
-
-  y += 4;
-  linea(doc, y);
+  y += 7;
+  doc.setDrawColor(...COLOR_LINEA);
+  doc.line(MARGEN, y, ANCHO - MARGEN, y);
 
   // Datos
   y += 6;
@@ -77,16 +88,22 @@ export const descargarTicketPdf = (ticket) => {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
   doc.text("TOTAL", MARGEN, y);
-  doc.text(ticket.monto || "-", ANCHO - MARGEN, y, {
-    align: "right",
-  });
+  doc.text(ticket.monto || "-", ANCHO - MARGEN, y, { align: "right" });
 
   // Pie
   y += 10;
+  doc.setDrawColor(...COLOR_LINEA);
+  doc.line(MARGEN, y, ANCHO - MARGEN, y);
+  y += 7;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(...COLOR_PRINCIPAL);
+  doc.text("\u00a1Gracias por su pago!", CENTRO, y, { align: "center" });
+  y += 5;
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(7.5);
-  doc.setTextColor(130);
-  doc.text("¡Gracias por su pago!", CENTRO, y, { align: "center" });
+  doc.setFontSize(6.5);
+  doc.setTextColor(...COLOR_GRIS);
+  doc.text(MARCA, CENTRO, y, { align: "center" });
 
   const nombre = `ticket_${(ticket.clienteNombre || "pago")
     .toLowerCase()

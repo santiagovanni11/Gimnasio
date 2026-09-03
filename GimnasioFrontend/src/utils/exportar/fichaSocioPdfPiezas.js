@@ -16,29 +16,24 @@ import {
   tablaListado,
   tituloSeccion,
 } from "./fichaSocioPdfTablas";
+import { encabezadoForza } from "./pdfBranding";
 
 export const nombreCompleto = (socio) =>
   `${socio?.nombre ?? ""} ${socio?.apellido ?? ""}`.trim();
 
 /** Encabezado del documento con nombre y aviso de incompletos. */
 export const encabezadoFicha = (doc, socio, faltantes) => {
-  let y = 18;
-
-  doc.setFontSize(16);
-  doc.setFont("helvetica", "bold");
-  doc.text(nombreCompleto(socio), 14, y);
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.text(
-    `Ficha del socio · Generada: ${new Date().toLocaleDateString("es-AR")}`,
-    14,
-    (y += 6)
-  );
+  let y = encabezadoForza(doc, {
+    titulo: nombreCompleto(socio) || "Socio",
+    subtitulo: `Ficha del socio · Generada: ${new Date().toLocaleDateString(
+      "es-AR"
+    )}`,
+  });
 
   if (faltantes.length > 0) {
     doc.setTextColor(180, 120, 0);
-    doc.text(`Datos incompletos: ${faltantes.join(", ")}`, 14, (y += 5));
+    doc.text(`Datos incompletos: ${faltantes.join(", ")}`, 14, y);
+    y += 5;
     doc.setTextColor(0);
   }
 

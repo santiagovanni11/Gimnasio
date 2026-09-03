@@ -5,6 +5,7 @@ import { autoTable } from "jspdf-autotable";
 import { estadoMembresiaTexto } from "../membresias";
 import { formatoMoneda, estadoPagoTexto, formaPagoTexto } from "../pagos";
 import { fechaTexto } from "../fechas";
+import { encabezadoForza, pieForza } from "./pdfBranding";
 
 export const exportarMembresiaPdf = (membresia, pagos = [], resumen = null) => {
   if (!membresia) return;
@@ -12,15 +13,14 @@ export const exportarMembresiaPdf = (membresia, pagos = [], resumen = null) => {
   const doc = new jsPDF();
   const socio = `${membresia.socioNombre || ""} ${membresia.socioApellido || ""}`.trim();
 
-  doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
-  doc.text("DETALLE DE MEMBRESÍA", 14, 18);
-
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  doc.text(`Socio: ${socio || "Sin dato"}`, 14, 28);
-  doc.text(`Plan: ${membresia.planNombre || "-"}`, 14, 34);
-  doc.text(`Período: ${fechaTexto(membresia.fechaInicio) || "-"} al ${fechaTexto(membresia.fechaFin) || "-"}`, 14, 40);
+  const y0 = encabezadoForza(doc, {
+    titulo: "Detalle de membresía",
+    subtitulo: `Socio: ${socio || "Sin dato"} · Plan: ${
+      membresia.planNombre || "-"
+    } · Período: ${fechaTexto(membresia.fechaInicio) || "-"} al ${
+      fechaTexto(membresia.fechaFin) || "-"
+    }`,
+  });
 
   const pagadoPeriodo = (pagos || [])
     .filter((pago) => Number(pago.estado) === 2)
@@ -35,7 +35,7 @@ export const exportarMembresiaPdf = (membresia, pagos = [], resumen = null) => {
   ];
 
   autoTable(doc, {
-    startY: 48,
+    startY: y0,
     body: filas.map(([campo, valor]) => ({ campo, valor })),
     columns: [{ header: "Campo", dataKey: "campo" }, { header: "Valor", dataKey: "valor" }],
     theme: "grid",
@@ -62,6 +62,12 @@ export const exportarMembresiaPdf = (membresia, pagos = [], resumen = null) => {
     });
   }
 
+  const paginasDetalle = doc.internal.getNumberOfPages();
+  for (let pagina = 1; pagina <= paginasDetalle; pagina++) {
+    doc.setPage(pagina);
+    pieForza(doc, pagina, paginasDetalle, "Detalle de membresía");
+  }
+
   doc.save(`membresia_${socio || "detalle"}_${new Date().toISOString().slice(0, 10)}.pdf`);
 };
 
@@ -71,21 +77,13 @@ export const exportarMembresiasPdf = (membresias = []) => {
   const doc = new jsPDF();
   const ahora = new Date();
 
-  doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
-  doc.text("LISTADO DE MEMBRESÍAS", 14, 18);
-
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  doc.text("Sistema de gestión del gimnasio", 14, 25);
-  doc.text(
-    `Generado: ${ahora.toLocaleDateString("es-AR")} ${ahora.toLocaleTimeString(
+  const y0 = encabezadoForza(doc, {
+    titulo: "Listado de membresías",
+    subtitulo: `Generado: ${ahora.toLocaleDateString("es-AR")} ${ahora.toLocaleTimeString(
       "es-AR",
       { hour: "2-digit", minute: "2-digit" }
     )}`,
-    14,
-    31
-  );
+  });
 
   const totales = {
     activas: membresias.filter((m) => Number(m.estado) === 1).length,
@@ -94,7 +92,7 @@ export const exportarMembresiasPdf = (membresias = []) => {
     canceladas: membresias.filter((m) => Number(m.estado) === 5).length,
   };
 
-  let y = 42;
+  let y = y0;
   doc.setFontSize(11);
   doc.text(`Total: ${membresias.length}`, 14, y);
   doc.text(`Activas: ${totales.activas}`, 14, y + 7);
@@ -125,15 +123,7 @@ export const exportarMembresiasPdf = (membresias = []) => {
   const paginas = doc.internal.getNumberOfPages();
   for (let pagina = 1; pagina <= paginas; pagina++) {
     doc.setPage(pagina);
-    const alto = doc.internal.pageSize.height;
-    doc.setFontSize(8);
-    doc.text(`Página ${pagina} de ${paginas}`, 14, alto - 10);
-    doc.text(
-      "Listado generado desde el sistema de gestión del gimnasio.",
-      196,
-      alto - 10,
-      { align: "right" }
-    );
+    pieForza(doc, pagina, paginas, "Listado de membresías");
   }
 
   doc.save(`membresias_${new Date().toISOString().slice(0, 10)}.pdf`);
