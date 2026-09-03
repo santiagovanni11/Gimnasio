@@ -27,7 +27,7 @@ export default function TablaPagos({
   }
 
   return (
-    <div className="table-wrapper tabla-pagos">
+    <div className="table-wrapper">
       <table>
         <thead>
           <tr>
@@ -48,56 +48,54 @@ export default function TablaPagos({
             const saldoInfo = saldoPorPago?.get(Number(pago.id));
             return (
             <tr key={pago.id}>
-              <td data-label="Socio">
-                <span className="td-valor">{pago.socioNombre} {pago.socioApellido}</span>
+              <td>
+                {pago.socioNombre} {pago.socioApellido}
               </td>
-              <td data-label="Membresía">
-                <span className="td-valor">
-                  <span className={getPlanBadgeClase(planNombre)}>{planNombre}</span>
-                  {pago.referencia?.startsWith("AUTO-") && <span className="chip-auto">Renov. auto</span>}
-                </span>
+              <td>
+                <span className={getPlanBadgeClase(planNombre)}>{planNombre}</span>
+                {pago.referencia?.startsWith("AUTO-") && <span className="chip-auto">Renov. auto</span>}
               </td>
-              <td data-label="Monto"><span className="td-valor">{formatoMoneda(pago.monto)}</span></td>
-              <td data-label="Pagado">
-                <span className="td-valor">
-                  {saldoInfo ? (
-                    saldoInfo.saldo > 0 ? (
-                      <span
-                        className="status-warning"
-                        title={`Saldo pendiente: ${formatoMoneda(saldoInfo.saldo)}`}
-                      >
-                        {formatoMoneda(saldoInfo.pagado)}
-                      </span>
-                    ) : (
-                      formatoMoneda(saldoInfo.pagado)
-                    )
+              <td>{formatoMoneda(pago.monto)}</td>
+              <td>
+                {saldoInfo ? (
+                  saldoInfo.saldo > 0 ? (
+                    <span
+                      className="status-warning"
+                      title={`Saldo pendiente: ${formatoMoneda(saldoInfo.saldo)}`}
+                    >
+                      {formatoMoneda(saldoInfo.pagado)}
+                    </span>
                   ) : (
-                    "-"
-                  )}
+                    formatoMoneda(saldoInfo.pagado)
+                  )
+                ) : (
+                  "-"
+                )}
+              </td>
+              <td>{formaPagoTexto(pago.formaPago)}</td>
+              <td>
+                {pago.fechaPago
+                  ? new Date(pago.fechaPago).toLocaleDateString("es-AR")
+                  : "-"}
+              </td>
+              <td>
+                <span
+                  className={
+                    esAnulado(pago)
+                      ? "status-inactive"
+                      : Number(pago.estado) === 2
+                      ? "status-active"
+                      : Number(pago.estado) === 1
+                      ? "status-warning"
+                      : Number(pago.estado) === 3
+                      ? "status-rejected"
+                      : "status-inactive"
+                  }
+                >
+                  {estadoPagoTexto(pago.estado)}
                 </span>
               </td>
-              <td data-label="Forma"><span className="td-valor">{formaPagoTexto(pago.formaPago)}</span></td>
-              <td data-label="Fecha"><span className="td-valor">{pago.fechaPago ? new Date(pago.fechaPago).toLocaleDateString("es-AR") : "-"}</span></td>
-              <td data-label="Estado">
-                <span className="td-valor">
-                  <span
-                    className={
-                      esAnulado(pago)
-                        ? "status-inactive"
-                        : Number(pago.estado) === 2
-                        ? "status-active"
-                        : Number(pago.estado) === 1
-                        ? "status-warning"
-                        : Number(pago.estado) === 3
-                        ? "status-rejected"
-                        : "status-inactive"
-                    }
-                  >
-                    {estadoPagoTexto(pago.estado)}
-                  </span>
-                </span>
-              </td>
-              <td data-label="Acciones">
+              <td>
                 <div className="table-actions">
                   <button
                     type="button"
