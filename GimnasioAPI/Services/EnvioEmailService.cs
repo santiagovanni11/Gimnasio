@@ -28,24 +28,31 @@ public class EnvioEmailService
     {
         var mensaje = ArmarMensaje(emailDestino, codigo);
 
+        // Las operaciones async de MailKit ignoran la propiedad
+        // Timeout: el único tope real es un CancellationToken.
+        using var corta = new CancellationTokenSource(
+            TimeSpan.FromSeconds(20));
+
         using var cliente = new SmtpClient();
 
         await cliente.ConnectAsync(
             _config["SMTP_HOST"] ?? "smtp-relay.brevo.com",
             ParsearPuerto(),
-            SecureSocketOptions.StartTls);
+            SecureSocketOptions.StartTls,
+            corta.Token);
 
         try
         {
             await cliente.AuthenticateAsync(
                 Requerido("SMTP_USER"),
-                Requerido("SMTP_PASS"));
+                Requerido("SMTP_PASS"),
+                corta.Token);
 
-            await cliente.SendAsync(mensaje);
+            await cliente.SendAsync(mensaje, corta.Token);
         }
         finally
         {
-            await cliente.DisconnectAsync(true);
+            await cliente.DisconnectAsync(true, corta.Token);
         }
     }
 

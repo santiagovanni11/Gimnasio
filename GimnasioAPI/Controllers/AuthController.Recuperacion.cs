@@ -59,8 +59,12 @@ public partial class AuthController
             await _email.EnviarCodigoRecuperacionAsync(
                 usuario.Email, codigo);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex,
+                "Fallo el envío del email de recuperación a {Email}",
+                usuario.Email);
+
             return StatusCode(503,
                 "No se pudo enviar el email. Reintentá " +
                 "en unos minutos.");

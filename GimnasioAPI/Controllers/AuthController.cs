@@ -29,6 +29,7 @@ public partial class AuthController : ControllerBase
     private readonly AuditoriaUsuariosService _auditoria;
     private readonly CreacionUsuariosService _altas;
     private readonly EnvioEmailService _email;
+    private readonly ILogger<AuthController> _logger;
 
     public AuthController(
         AppDbContext context,
@@ -36,7 +37,8 @@ public partial class AuthController : ControllerBase
         LoginGuardService guardLogin,
         AuditoriaUsuariosService auditoria,
         CreacionUsuariosService altas,
-        EnvioEmailService email)
+        EnvioEmailService email,
+        ILogger<AuthController> logger)
     {
         _context = context;
         _tokenService = tokenService;
@@ -44,6 +46,7 @@ public partial class AuthController : ControllerBase
         _auditoria = auditoria;
         _altas = altas;
         _email = email;
+        _logger = logger;
     }
 
     // =========================================================
