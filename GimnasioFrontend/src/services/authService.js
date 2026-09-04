@@ -79,4 +79,22 @@ export const authService = {
   async obtenerPerfil() {
     return apiRequest("Auth/perfil");
   },
+
+  /** Paso 1 de recuperación: pide el código al email. */
+  async enviarCodigoRecuperacion(email) {
+    return apiRequest("Auth/recuperar-password", {
+      method: "POST",
+      body: { email: email.trim() },
+      auth: false,
+    });
+  },
+
+  /** Paso 2 de recuperación: código + nueva contraseña. */
+  async restablecerPassword({ email, codigo, passwordNueva }) {
+    return apiRequest("Auth/restablecer-password", {
+      method: "POST",
+      body: { email: email.trim(), codigo, passwordNueva },
+      auth: false,
+    });
+  },
 };

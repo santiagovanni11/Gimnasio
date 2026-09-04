@@ -1,12 +1,14 @@
 // LOGIN — Pantalla de acceso (tarjeta profesional DiseñoLogin)
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AuthField from "../components/auth/AuthField";
 import AuthMessage from "../components/auth/AuthMessage";
 import CampoPassword from "../components/auth/CampoPassword";
 import FormularioRegistro from "../components/auth/FormularioRegistro";
 import LoginHero from "../components/auth/LoginHero";
+import RecuperarPasswordForm from "../components/auth/RecuperarPasswordForm";
 import { Logo, Logotipo } from "../assets/Marca";
+import { useBloqueoLogin } from "../hooks/useBloqueoLogin";
 
 function LoginPage({ app }) {
   const {
@@ -23,28 +25,22 @@ function LoginPage({ app }) {
     setRecordar,
   } = app;
 
-  const [bloqueadoSegundos, setBloqueadoSegundos] = useState(0);
-  const estaBloqueado = bloqueadoSegundos > 0;
-
-  useEffect(() => {
-    if (!mensaje) return undefined;
-    const match = mensaje.match(/en (\d+) minuto/);
-    if (!match) return undefined;
-    setBloqueadoSegundos(Number(match[1]) * 60);
-    return undefined;
-  }, [mensaje]);
-
-  useEffect(() => {
-    if (!estaBloqueado) return undefined;
-    const id = setInterval(
-      () => setBloqueadoSegundos((s) => (s > 0 ? s - 1 : 0)),
-      1000
-    );
-    return () => clearInterval(id);
-  }, [estaBloqueado]);
+  const [modoRecuperar, setModoRecuperar] = useState(false);
+  const { bloqueadoSegundos, estaBloqueado } =
+    useBloqueoLogin(mensaje);
 
   // Renderiza el formulario de login o registro como rama única
   const formRender = () => {
+    if (modoRecuperar) {
+      return (
+        <RecuperarPasswordForm
+          onVolver={() => {
+            setModoRecuperar(false);
+          }}
+        />
+      );
+    }
+
     if (modoRegistro) {
       return <FormularioRegistro app={app} />;
     }
@@ -81,6 +77,14 @@ function LoginPage({ app }) {
             />
             Recordarme en este equipo
           </label>
+
+          <button
+            type="button"
+            className="login-olvidaste"
+            onClick={() => setModoRecuperar(true)}
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
 
           <button
             className="login-button"

@@ -28,19 +28,22 @@ public partial class AuthController : ControllerBase
     private readonly LoginGuardService _guardLogin;
     private readonly AuditoriaUsuariosService _auditoria;
     private readonly CreacionUsuariosService _altas;
+    private readonly EnvioEmailService _email;
 
     public AuthController(
         AppDbContext context,
         TokenService tokenService,
         LoginGuardService guardLogin,
         AuditoriaUsuariosService auditoria,
-        CreacionUsuariosService altas)
+        CreacionUsuariosService altas,
+        EnvioEmailService email)
     {
         _context = context;
         _tokenService = tokenService;
         _guardLogin = guardLogin;
         _auditoria = auditoria;
         _altas = altas;
+        _email = email;
     }
 
     // =========================================================

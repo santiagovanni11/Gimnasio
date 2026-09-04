@@ -37,6 +37,7 @@ builder.Services.AddScoped<AuditoriaUsuariosService>();
 builder.Services.AddScoped<AuditoriaMembresiasService>();
 builder.Services.AddScoped<AuditoriaPlanesService>();
 builder.Services.AddScoped<CreacionUsuariosService>();
+builder.Services.AddScoped<EnvioEmailService>();
 builder.Services.AddScoped<RenovacionAutomaticaService>();
 builder.Services.AddHostedService<RenovacionAutomaticaJob>();
 builder.Services.AddSingleton<TokenService>();

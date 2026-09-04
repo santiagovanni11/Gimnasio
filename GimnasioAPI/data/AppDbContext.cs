@@ -33,6 +33,8 @@ public class AppDbContext : DbContext
 
     public DbSet<AuditoriaUsuario> AuditoriaUsuarios { get; set; }
 
+    public DbSet<CodigoRecuperacion> CodigosRecuperacion { get; set; }
+
     public DbSet<AuditoriaMembresia> AuditoriaMembresias { get; set; }
 
     public DbSet<AuditoriaPlan> AuditoriaPlanes { get; set; }
