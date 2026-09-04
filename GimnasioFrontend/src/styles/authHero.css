@@ -1,7 +1,7 @@
 /* =========================================================
    authHero.css — Fondo de marca del login (presentacional).
-   Capas: fondo difuminado (::before) + foto completa nítida
-   + overlay degradado + contenido (marca y propuesta de valor).
+   Capas: foto nítida que cubre siempre toda la pantalla
+   + overlay degradado + contenido (marca y propuesta).
    Las media queries viven en authHeroResponsive.css.
    ========================================================= */
 
@@ -12,25 +12,17 @@
   background: var(--ink-950);
 }
 
-/* Fondo difuminado: llena con la misma imagen ampliada lo que
-   "contain" deja libre, tipo reproductor de video. La foto
-   principal se ve COMPLETA y nítida encima, sin bandas negras. */
-.login-hero::before {
-  content: "";
-  position: absolute; inset: -40px; z-index: 0;
-  background: url("/Imagenes/horizontal.jpg") center / cover no-repeat;
-  filter: blur(28px) brightness(0.55) saturate(1.1);
-  transform: scale(1.05);
-}
-
 /* El <picture> es solo contenedor: no interviene en el layout */
 .login-hero-picture { display: contents; }
 
-/* Foto principal: entera, nunca recortada */
+/* Foto principal: "cover" garantiza que llene el 100% de la
+   pantalla en cualquier monitor (sin bandas difuminadas ni
+   negras); solo recorta bordes laterales o superiores según
+   la proporcion del dispositivo. */
 .login-hero-foto {
   position: absolute; inset: 0; z-index: 1;
   width: 100%; height: 100%;
-  object-fit: contain; object-position: center;
+  object-fit: cover; object-position: center;
 }
 
 /* Degradado para dar legibilidad al contenido y a la tarjeta */
