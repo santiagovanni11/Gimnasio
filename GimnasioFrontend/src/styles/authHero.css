@@ -1,51 +1,41 @@
-/* authHero.css - Fondo de marca del login (foto a pantalla completa) */
+/* =========================================================
+   authHero.css — Fondo de marca del login (presentacional).
+   Capas: fondo difuminado (::before) + foto completa nítida
+   + overlay degradado + contenido (marca y propuesta de valor).
+   Las media queries viven en authHeroResponsive.css.
+   ========================================================= */
 
 .login-hero {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 42px;
-  overflow: hidden;
+  position: absolute; inset: 0; z-index: 0;
+  display: flex; flex-direction: column; justify-content: space-between;
+  gap: 24px; padding: 42px; overflow: hidden;
   background: var(--ink-950);
 }
 
-/* Fondo difuminado: llena las bandas que deja "contain" con
-   la misma imagen ampliada y desenfocada (efecto tipo reproductor
-   de video). La foto principal sigue viéndose COMPLETA y nítida
-   encima, sin espacio negro alrededor en ninguna pantalla. */
+/* Fondo difuminado: llena con la misma imagen ampliada lo que
+   "contain" deja libre, tipo reproductor de video. La foto
+   principal se ve COMPLETA y nítida encima, sin bandas negras. */
 .login-hero::before {
   content: "";
-  position: absolute;
-  inset: -40px;
-  z-index: 0;
+  position: absolute; inset: -40px; z-index: 0;
   background: url("/Imagenes/horizontal.jpg") center / cover no-repeat;
   filter: blur(28px) brightness(0.55) saturate(1.1);
   transform: scale(1.05);
 }
 
-/* El <picture> es solo contenedor: no debe intervenir en el layout */
-.login-hero-picture {
-  display: contents;
-}
+/* El <picture> es solo contenedor: no interviene en el layout */
+.login-hero-picture { display: contents; }
 
+/* Foto principal: entera, nunca recortada */
 .login-hero-foto {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center;
-  z-index: 1;
+  position: absolute; inset: 0; z-index: 1;
+  width: 100%; height: 100%;
+  object-fit: contain; object-position: center;
 }
 
+/* Degradado para dar legibilidad al contenido y a la tarjeta */
 .login-hero-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
+  position: absolute; inset: 0; z-index: 1;
   background:
     linear-gradient(
       180deg,
@@ -56,62 +46,31 @@
     linear-gradient(115deg, rgba(47, 191, 113, 0.14), transparent 55%);
 }
 
-/* =========================================================
-   RESPONSIVE DEL HERO
-   En pantallas verticales (celulares/tablets) la foto
-   horizontal 3:2 deja bandas negras arriba y abajo con
-   "contain": se ancla arriba para leerse como cabecera
-   y que la tarjeta respire sobre el fondo oscuro.
-   ========================================================= */
-@media (max-width: 768px) {
-  .login-hero-foto {
-    object-position: 50% 0;
-  }
-
-  /* El fondo difuminado usa la version vertical en movil */
-  .login-hero::before {
-    background-image: url("/Imagenes/vertical.jpg");
-  }
-}
-
+/* Contenido: marca arriba, propuesta de valor abajo */
 .login-hero-contenido {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 24px;
-  height: 100%;
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; justify-content: space-between;
+  gap: 24px; height: 100%;
   text-shadow: 0 1px 14px rgba(0, 0, 0, 0.5);
 }
 
-.login-marca {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.login-marca .texto {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-}
-
+.login-marca { display: flex; align-items: center; gap: 12px; }
+.login-marca .texto { display: flex; flex-direction: column; line-height: 1.1; }
 .login-marca .texto small {
-  margin-top: 3px;
-  color: var(--texto-dim);
-  font-size: 11px;
-  letter-spacing: 0.4px;
+  margin-top: 3px; color: var(--texto-dim);
+  font-size: 11px; letter-spacing: 0.4px;
 }
 
+/* Tarjeta de propuesta de valor (esquina inferior izquierda).
+   La visibilidad según tamaño de pantalla la define
+   authHeroResponsive.css: se oculta donde se superpondría
+   con la tarjeta de login. */
 .login-hero-pie {
-  align-self: flex-start;
-  max-width: 520px;
-  padding: 26px 28px;
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(10, 12, 16, 0.52), rgba(10, 12, 16, 0.40));
+  align-self: flex-start; max-width: 520px; padding: 26px 28px;
   border: 1px solid rgba(255, 255, 255, 0.10);
   border-left: 3px solid var(--accent);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(10, 12, 16, 0.52), rgba(10, 12, 16, 0.40));
   box-shadow: 0 20px 55px rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -119,45 +78,28 @@
 
 .login-hero-pie h2 {
   margin-bottom: 10px;
-  font-family: var(--fuente-titulo);
-  font-size: 30px;
-  line-height: 1.12;
+  font-family: var(--fuente-titulo); font-size: 30px; line-height: 1.12;
 }
 
 .login-hero-pie p {
-  max-width: 460px;
-  color: var(--texto-muted);
-  line-height: 1.6;
+  max-width: 460px; color: var(--texto-muted); line-height: 1.6;
 }
 
 .login-hero-pie ul {
-  list-style: none;
-  margin-top: 18px;
-  display: grid;
-  gap: 10px;
+  list-style: none; margin-top: 18px;
+  display: grid; gap: 10px;
 }
 
 .login-hero-pie li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--texto);
-  font-size: 14px;
+  display: flex; align-items: center; gap: 10px;
+  color: var(--texto); font-size: 14px;
 }
 
 .login-hero-pie li::before {
   content: "✓";
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  border-radius: 6px;
-  background: var(--accent-suave);
-  border: 1px solid var(--accent-borde);
-  color: var(--accent-hover);
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; flex-shrink: 0;
+  border: 1px solid var(--accent-borde); border-radius: 6px;
+  background: var(--accent-suave); color: var(--accent-hover);
+  font-size: 11px; font-weight: 800; line-height: 1;
 }

@@ -1,0 +1,25 @@
+/* =========================================================
+   authHeroResponsive.css — Media queries del hero del login.
+   Complementa responsive.css (que oculta .login-hero-contenido
+   en movil). Se importa despues de authHero.css.
+   ========================================================= */
+
+/* La tarjeta de propuesta de valor se oculta por defecto: en
+   notebooks (1366-1536px) su esquina inferior izquierda se
+   superpone con la tarjeta de login centrada. Solo se muestra
+   en monitores grandes, donde conviven sin tocarse. */
+.login-hero-pie { display: none; }
+
+@media (min-width: 1600px) {
+  .login-hero-pie { display: block; }
+}
+
+/* Movil/tablet vertical: la foto 9:16 se ancla arriba como
+   cabecera y el fondo difuminado usa la imagen vertical. */
+@media (max-width: 768px) {
+  .login-hero-foto { object-position: 50% 0; }
+
+  .login-hero::before {
+    background-image: url("/Imagenes/vertical.jpg");
+  }
+}
