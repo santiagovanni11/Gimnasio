@@ -40,3 +40,46 @@
   box-shadow:
     0 0 0 3px var(--accent-suave);
 }
+
+/* =========================================================
+   iOS SAFARI (iPhone): los input[type=date] nativos se ven
+   rotos — texto desalineado arriba, altura incorrecta y zoom
+   al enfocar. Se normaliza todo input de fecha salvo los de
+   filtros (.filter-date). El @supports limita el arreglo a
+   iOS: escritorio y Android no cambian en absoluto.
+   ========================================================= */
+
+@supports (-webkit-touch-callout: none) {
+  input[type="date"]:not(.filter-date) {
+    -webkit-appearance: none;
+    appearance: none;
+
+    min-height: 42px;
+    box-sizing: border-box;
+    padding: 0 12px;
+
+    border: 1px solid #303740;
+    border-radius: 10px;
+    background: #0d1014;
+    color: #f4f4f5;
+    color-scheme: dark;
+
+    font-size: 16px;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  /* iOS pinta el valor en un pseudo-elemento interno que
+     queda pegado arriba: con la altura del input centrado. */
+  input[type="date"]:not(.filter-date)::-webkit-date-and-time-value {
+    text-align: left;
+    min-height: 40px;
+  }
+
+  input[type="date"]:not(.filter-date):focus {
+    border-color: var(--accent);
+    outline: none;
+
+    box-shadow: 0 0 0 3px var(--accent-suave);
+  }
+}
