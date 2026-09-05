@@ -4,6 +4,7 @@ import SelectorSocioConAviso from "./SelectorSocioConAviso";
 import SelectorMetodoPago from "./SelectorMetodoPago";
 import { SelectorPlan, SelectorDuracion, CampoSoloLectura } from "./CamposMembresia";
 import { useCalculoFormularioMembresia } from "../../hooks/useCalculoFormularioMembresia";
+import { useDesplazamientoInicial } from "../../hooks/useDesplazamientoInicial";
 import { aISO, fechaDesdeValor, fechaTexto } from "../../utils/fechas";
 
 function FormularioMembresia({
@@ -42,8 +43,10 @@ function FormularioMembresia({
     setFechaInicioMembresia(aISO(fechaDesdeValor(membresiaEditando.fechaFin)));
   };
 
+  const refFormulario = useDesplazamientoInicial();
+
   return (
-    <div className="form-card">
+    <div className="form-card" ref={refFormulario}>
       <div className="form-card-header">
         <div><h3>{titulo}</h3><p>{descripcion}</p></div>
         <button type="button" className="close-button" onClick={cerrarFormularioMembresia}>×</button>

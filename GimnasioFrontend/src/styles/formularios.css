@@ -5,6 +5,9 @@
 .form-card {
   margin-bottom: 24px;
   padding: 24px;
+  /* Ancla del auto-desplazamiento al abrir el formulario:
+     compensa la altura de la barra superior fija. */
+  scroll-margin-top: 84px;
   border: 1px solid var(--line);
   border-radius: var(--radio-lg);
   background: var(--surface);

@@ -5,6 +5,7 @@
 // =========================================================
 
 import SocioCampos from "./SocioCampos";
+import { useDesplazamientoInicial } from "../../hooks/useDesplazamientoInicial";
 
 function FormularioSocio({
   socioEditando,
@@ -19,8 +20,10 @@ function FormularioSocio({
   errorSocio,
   guardandoSocio,
 }) {
+  const refFormulario = useDesplazamientoInicial();
+
   return (
-    <div className="form-card">
+    <div className="form-card" ref={refFormulario}>
       <div className="form-card-header">
         <div>
           <h3>{socioEditando ? "Editar socio" : "Nuevo socio"}</h3>
